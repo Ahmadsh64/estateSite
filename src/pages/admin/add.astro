@@ -12,113 +12,104 @@ const filePath = path.resolve("./src/data/properties.json");
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body dir="rtl">
-  <header>
+  <header class="admin-add-header">
     <h1>➕ הוספת דירה חדשה</h1>
-    <a href="/admin/dashboard">⬅️ חזרה לדשבורד</a>
+    <a href="/admin/dashboard" class="admin-add-back">⬅️ חזרה לדשבורד</a>
   </header>
 
-  <main>
-    <form id="addForm">
-      <label>כותרת:</label>
-      <input type="text" name="title" required />
-      <br/>
+  <main class="admin-add-main">
+    <form id="admin-add-form" class="admin-add-form">
+      <label class="admin-add-label">כותרת:</label>
+      <input type="text" name="title" class="admin-add-input" required />
 
-      <label>מחיר:</label>
-      <input type="text" name="price" required />
-      <br/>
+      <label class="admin-add-label">מחיר:</label>
+      <input type="text" name="price" class="admin-add-input" required />
 
-      <label>מיקום:</label>
-      <input type="text" name="location" required />
-      <br/>
+      <label class="admin-add-label">מיקום:</label>
+      <input type="text" name="location" class="admin-add-input" required />
 
-      <label>תיאור:</label>
-      <textarea name="description" required></textarea>
-      <label>תמונות:</label>
-      <div class="image-upload-wrapper">
-        <input type="file" id="imageInput" name="images" accept="image/*" multiple />
-        <button type="button" id="addMoreBtn">+</button>
+      <label class="admin-add-label">תיאור:</label>
+      <textarea name="description" class="admin-add-textarea" required></textarea>
+
+      <label class="admin-add-label">תמונות:</label>
+      <div class="admin-add-image-upload-wrapper">
+        <input type="file" id="admin-add-image-input" name="images" accept="image/*" multiple />
+        <button type="button" id="admin-add-addMoreBtn" class="admin-add-add-btn">+</button>
       </div>
-      <div id="preview" class="image-preview"></div>
-      <br/>
-      
-      <button type="submit">שמור</button>
+      <div id="admin-add-preview" class="admin-add-image-preview"></div>
+
+      <button type="submit" class="admin-add-submit-btn">שמור</button>
     </form>
 
-    <p id="message" style="color:green;"></p>
+    <p id="admin-add-message" class="admin-add-message"></p>
 
-<script type="module">
-  const form = document.getElementById("addForm");
-  const msg = document.getElementById("message");
-  const imageInput = document.getElementById("imageInput");
-  const addMoreBtn = document.getElementById("addMoreBtn");
-  const preview = document.getElementById("preview");
+    <script type="module">
+      const form = document.getElementById("admin-add-form");
+      const msg = document.getElementById("admin-add-message");
+      const imageInput = document.getElementById("admin-add-image-input");
+      const addMoreBtn = document.getElementById("admin-add-addMoreBtn");
+      const preview = document.getElementById("admin-add-preview");
 
-  let allFiles = [];
+      let allFiles = [];
 
-  // עדכון תצוגה מקדימה
-  function updatePreview() {
-    preview.innerHTML = "";
-    allFiles.forEach((file, idx) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        img.classList.add("preview-img");
-        // אפשרות למחוק תמונה
-        img.title = "לחץ למחיקה";
-        img.addEventListener("click", () => {
-          allFiles.splice(idx, 1);
-          updatePreview();
+      function updatePreview() {
+        preview.innerHTML = "";
+        allFiles.forEach((file, idx) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.classList.add("admin-add-preview-img");
+            img.title = "לחץ למחיקה";
+            img.addEventListener("click", () => {
+              allFiles.splice(idx, 1);
+              updatePreview();
+            });
+            preview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
         });
-        preview.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
+      }
 
-  // בחירת קבצים חדשים
-  imageInput.addEventListener("change", (e) => {
-    allFiles = allFiles.concat(Array.from(e.target.files));
-    updatePreview();
-    imageInput.value = ""; // איפוס השדה כדי לאפשר בחירה נוספת
-  });
-
-  // כפתור +
-  addMoreBtn.addEventListener("click", () => {
-    imageInput.click();
-  });
-
-  // שליחת הטופס
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    allFiles.forEach((file) => formData.append("images", file));
-
-    try {
-      const res = await fetch("/api/add-property", {
-        method: "POST",
-        body: formData
+      imageInput.addEventListener("change", (e) => {
+        allFiles = allFiles.concat(Array.from(e.target.files));
+        updatePreview();
+        imageInput.value = "";
       });
 
-      const result = await res.json();
-      if (result.success) {
-        msg.textContent = "✅ הדירה נוספה בהצלחה!";
-        msg.style.color = "green";
-        form.reset();
-        allFiles = [];
-        updatePreview();
-      } else {
-        msg.textContent = "❌ שגיאה בהוספה";
-        msg.style.color = "red";
-      }
-    } catch (err) {
-      console.error(err);
-      msg.textContent = "❌ שגיאה בחיבור לשרת";
-      msg.style.color = "red";
-    }
-  });
-</script>
+      addMoreBtn.addEventListener("click", () => {
+        imageInput.click();
+      });
 
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        allFiles.forEach((file) => formData.append("images", file));
+
+        try {
+          const res = await fetch("/api/add-property", {
+            method: "POST",
+            body: formData
+          });
+
+          const result = await res.json();
+          if (result.success) {
+            msg.textContent = "✅ הדירה נוספה בהצלחה!";
+            msg.style.color = "green";
+            form.reset();
+            allFiles = [];
+            updatePreview();
+          } else {
+            msg.textContent = "❌ שגיאה בהוספה";
+            msg.style.color = "red";
+          }
+        } catch (err) {
+          console.error(err);
+          msg.textContent = "❌ שגיאה בחיבור לשרת";
+          msg.style.color = "red";
+        }
+      });
+    </script>
   </main>
 </body>
 </html>

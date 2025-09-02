@@ -32,70 +32,51 @@ if (!property) {
   <meta charset="UTF-8" />
   <title>עריכת דירה - {property.title}</title>
   <link rel="stylesheet" href="/styles.css" />
-  <style>
-    .image-wrapper { position: relative; display: inline-block; margin: 5px; }
-    .image-wrapper img { width: 150px; height: auto; display: block; }
-    .remove-btn {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      width: 22px;
-      height: 22px;
-      text-align: center;
-      line-height: 18px;
-      font-weight: bold;
-    }
-  </style>
 </head>
 <body dir="rtl">
-  <header>
+  <header class="edit-property-header">
     <h1>עריכת דירה - {property.title}</h1>
-    <a href="/admin/dashboard">⬅️ חזרה לדשבורד</a>
+    <a href="/admin/dashboard" class="edit-property-back">⬅️ חזרה לדשבורד</a>
   </header>
 
-  <main>
-    <form id="editForm" data-id={property.id}>
+  <main class="edit-property-main">
+    <form id="editForm" class="edit-property-form" data-id={property.id}>
       <label>כותרת:</label>
-      <input type="text" name="title" value={property.title} required />
+      <input type="text" name="title" class="edit-property-input" value={property.title} required />
       <br />
 
       <label>מחיר:</label>
-      <input type="text" name="price" value={property.price} required />
+      <input type="text" name="price" class="edit-property-input" value={property.price} required />
       <br />
 
       <label>מיקום:</label>
-      <input type="text" name="location" value={property.location} required />
+      <input type="text" name="location" class="edit-property-input" value={property.location} required />
       <br />
 
       <label>תיאור:</label>
-      <textarea name="description" required>{property.description}</textarea>
+      <textarea name="description" class="edit-property-textarea" required>{property.description}</textarea>
       <br />
 
       <label>תמונות קיימות:</label>
-      <div id="existingImages" style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div id="existingImages" class="edit-property-existing-images">
         {property.images.map((img, i) => (
-          <div class="image-wrapper" data-index={i}>
+          <div class="edit-property-image-wrapper" data-index={i}>
             <img src={img} alt="תמונה קיימת" />
-            <button type="button" class="remove-btn">×</button>
+            <button type="button" class="edit-property-remove-btn">×</button>
           </div>
         ))}
       </div>
       <br />
 
       <label>הוסף תמונות חדשות:</label>
-      <input type="file" id="imageInput" accept="image/*" multiple />
-      <div id="previewContainer" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+      <input type="file" id="imageInput" class="edit-property-image-input" accept="image/*" multiple />
+      <div id="previewContainer" class="edit-property-preview"></div>
       <br />
 
-      <button type="submit">שמור שינויים</button>
+      <button type="submit" class="edit-property-submit-btn">שמור שינויים</button>
     </form>
 
-    <p id="message"></p>
+    <p id="message" class="edit-property-msg"></p>
 
     <script type="module">
       const form = document.getElementById("editForm");
@@ -106,17 +87,15 @@ if (!property) {
 
       let existingImages = Array.from(existingImagesDiv.querySelectorAll('img')).map(img => img.src);
 
-      // הסרת תמונה קיימת
       existingImagesDiv.addEventListener("click", (e) => {
-        if (e.target.classList.contains("remove-btn")) {
+        if (e.target.classList.contains("edit-property-remove-btn")) {
           const wrapper = e.target.parentElement;
           const index = Number(wrapper.dataset.index);
-          existingImages.splice(index, 1); // הסרת מהמערך
+          existingImages.splice(index, 1);
           wrapper.remove();
         }
       });
 
-      // הצגת תצוגה מקדימה לתמונות חדשות
       imageInput.addEventListener("change", () => {
         previewContainer.innerHTML = "";
         Array.from(imageInput.files).forEach(file => {
@@ -133,14 +112,9 @@ if (!property) {
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         const formData = new FormData(form);
         formData.append("id", form.dataset.id);
-
-        // שליחת התמונות הקיימות לאחר הסרה
         existingImages.forEach(src => formData.append("existingImages", src));
-
-        // שליחת תמונות חדשות
         Array.from(imageInput.files).forEach(file => formData.append("images", file));
 
         try {
@@ -154,17 +128,16 @@ if (!property) {
             msg.textContent = "✅ הדירה עודכנה בהצלחה!";
             msg.style.color = "green";
 
-            // עדכון תצוגה מקדימה של כל התמונות
             existingImagesDiv.innerHTML = "";
             previewContainer.innerHTML = "";
             result.images.forEach(src => {
               const wrapper = document.createElement("div");
-              wrapper.className = "image-wrapper";
+              wrapper.className = "edit-property-image-wrapper";
               const img = document.createElement("img");
               img.src = src;
               const btn = document.createElement("button");
               btn.type = "button";
-              btn.className = "remove-btn";
+              btn.className = "edit-property-remove-btn";
               btn.textContent = "×";
               wrapper.appendChild(img);
               wrapper.appendChild(btn);
@@ -172,7 +145,6 @@ if (!property) {
             });
 
             existingImages = [...result.images];
-
           } else {
             msg.textContent = "❌ שגיאה בעדכון הדירה";
             msg.style.color = "red";

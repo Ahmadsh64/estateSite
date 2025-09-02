@@ -2,11 +2,11 @@
   {
     "id": 1,
     "title": "דירה בצפון ",
-    "price": "3500",
+    "price": 3900,
     "location": "משגב",
     "description": "נוף יפה ",
     "images": [
-      "/uploads/apt1.jpg"
+      "http://localhost:4321/uploads/apt1.jpg"
     ],
     "imageFile": {}
   },

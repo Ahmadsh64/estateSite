@@ -17,6 +17,10 @@ a:hover {
   text-decoration: underline;
 }
 
+button {
+  cursor: pointer;
+}
+
 /* =================== Header =================== */
 header {
   background-color: #000000;
@@ -38,7 +42,7 @@ header .logo {
 
 header .logo img {
   height: 80px;
-  width: 100%;
+  width: auto;
 }
 
 header .logo span {
@@ -78,11 +82,6 @@ header .admin-btn:hover {
   background-color: #7e620f;
 }
 
-header .contact-header {
-  font-weight: bold;
-  color: #D9AF41;
-}
-
 /* =================== Hero Section =================== */
 .hero {
   position: relative;
@@ -109,12 +108,14 @@ header .contact-header {
 .hero h1 {
   font-size: 2.5rem;
   margin-bottom: 15px;
+  color : #D9AF41;
 }
 
 .hero p {
   font-size: 1.2rem;
   margin-bottom: 20px;
 }
+
 .price::after {
   content: " ₪";
   font-weight: bold;
@@ -122,9 +123,9 @@ header .contact-header {
 }
 
 @keyframes bgSlide {
-  0%   { background-image: url('/images/bg.jpg'); }
-  33%  { background-image: url('/images/bg1.jpg'); }
-  66%  { background-image: url('/images/bg2.jpg'); }
+  0% { background-image: url('/images/bg.jpg'); }
+  33% { background-image: url('/images/bg1.jpg'); }
+  66% { background-image: url('/images/bg2.jpg'); }
   100% { background-image: url('/images/bg3.jpg'); }
 }
 
@@ -134,6 +135,7 @@ header .contact-header {
   gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .filters select,
@@ -153,7 +155,6 @@ header .contact-header {
 .filters button {
   background: #D9AF41;
   color: white;
-  cursor: pointer;
   transition: background 0.3s;
 }
 
@@ -162,22 +163,18 @@ header .contact-header {
 }
 
 /* =================== רשימת נכסים =================== */
-main {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-
-ul {
+/* =================== Property List - Home Page =================== */
+.home-property-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 25px;
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 40px auto;
+  max-width: 1200px;
 }
 
-li {
+.home-property-item {
   background-color: white;
   border-radius: 12px;
   overflow: hidden;
@@ -185,170 +182,609 @@ li {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-li:hover {
+.home-property-item:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
-li a {
+.home-property-item a {
   display: block;
-  height: 100%;
   color: inherit;
+  text-decoration: none;
+  padding: 10px;
 }
 
-li img {
+.home-property-images img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd;
+  border-radius: 12px 12px 0 0;
+}
+
+.home-property-title {
+  font-size: 1.2rem;
+  margin: 10px 0 5px;
+  font-weight: bold;
+  color: #222;
+}
+
+.home-property-price {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #e91e63;
+  margin: 5px 0;
+}
+
+.home-property-location,
+.home-property-details,
+.home-property-check-times {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.home-property-item button,
+.home-property-item a.edit-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.home-property-item a.edit-btn {
+  background-color: #0077cc;
+  color: white;
+  margin-right: 5px;
+}
+
+.home-property-item a.edit-btn:hover {
+  background-color: #005fa3;
+}
+
+.home-property-item button.delete-btn {
+  background-color: #e91e63;
+  color: white;
+}
+
+.home-property-item button.delete-btn:hover {
+  background-color: #c2185b;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .home-property-list {
+    grid-template-columns: 1fr;
+  }
+
+  .home-property-images img {
+    height: 150px;
+  }
+}
+
+/* =================== Admin Dashboard =================== */
+.admin-header {
+  background-color: #000;
+  color: #fff;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 15px;
+}
+
+.admin-nav a {
+  background-color: #D9AF41;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.admin-nav a:hover {
+  background-color: #7e620f;
+}
+
+.admin-main {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.admin-property-card {
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.admin-property-img {
   width: 100%;
   height: 180px;
   object-fit: cover;
 }
 
-li h2 {
+.admin-property-info {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-property-title {
   font-size: 1.2rem;
-  margin: 15px 20px 5px;
+  margin: 0 0 5px;
 }
 
-li p {
-  margin: 5px 20px 15px;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-/* =================== Property Page =================== */
-.property-container {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 1200px;
-  margin: 30px auto;
-  gap: 30px;
-}
-
-.property-gallery {
-  flex: 1 1 45%;
-  min-width: 300px;
-}
-
-.property-gallery .main-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin-bottom: 10px;
-}
-
-.property-gallery .thumbs {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.property-gallery .thumb {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 4px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: border 0.2s;
-}
-
-.property-gallery .thumb:hover {
-  border: 2px solid #0077cc;
-}
-
-.property-details {
-  flex: 1 1 45%;
-  min-width: 300px;
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.property-details h1 {
-  margin-top: 0;
-  color: #222;
-}
-
-.property-details .price {
-  font-size: 1.3em;
-  color: #e91e63;
+.admin-property-price {
   font-weight: bold;
-  margin: 10px 0;
+  color: #e91e63;
 }
 
-.property-details .desc {
-  margin: 15px 0;
-  line-height: 1.6;
-}
-
-.property-details .info-list {
-  list-style: none;
-  padding: 0;
-  margin: 15px 0;
-}
-
-.property-details .info-list li {
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-/* =================== טופס יצירת קשר =================== */
-.contact-box,
-.contact {
-  margin-top: 25px;
-  padding: 20px;
-  background-color: #f1f8ff;
-  border-radius: 8px;
-}
-
-.contact-box h3,
-.contact h2 {
-  margin-top: 0;
-}
-
-.contact-form {
+.admin-property-actions {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.contact-form input,
-.contact-form textarea {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1em;
-}
-
-.contact-form textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.contact-form button {
-  padding: 12px;
+.admin-edit-btn {
   background-color: #0077cc;
   color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-align: center;
+  transition: background 0.3s;
 }
 
-.contact-form button:hover {
+.admin-edit-btn:hover {
   background-color: #005fa3;
 }
 
-/* =================== Footer =================== */
-footer {
-  background-color: #222;
-  color: #fff;
-  padding: 25px 30px;
-  text-align: center;
-  margin-top: 40px;
+.admin-delete-btn {
+  background-color: #e91e63;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.3s;
 }
+
+.admin-delete-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =================== Property Page =================== */
+/* =================== Property Detail Page =================== */
+.detail-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.detail-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-main-image {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.detail-thumbs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.detail-thumb {
+  width: 70px;
+  height: 70px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.2s;
+}
+
+.detail-thumb:hover {
+  border: 2px solid #0077cc;
+}
+
+.detail-info {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+.detail-title {
+  margin-top: 0;
+  font-size: 2rem;
+  color: #222;
+}
+
+.detail-price {
+  font-size: 1.5rem;
+  color: #e91e63;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+.detail-description {
+  margin: 15px 0;
+  line-height: 1.6;
+  color: #555;
+}
+
+.detail-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.detail-info-list li {
+  background-color: #f5f6fa;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-contact-box {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f1f8ff;
+  border-radius: 12px;
+}
+
+.detail-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-contact-form input,
+.detail-contact-form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.detail-contact-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.detail-contact-form button {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: #0077cc;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.detail-contact-form button:hover {
+  background-color: #005fa3;
+}
+
+.detail-not-found {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #e91e63;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .detail-container {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-info-list {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-thumb {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* =================== Forms =================== */
+/* =================== Admin Add Property =================== */
+.admin-add-header {
+  background-color: #000;
+  color: #fff;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-add-back {
+  color: #D9AF41;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.admin-add-back:hover {
+  text-decoration: underline;
+}
+
+.admin-add-main {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.admin-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.admin-add-label {
+  font-weight: bold;
+}
+
+.admin-add-input,
+.admin-add-textarea {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.admin-add-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.admin-add-image-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-add-add-btn {
+  padding: 6px 12px;
+  background-color: #D9AF41;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-add-add-btn:hover {
+  background-color: #7e620f;
+}
+
+.admin-add-image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.admin-add-preview-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 2px solid #ccc;
+  transition: transform 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+
+.admin-add-preview-img:hover {
+  transform: scale(1.1);
+  border-color: #0077cc;
+}
+
+.admin-add-submit-btn {
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  background-color: #D9AF41;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-add-submit-btn:hover {
+  background-color: #7e620f;
+}
+
+.admin-add-message {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+/* =================== Admin Login =================== */
+.admin-login-main {
+  max-width: 400px;
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.admin-login-title {
+  margin-bottom: 2rem;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-login-field label {
+  font-weight: bold;
+}
+
+.admin-login-input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.admin-login-btn {
+  padding: 0.5rem 1rem;
+  background-color: #D9AF41;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-login-btn:hover {
+  background-color: #7e620f;
+}
+
+/* =================== Edit Property =================== */
+.edit-property-header h1 {
+  margin-bottom: 1rem;
+}
+.edit-property-back {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.edit-property-main {
+  max-width: 800px;
+  margin: auto;
+  padding: 1rem;
+}
+
+.edit-property-input,
+.edit-property-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.edit-property-existing-images,
+.edit-property-preview {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.edit-property-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.edit-property-image-wrapper img {
+  width: 150px;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+
+.edit-property-remove-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 18px;
+}
+
+.edit-property-submit-btn {
+  padding: 0.5rem 1rem;
+  background-color: #D9AF41;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.edit-property-submit-btn:hover {
+  background-color: #7e620f;
+}
+
+.edit-property-msg {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+/* =================== Image Upload & Preview =================== */
 .image-upload-wrapper {
   display: flex;
   align-items: center;
@@ -377,6 +813,15 @@ footer {
   border-color: #0077cc;
 }
 
+/* =================== Footer =================== */
+footer {
+  background-color: #222;
+  color: #fff;
+  padding: 25px 30px;
+  text-align: center;
+  margin-top: 40px;
+}
+
 /* =================== Responsive =================== */
 @media (max-width: 900px) {
   .property-container,
@@ -385,7 +830,8 @@ footer {
     gap: 20px;
   }
 
-  .property-gallery, .property-details {
+  .property-gallery,
+  .property-details {
     flex: 1 1 100%;
   }
 

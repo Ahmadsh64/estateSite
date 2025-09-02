@@ -12,79 +12,64 @@ if (fs.existsSync(filePath)) {
 ---
 
 <html lang="he">
-  <head>
-    <meta charset="UTF-8" />
-    <title>ניהול דירות</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body dir="rtl">
-    <header>
-      <h1>ניהול דירות</h1>
-      <nav>
-        <a href="/admin/add">➕ הוספת דירה חדשה</a>
-        <a href="/">🏠 חזרה לדף הראשי</a>
-      </nav>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <title>ניהול דירות - מנהל</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body dir="rtl">
+  <header class="admin-header">
+    <h1 class="admin-title">ניהול דירות</h1>
+    <nav class="admin-nav">
+      <a href="/admin/add" class="admin-add-btn">➕ הוספת דירה חדשה</a>
+      <a href="/" class="admin-home-btn">🏠 חזרה לדף הראשי</a>
+    </nav>
+  </header>
 
-    <main>
-      <table border="1" cellpadding="10" cellspacing="0">
-        <thead>
-          <tr>
-            <th>תמונה</th>
-            <th>כותרת</th>
-            <th>מחיר</th>
-            <th>מיקום</th>
-            <th>פעולות</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-        {properties.map((p: { id: number; title: string; price: string; location: string; images: string }) => (
-              <tr>
-                <td>
-                  <img src={p.images[0]} alt={p.title} width="100" />
-                </td>
-                <td>{p.title}</td>
-                <td>{p.price}</td>
-                <td>{p.location}</td>
-                <td>
-                  <a href={`/admin/edit/${p.id}`}>✏️ עריכה</a>
-                  <button type="button" onclick={`deleteProperty(${p.id})`}>
-                    🗑️ מחיקה
-                  </button>
-                </td>
-              </tr>
-            ))
+  <main class="admin-main">
+    {properties.map((p: { id: number; title: string; price: number; location: string; images: string[] }) => (
+      <div class="admin-property-card">
+        <img src={p.images[0]} alt={p.title} class="admin-property-img"/>
+        <div class="admin-property-info">
+          <div>
+            <h2 class="admin-property-title">{p.title}</h2>
+            <p class="admin-property-price">{p.price.toLocaleString("he-IL")} ₪</p>
+            <p class="admin-property-location">{p.location}</p>
+          </div>
+          <div class="admin-property-actions">
+            <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">✏️ עריכה</a>
+            <button type="button" class="admin-delete-btn" onclick={`deleteProperty(${p.id})`}>🗑️ מחיקה</button>
+          </div>
+        </div>
+      </div>
+    ))}
+  </main>
+
+  <script type="module">
+    document.addEventListener("DOMContentLoaded", () => {
+      window.deleteProperty = async function (id) {
+        if (!confirm("האם אתה בטוח שברצונך למחוק דירה זו?")) return;
+
+        try {
+          const res = await fetch(`/api/delete-property`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+
+          const result = await res.json();
+          if (result.success) {
+            alert("הדירה נמחקה בהצלחה");
+            location.reload();
+          } else {
+            alert("שגיאה במחיקה");
           }
-        </tbody>
-      </table>
-
-      <script type="module">
-        document.addEventListener("DOMContentLoaded", () => {
-          window.deleteProperty = async function (id) {
-            if (!confirm("האם אתה בטוח שברצונך למחוק דירה זו?")) return;
-
-            try {
-              const res = await fetch(`/api/delete-property`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id }),
-              });
-
-              const result = await res.json();
-              if (result.success) {
-                alert("הדירה נמחקה בהצלחה");
-                location.reload();
-              } else {
-                alert("שגיאה במחיקה");
-              }
-            } catch (err) {
-              console.error(err);
-              alert("שגיאה בחיבור לשרת");
-            }
-          };
-        });
-      </script>
-    </main>
-  </body>
+        } catch (err) {
+          console.error(err);
+          alert("שגיאה בחיבור לשרת");
+        }
+      };
+    });
+  </script>
+</body>
 </html>

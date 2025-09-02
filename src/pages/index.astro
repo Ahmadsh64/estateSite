@@ -2,16 +2,33 @@
 import fs from "fs";
 import path from "path";
 
-// הגדרת טיפוס לכל פרופרטי
+// טיפוס Property מעודכן
 interface Property {
   id: number;
   title: string;
   price: number;
-  location: string;
+  location: {
+    city: string;
+    street: string;
+    number: string;
+    floor?: string;
+  };
   description: string;
-  images: string[]; // ⬅️ מערך תמונות במקום image יחיד
+  images: string[];
+  occupancy: number;
+  bedrooms: number;
+  beds: number;
+  bathrooms: number;
+  kitchen: boolean;
+  washingMachine: boolean;
+  wifi: boolean;
+  tv: boolean;
+  publicTransportNearby: boolean;
+  parking: boolean;
+  checkInTime: string;
+  checkOutTime: string;
+  minStayDays: number;
 }
-
 
 const filePath = path.resolve("./src/data/properties.json");
 let properties: Property[] = [];
@@ -21,6 +38,7 @@ if (fs.existsSync(filePath)) {
   properties = JSON.parse(fileData) as Property[];
 }
 ---
+
 <html lang="he">
 <head>
   <meta charset="UTF-8" />
@@ -76,14 +94,28 @@ if (fs.existsSync(filePath)) {
 </section>
 
 <main>
-  <ul>
+  <ul class="home-property-list">
     {properties.map((p: Property) => (
-      <li>
+      <li class="home-property-item">
         <a href={`/${p.id}`}>
-          <img src={p.images[0]} alt={p.title} />
-          <h2>{p.title}</h2>
-          <p class="price">מחיר: {p.price.toLocaleString("he-IL")}</p>
-          <p>מיקום: {p.location}</p>
+          <div class="home-property-images">
+            <img src={p.images[0]} alt={p.title} />
+          </div>
+          <h2 class="home-property-title">{p.title}</h2>
+          <p class="home-property-price">מחיר: {p.price.toLocaleString("he-IL")}</p>
+          <p class="home-property-location">
+            {p.location.city}, {p.location.street} {p.location.number}
+            {p.location.floor ? `, קומה ${p.location.floor}` : ""}
+          </p>
+          <p class="home-property-details">
+            חדרים: {p.bedrooms} | מיטות: {p.beds} | שירותים: {p.bathrooms} | 
+            מטבח: {p.kitchen ? "✔️" : "❌"} | כביסה: {p.washingMachine ? "✔️" : "❌"} | 
+            וויפי: {p.wifi ? "✔️" : "❌"} | טלוויזיה: {p.tv ? "✔️" : "❌"} | 
+            חניה: {p.parking ? "✔️" : "❌"} | תחבורה ציבורית: {p.publicTransportNearby ? "✔️" : "❌"}
+          </p>
+          <p class="home-property-check-times">
+            כניסה: {p.checkInTime} | יציאה: {p.checkOutTime} | מינימום ימים: {p.minStayDays}
+          </p>
         </a>
       </li>
     ))}

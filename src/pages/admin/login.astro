@@ -5,18 +5,18 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body dir="rtl">
-  <main style="max-width:400px; margin:auto; padding:2rem; text-align:center;">
-    <h1>🔑 כניסת אדמין</h1>
-    <form id="loginForm">
-      <div style="margin:1rem 0;">
+  <main class="admin-login-main">
+    <h1 class="admin-login-title">🔑 כניסת אדמין</h1>
+    <form id="admin-login-form" class="admin-login-form">
+      <div class="admin-login-field">
         <label>אימייל:</label><br/>
-        <input type="email" name="email" required style="width:100%; padding:0.5rem;" />
+        <input type="email" name="email" class="admin-login-input" required />
       </div>
-      <div style="margin:1rem 0;">
+      <div class="admin-login-field">
         <label>סיסמה:</label><br/>
-        <input type="password" name="password" required style="width:100%; padding:0.5rem;" />
+        <input type="password" name="password" class="admin-login-input" required />
       </div>
-      <button type="submit" style="padding:0.5rem 1rem;">כניסה</button>
+      <button type="submit" class="admin-login-btn">כניסה</button>
     </form>
   </main>
 
@@ -28,7 +28,7 @@
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
     );
 
-    const form = document.getElementById('loginForm');
+    const form = document.getElementById('admin-login-form');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = form.email.value;
@@ -39,10 +39,7 @@
       if (error) {
         alert("שגיאה: " + error.message);
       } else {
-        // שומרים session בלוקאל סטורג' (אופציונלי לשימוש בהמשך)
         localStorage.setItem("sb-token", JSON.stringify(data.session));
-
-        // מפנים לדשבורד (שזה בעצם /admin/index.astro)
         setTimeout(() => {
           window.location.href = "/admin/dashboard";
         }, 500);

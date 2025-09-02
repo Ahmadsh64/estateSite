@@ -5,13 +5,28 @@ import path from "path";
 interface Property {
   id: number;
   title: string;
-  price: string;
-  location: string;
+  price: number;
+  location: {
+    city: string;
+    street: string;
+    number: string;
+    floor?: string;
+  };
   description: string;
-  images: string | string[]; 
+  images: string[];
   rooms: number;
+  beds: number;
   bathrooms: number;
   type: string;
+  hasKitchen: boolean;
+  hasWashingMachine: boolean;
+  hasWifi: boolean;
+  hasTv: boolean;
+  publicTransport: boolean;
+  parking: boolean;
+  checkIn: string;
+  checkOut: string;
+  minStay: number;
 }
 
 const { params } = Astro;
@@ -26,8 +41,6 @@ if (fs.existsSync(filePath)) {
 }
 
 const property = properties.find((p: Property) => p.id === id);
-
-// הפוך את התמונה הראשית למערך במידת הצורך
 const images = property ? (Array.isArray(property.images) ? property.images : [property.images]) : [];
 ---
 
@@ -38,45 +51,58 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body dir="rtl">
-  <header class="property-header">
-    <a href="/" class="back-btn">⬅ חזרה לרשימת דירות</a>
+  <header class="detail-header">
+    <a href="/" class="detail-back-btn">⬅ חזרה לרשימת דירות</a>
   </header>
 
-  <main class="property-container">
+  <main class="detail-container">
     {property ? (
       <>
         <!-- צד שמאל - גלריה -->
-        <div class="property-gallery">
-          <img id="mainImage" src={images[0]} alt={property.title} class="main-image" />
-          <div class="thumbs">
+        <div class="detail-gallery">
+          <img id="detailMainImage" src={images[0]} alt={property.title} class="detail-main-image" />
+          <div class="detail-thumbs">
             {images.map((img, i) => (
               <img 
                 src={img} 
                 alt={`תמונה ${i+1} של ${property.title}`} 
-                class="thumb" 
-                onclick={`document.getElementById('mainImage').src='${img}'`}
+                class="detail-thumb" 
+                onclick={`document.getElementById('detailMainImage').src='${img}'`}
               />
             ))}
           </div>
         </div>
 
         <!-- צד ימין - פרטים -->
-        <div class="property-details">
-          <h1>{property.title}</h1>
-          <p class="price">מחיר: {property.price} </p>
-          <p><strong>מיקום:</strong> {property.location}</p>
-          <p class="desc">{property.description}</p>
+        <div class="detail-info">
+          <h1 class="detail-title">{property.title}</h1>
+          <p class="detail-price">מחיר: {property.price.toLocaleString("he-IL")}</p>
 
-          <ul class="info-list">
+          <h3>מיקום:</h3>
+          <p class="detail-location">{property.location.city}, {property.location.street} {property.location.number}{property.location.floor ? `, קומה ${property.location.floor}` : ""}</p>
+
+          <p class="detail-description">{property.description}</p>
+
+          <ul class="detail-info-list">
             <li>🛏 מספר חדרים: {property.rooms}</li>
+            <li>🛌 מיטות: {property.beds}</li>
             <li>🚿 חדרי אמבטיה: {property.bathrooms}</li>
             <li>🏠 סוג נכס: {property.type}</li>
+            <li>🍳 מטבח: {property.hasKitchen ? "כן" : "לא"}</li>
+            <li>🧺 מכונת כביסה: {property.hasWashingMachine ? "כן" : "לא"}</li>
+            <li>📶 Wi-Fi: {property.hasWifi ? "כן" : "לא"}</li>
+            <li>📺 טלוויזיה: {property.hasTv ? "כן" : "לא"}</li>
+            <li>🚌 תחבורה ציבורית בסביבה: {property.publicTransport ? "כן" : "לא"}</li>
+            <li>🚗 חניה: {property.parking ? "כן" : "לא"}</li>
+            <li>⏰ שעת כניסה: {property.checkIn}</li>
+            <li>⏰ שעת יציאה: {property.checkOut}</li>
+            <li>🗓 מינימום הזמנה בימים: {property.minStay}</li>
           </ul>
 
-          <div class="contact-box">
+          <div class="detail-contact-box">
             <h3>מעוניין בנכס זה?</h3>
             <p>השאירו פרטים ונחזור אליכם בהקדם!</p>
-            <form class="contact-form">
+            <form class="detail-contact-form">
               <input type="text" name="name" placeholder="שם מלא" required />
               <input type="email" name="email" placeholder="אימייל" required />
               <input type="tel" name="phone" placeholder="טלפון" required />
@@ -87,7 +113,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
         </div>
       </>
     ) : (
-      <p class="not-found">דירה זו לא קיימת.</p>
+      <p class="detail-not-found">דירה זו לא קיימת.</p>
     )}
   </main>
 </body>
