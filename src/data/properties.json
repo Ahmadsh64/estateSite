@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "title": "דירה בצפון ",
+    "price": "3500 ₪",
+    "location": "משגב",
+    "description": "נוף יפה ",
+    "image": "/images/apt1.jpg",
+    "imageFile": {}
+  },
+  {
+    "id": 3,
+    "title": "דירה במרכז ",
+    "price": "3000 ₪",
+    "location": "צפת, מרכז",
+    "description": "למכירה",
+    "image": "/uploads/property_1756725368233.png",
+    "imageFile": {}
+  },
+  {
+    "id": 4,
+    "title": "דירה בצפון ",
+    "price": "₪6000",
+    "location": "סחנין",
+    "description": "דירה חדשה בדרום ",
+    "image": "/uploads/property_1756724925915.png"
+  },
+  {
+  "id": 5,
+  "title": "דירה מרווחת בתל אביב",
+  "price": "2,500,000",
+  "location": "תל אביב, ישראל",
+  "description": "דירה מרווחת עם נוף לים...",
+  "image": ["/images/apt1.jpg","/images/apt2.png"],
+  "rooms": 4,
+  "bathrooms": 2,
+  "type": "דירה"
+}
+
+]

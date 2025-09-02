@@ -1,0 +1,126 @@
+---
+import fs from "fs";
+import path from "path";
+
+const { params } = Astro;
+
+const filePath = path.resolve("./src/data/properties.json");
+
+interface Property {
+  id: number;
+  title: string;
+  price: string;
+  location: string;
+  description: string;
+  image: string;
+}
+
+let properties: Property[] = [];
+if (fs.existsSync(filePath)) {
+  const fileData = fs.readFileSync(filePath, "utf-8");
+  properties = JSON.parse(fileData);
+}
+
+const property = properties.find((p: Property) => p.id === Number(params.id));
+
+if (!property) {
+  throw new Error(`Property with id ${params.id} not found`);
+}
+---
+
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <title>עריכת דירה - {property.title}</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body dir="rtl">
+  <header>
+    <h1>עריכת דירה - {property.title}</h1>
+    <a href="/admin/dashboard">חזרה לדשבורד</a>
+  </header>
+
+  <main>
+    <form id="editForm" data-id={property.id}>
+      <label>כותרת:</label>
+      <input type="text" name="title" value={property.title} required />
+      <br />
+
+      <label>מחיר:</label>
+      <input type="text" name="price" value={property.price} required />
+      <br />
+
+      <label>מיקום:</label>
+      <input type="text" name="location" value={property.location} required />
+      <br />
+
+      <label>תיאור:</label>
+      <textarea name="description" required>{property.description}</textarea>
+      <br />
+
+      <label>תמונה:</label>
+      <input type="file" id="imageInput" accept="image/*" />
+      <br />
+      <img id="preview" src={property.image} alt="תצוגה מקדימה" width="200" style="display:block; margin-top:10px;" />
+      <br />
+
+      <button type="submit">שמור שינויים</button>
+    </form>
+
+    <p id="message"></p>
+
+    <script type="module">
+      const form = document.getElementById("editForm");
+      const msg = document.getElementById("message");
+      const imageInput = document.getElementById("imageInput");
+      const preview = document.getElementById("preview");
+
+      // תצוגה מקדימה של תמונה
+      imageInput.addEventListener("change", () => {
+        const file = imageInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            preview.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        formData.append("id", form.dataset.id);
+
+        // אם נבחר קובץ חדש, ישלח כ-imageFile
+        if (imageInput.files[0]) {
+          formData.append("imageFile", imageInput.files[0]);
+        }
+
+        try {
+          const res = await fetch("/api/edit-property", {
+            method: "POST",
+            body: formData // שולחים FormData כולל קובץ
+          });
+
+          const result = await res.json();
+          if (result.success) {
+            msg.textContent = "✅ הדירה עודכנה בהצלחה!";
+            msg.style.color = "green";
+            // עדכון התצוגה
+            if (result.image) preview.src = result.image;
+          } else {
+            msg.textContent = "❌ שגיאה בעדכון הדירה";
+            msg.style.color = "red";
+          }
+        } catch (err) {
+          console.error(err);
+          msg.textContent = "❌ שגיאה בחיבור לשרת";
+          msg.style.color = "red";
+        }
+      });
+    </script>
+  </main>
+</body>
+</html>

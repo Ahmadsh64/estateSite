@@ -1,0 +1,94 @@
+---
+import fs from "fs";
+import path from "path";
+
+interface Property {
+  id: number;
+  title: string;
+  price: string;
+  location: string;
+  description: string;
+  image: string | string[]; 
+  rooms: number;
+  bathrooms: number;
+  type: string;
+}
+
+const { params } = Astro;
+const id = parseInt(params.id ?? "0");
+
+const filePath = path.resolve("./src/data/properties.json");
+let properties: Property[] = [];
+
+if (fs.existsSync(filePath)) {
+  const fileData = fs.readFileSync(filePath, "utf-8");
+  properties = JSON.parse(fileData) as Property[];
+}
+
+const property = properties.find((p: Property) => p.id === id);
+
+// הפוך את התמונה הראשית למערך במידת הצורך
+const images = property ? (Array.isArray(property.image) ? property.image : [property.image]) : [];
+---
+
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <title>{property ? property.title : "דירה לא נמצאה"}</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body dir="rtl">
+  <header class="property-header">
+    <a href="/" class="back-btn">⬅ חזרה לרשימת דירות</a>
+  </header>
+
+  <main class="property-container">
+    {property ? (
+      <>
+        <!-- צד שמאל - גלריה -->
+        <div class="property-gallery">
+          <img id="mainImage" src={images[0]} alt={property.title} class="main-image" />
+          <div class="thumbs">
+            {images.map((img, i) => (
+              <img 
+                src={img} 
+                alt={`תמונה ${i+1} של ${property.title}`} 
+                class="thumb" 
+                onclick={`document.getElementById('mainImage').src='${img}'`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <!-- צד ימין - פרטים -->
+        <div class="property-details">
+          <h1>{property.title}</h1>
+          <p class="price">מחיר: {property.price} </p>
+          <p><strong>מיקום:</strong> {property.location}</p>
+          <p class="desc">{property.description}</p>
+
+          <ul class="info-list">
+            <li>🛏 מספר חדרים: {property.rooms}</li>
+            <li>🚿 חדרי אמבטיה: {property.bathrooms}</li>
+            <li>🏠 סוג נכס: {property.type}</li>
+          </ul>
+
+          <div class="contact-box">
+            <h3>מעוניין בנכס זה?</h3>
+            <p>השאירו פרטים ונחזור אליכם בהקדם!</p>
+            <form class="contact-form">
+              <input type="text" name="name" placeholder="שם מלא" required />
+              <input type="email" name="email" placeholder="אימייל" required />
+              <input type="tel" name="phone" placeholder="טלפון" required />
+              <textarea name="message" placeholder="הודעה"></textarea>
+              <button type="submit">שליחה 📩</button>
+            </form>
+          </div>
+        </div>
+      </>
+    ) : (
+      <p class="not-found">דירה זו לא קיימת.</p>
+    )}
+  </main>
+</body>
+</html>

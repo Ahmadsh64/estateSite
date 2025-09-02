@@ -1,0 +1,79 @@
+---
+import fs from "fs";
+import path from "path";
+
+const filePath = path.resolve("./src/data/properties.json");
+---
+
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <title>הוספת דירה חדשה</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body dir="rtl">
+  <header>
+    <h1>➕ הוספת דירה חדשה</h1>
+    <a href="/admin/dashboard">⬅️ חזרה לדשבורד</a>
+  </header>
+
+  <main>
+    <form id="addForm">
+      <label>כותרת:</label>
+      <input type="text" name="title" required />
+      <br/>
+
+      <label>מחיר:</label>
+      <input type="text" name="price" required />
+      <br/>
+
+      <label>מיקום:</label>
+      <input type="text" name="location" required />
+      <br/>
+
+      <label>תיאור:</label>
+      <textarea name="description" required></textarea>
+      <br/>
+
+      <label>תמונה:</label>
+      <input type="file" name="imageFile" accept="image/*" required />
+      <br/>
+
+      <button type="submit">שמור</button>
+    </form>
+
+    <p id="message" style="color:green;"></p>
+
+    <script type="module">
+      const form = document.getElementById("addForm");
+      const msg = document.getElementById("message");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        try {
+          const res = await fetch("/api/add-property", {
+            method: "POST",
+            body: formData // שולחים FormData כולל קובץ
+          });
+
+          const result = await res.json();
+          if (result.success) {
+            msg.textContent = "✅ הדירה נוספה בהצלחה!";
+            msg.style.color = "green";
+            form.reset();
+          } else {
+            msg.textContent = "❌ שגיאה בהוספה";
+            msg.style.color = "red";
+          }
+        } catch (err) {
+          console.error(err);
+          msg.textContent = "❌ שגיאה בחיבור לשרת";
+          msg.style.color = "red";
+        }
+      });
+    </script>
+  </main>
+</body>
+</html>

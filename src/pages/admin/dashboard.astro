@@ -1,0 +1,90 @@
+---
+import fs from "fs";
+import path from "path";
+
+const filePath = path.resolve("./src/data/properties.json");
+let properties = [];
+
+if (fs.existsSync(filePath)) {
+  const fileData = fs.readFileSync(filePath, "utf-8");
+  properties = JSON.parse(fileData);
+}
+---
+
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ניהול דירות</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body dir="rtl">
+    <header>
+      <h1>ניהול דירות</h1>
+      <nav>
+        <a href="/admin/add">➕ הוספת דירה חדשה</a>
+        <a href="/">🏠 חזרה לדף הראשי</a>
+      </nav>
+    </header>
+
+    <main>
+      <table border="1" cellpadding="10" cellspacing="0">
+        <thead>
+          <tr>
+            <th>תמונה</th>
+            <th>כותרת</th>
+            <th>מחיר</th>
+            <th>מיקום</th>
+            <th>פעולות</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        {properties.map((p: { id: number; title: string; price: string; location: string; image: string }) => (
+              <tr>
+                <td>
+                  <img src={p.image} alt={p.title} width="100" />
+                </td>
+                <td>{p.title}</td>
+                <td>{p.price}</td>
+                <td>{p.location}</td>
+                <td>
+                  <a href={`/admin/edit/${p.id}`}>✏️ עריכה</a>
+                  <button type="button" onclick={`deleteProperty(${p.id})`}>
+                    🗑️ מחיקה
+                  </button>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+
+      <script type="module">
+        document.addEventListener("DOMContentLoaded", () => {
+          window.deleteProperty = async function (id) {
+            if (!confirm("האם אתה בטוח שברצונך למחוק דירה זו?")) return;
+
+            try {
+              const res = await fetch(`/api/delete-property`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id }),
+              });
+
+              const result = await res.json();
+              if (result.success) {
+                alert("הדירה נמחקה בהצלחה");
+                location.reload();
+              } else {
+                alert("שגיאה במחיקה");
+              }
+            } catch (err) {
+              console.error(err);
+              alert("שגיאה בחיבור לשרת");
+            }
+          };
+        });
+      </script>
+    </main>
+  </body>
+</html>

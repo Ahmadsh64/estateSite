@@ -1,0 +1,91 @@
+---
+import fs from "fs";
+import path from "path";
+
+// הגדרת טיפוס לכל פרופרטי
+interface Property {
+  id: number;
+  title: string;
+  price: string;
+  location: string;
+  description: string;
+  image: string;
+}
+
+const filePath = path.resolve("./src/data/properties.json");
+let properties: Property[] = [];
+
+if (fs.existsSync(filePath)) {
+  const fileData = fs.readFileSync(filePath, "utf-8");
+  properties = JSON.parse(fileData) as Property[];
+}
+---
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <title>רשימת דירות</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body dir="rtl">
+<header>
+  <div class="logo">
+    <img src="/images/logo.png" alt="לוגו החברה" />
+    <span>חברת דירות</span>
+  </div>
+
+  <nav>
+    <a href="/">כל הדירות</a>
+    <a href="/filter/price">עד 1,000,000 ₪</a>
+    <a href="/filter/center">מרכז</a>
+    <a href="/filter/north">צפון</a>
+  </nav>
+
+  <a href="/admin/login" class="admin-btn">כניסת מנהל</a>
+</header>
+<section class="hero">
+  <div class="overlay">
+    <h1>חברת דירות - הבית החדש שלך מתחיל כאן</h1>
+    <p>מצא את הדירה המושלמת מתוך מאות נכסים</p>
+    <form class="filters">
+      <select name="transaction">
+        <option value="">סוג עסקה</option>
+        <option value="מכירה">מכירה</option>
+        <option value="השכרה">השכרה</option>
+      </select>
+
+      <select name="location">
+        <option value="">אזור</option>
+        <option value="צפון">צפון</option>
+        <option value="מרכז">מרכז</option>
+        <option value="דרום">דרום</option>
+      </select>
+
+      <select name="rooms">
+        <option value="">חדרים</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+        <option value="4">4+</option>
+        <option value="5">5+</option>
+      </select>
+
+      <button type="submit">חפש 🔎</button>
+    </form>
+  </div>
+</section>
+
+  <main>
+    <ul>
+      {properties.map((p: Property) => (
+        <li>
+          <a href={`/${p.id}`}>
+            <img src={p.image} alt={p.title} />
+            <h2>{p.title}</h2>
+            <p>מחיר: {p.price}</p>
+            <p>מיקום: {p.location}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
+</body>
+</html>
