@@ -8,7 +8,7 @@ interface Property {
   price: string;
   location: string;
   description: string;
-  image: string | string[]; 
+  images: string | string[]; 
   rooms: number;
   bathrooms: number;
   type: string;
@@ -28,7 +28,7 @@ if (fs.existsSync(filePath)) {
 const property = properties.find((p: Property) => p.id === id);
 
 // הפוך את התמונה הראשית למערך במידת הצורך
-const images = property ? (Array.isArray(property.image) ? property.image : [property.image]) : [];
+const images = property ? (Array.isArray(property.images) ? property.images : [property.images]) : [];
 ---
 
 <html lang="he">

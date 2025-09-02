@@ -2,39 +2,60 @@
   {
     "id": 1,
     "title": "דירה בצפון ",
-    "price": "3500 ₪",
+    "price": "3500",
     "location": "משגב",
     "description": "נוף יפה ",
-    "image": "/images/apt1.jpg",
+    "images": [
+      "/uploads/apt1.jpg"
+    ],
+    "imageFile": {}
+  },
+  {
+    "id": 2,
+    "title": "דירה במרכז ",
+    "price": "3000",
+    "location": "צפת, מרכז",
+    "description": "למכירה",
+    "images": [
+      "/uploads/property_1756725368233.png"
+    ],
     "imageFile": {}
   },
   {
     "id": 3,
-    "title": "דירה במרכז ",
-    "price": "3000 ₪",
-    "location": "צפת, מרכז",
-    "description": "למכירה",
-    "image": "/uploads/property_1756725368233.png",
-    "imageFile": {}
+    "title": "דירה בצפון ",
+    "price": "6000",
+    "location": "סחנין",
+    "description": "דירה חדשה בדרום ",
+    "images": [
+      "/uploads/property_1756724925915.png"
+    ]
   },
   {
     "id": 4,
-    "title": "דירה בצפון ",
-    "price": "₪6000",
-    "location": "סחנין",
-    "description": "דירה חדשה בדרום ",
-    "image": "/uploads/property_1756724925915.png"
+    "title": "דירת 3 חדרים",
+    "price": 950000,
+    "location": "חיפה",
+    "description": "דירה משופצת קרוב לים",
+    "images": [
+      "/uploads/apt1.jpg",
+      "/uploads/apt2.png",
+      "/uploads/apt1.jpg"
+    ]
   },
   {
-  "id": 5,
-  "title": "דירה מרווחת בתל אביב",
-  "price": "2,500,000",
-  "location": "תל אביב, ישראל",
-  "description": "דירה מרווחת עם נוף לים...",
-  "image": ["/images/apt1.jpg","/images/apt2.png"],
-  "rooms": 4,
-  "bathrooms": 2,
-  "type": "דירה"
-}
-
+    "id": 5,
+    "title": "דירות הנופש - תל אביב",
+    "price": 2800,
+    "location": "תל אביב, 64353, ישראל ",
+    "description": "מיקום מצוין – תצוגת מפה",
+    "images": [
+      "http://localhost:4321/uploads/property_1756808037087_101.jpg",
+      "http://localhost:4321/uploads/property_1756808037094_714.jpg",
+      "http://localhost:4321/uploads/property_1756808037097_780.jpg",
+      "http://localhost:4321/uploads/property_1756808037099_717.jpg",
+      "http://localhost:4321/uploads/property_1756808037099_661.jpg",
+      "http://localhost:4321/uploads/property_1756808037100_550.jpg"
+    ]
+  }
 ]

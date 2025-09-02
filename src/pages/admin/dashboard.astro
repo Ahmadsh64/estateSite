@@ -39,10 +39,10 @@ if (fs.existsSync(filePath)) {
         </thead>
         <tbody>
           
-        {properties.map((p: { id: number; title: string; price: string; location: string; image: string }) => (
+        {properties.map((p: { id: number; title: string; price: string; location: string; images: string }) => (
               <tr>
                 <td>
-                  <img src={p.image} alt={p.title} width="100" />
+                  <img src={p.images[0]} alt={p.title} width="100" />
                 </td>
                 <td>{p.title}</td>
                 <td>{p.price}</td>

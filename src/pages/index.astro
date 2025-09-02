@@ -6,11 +6,12 @@ import path from "path";
 interface Property {
   id: number;
   title: string;
-  price: string;
+  price: number;
   location: string;
   description: string;
-  image: string;
+  images: string[]; // ⬅️ מערך תמונות במקום image יחיד
 }
+
 
 const filePath = path.resolve("./src/data/properties.json");
 let properties: Property[] = [];
@@ -42,6 +43,7 @@ if (fs.existsSync(filePath)) {
 
   <a href="/admin/login" class="admin-btn">כניסת מנהל</a>
 </header>
+
 <section class="hero">
   <div class="overlay">
     <h1>חברת דירות - הבית החדש שלך מתחיל כאן</h1>
@@ -73,19 +75,21 @@ if (fs.existsSync(filePath)) {
   </div>
 </section>
 
-  <main>
-    <ul>
-      {properties.map((p: Property) => (
-        <li>
-          <a href={`/${p.id}`}>
-            <img src={p.image} alt={p.title} />
-            <h2>{p.title}</h2>
-            <p>מחיר: {p.price}</p>
-            <p>מיקום: {p.location}</p>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </main>
+<main>
+  <ul>
+    {properties.map((p: Property) => (
+      <li>
+        <a href={`/${p.id}`}>
+          <img src={p.images[0]} alt={p.title} />
+          <h2>{p.title}</h2>
+          <p class="price">מחיר: {p.price.toLocaleString("he-IL")}</p>
+          <p>מיקום: {p.location}</p>
+        </a>
+      </li>
+    ))}
+  </ul>
+</main>
+
+
 </body>
 </html>

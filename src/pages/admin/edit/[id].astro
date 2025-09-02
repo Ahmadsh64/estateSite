@@ -3,16 +3,15 @@ import fs from "fs";
 import path from "path";
 
 const { params } = Astro;
-
 const filePath = path.resolve("./src/data/properties.json");
 
 interface Property {
   id: number;
   title: string;
-  price: string;
+  price: number;
   location: string;
   description: string;
-  image: string;
+  images: string[];
 }
 
 let properties: Property[] = [];
@@ -33,11 +32,30 @@ if (!property) {
   <meta charset="UTF-8" />
   <title>עריכת דירה - {property.title}</title>
   <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .image-wrapper { position: relative; display: inline-block; margin: 5px; }
+    .image-wrapper img { width: 150px; height: auto; display: block; }
+    .remove-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      width: 22px;
+      height: 22px;
+      text-align: center;
+      line-height: 18px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body dir="rtl">
   <header>
     <h1>עריכת דירה - {property.title}</h1>
-    <a href="/admin/dashboard">חזרה לדשבורד</a>
+    <a href="/admin/dashboard">⬅️ חזרה לדשבורד</a>
   </header>
 
   <main>
@@ -58,10 +76,20 @@ if (!property) {
       <textarea name="description" required>{property.description}</textarea>
       <br />
 
-      <label>תמונה:</label>
-      <input type="file" id="imageInput" accept="image/*" />
+      <label>תמונות קיימות:</label>
+      <div id="existingImages" style="display:flex; gap:10px; flex-wrap:wrap;">
+        {property.images.map((img, i) => (
+          <div class="image-wrapper" data-index={i}>
+            <img src={img} alt="תמונה קיימת" />
+            <button type="button" class="remove-btn">×</button>
+          </div>
+        ))}
+      </div>
       <br />
-      <img id="preview" src={property.image} alt="תצוגה מקדימה" width="200" style="display:block; margin-top:10px;" />
+
+      <label>הוסף תמונות חדשות:</label>
+      <input type="file" id="imageInput" accept="image/*" multiple />
+      <div id="previewContainer" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
       <br />
 
       <button type="submit">שמור שינויים</button>
@@ -73,18 +101,34 @@ if (!property) {
       const form = document.getElementById("editForm");
       const msg = document.getElementById("message");
       const imageInput = document.getElementById("imageInput");
-      const preview = document.getElementById("preview");
+      const previewContainer = document.getElementById("previewContainer");
+      const existingImagesDiv = document.getElementById("existingImages");
 
-      // תצוגה מקדימה של תמונה
+      let existingImages = Array.from(existingImagesDiv.querySelectorAll('img')).map(img => img.src);
+
+      // הסרת תמונה קיימת
+      existingImagesDiv.addEventListener("click", (e) => {
+        if (e.target.classList.contains("remove-btn")) {
+          const wrapper = e.target.parentElement;
+          const index = Number(wrapper.dataset.index);
+          existingImages.splice(index, 1); // הסרת מהמערך
+          wrapper.remove();
+        }
+      });
+
+      // הצגת תצוגה מקדימה לתמונות חדשות
       imageInput.addEventListener("change", () => {
-        const file = imageInput.files[0];
-        if (file) {
+        previewContainer.innerHTML = "";
+        Array.from(imageInput.files).forEach(file => {
           const reader = new FileReader();
-          reader.onload = (e) => {
-            preview.src = e.target.result;
+          reader.onload = e => {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.width = 150;
+            previewContainer.appendChild(img);
           };
           reader.readAsDataURL(file);
-        }
+        });
       });
 
       form.addEventListener("submit", async (e) => {
@@ -93,23 +137,42 @@ if (!property) {
         const formData = new FormData(form);
         formData.append("id", form.dataset.id);
 
-        // אם נבחר קובץ חדש, ישלח כ-imageFile
-        if (imageInput.files[0]) {
-          formData.append("imageFile", imageInput.files[0]);
-        }
+        // שליחת התמונות הקיימות לאחר הסרה
+        existingImages.forEach(src => formData.append("existingImages", src));
+
+        // שליחת תמונות חדשות
+        Array.from(imageInput.files).forEach(file => formData.append("images", file));
 
         try {
           const res = await fetch("/api/edit-property", {
             method: "POST",
-            body: formData // שולחים FormData כולל קובץ
+            body: formData
           });
 
           const result = await res.json();
           if (result.success) {
             msg.textContent = "✅ הדירה עודכנה בהצלחה!";
             msg.style.color = "green";
-            // עדכון התצוגה
-            if (result.image) preview.src = result.image;
+
+            // עדכון תצוגה מקדימה של כל התמונות
+            existingImagesDiv.innerHTML = "";
+            previewContainer.innerHTML = "";
+            result.images.forEach(src => {
+              const wrapper = document.createElement("div");
+              wrapper.className = "image-wrapper";
+              const img = document.createElement("img");
+              img.src = src;
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "remove-btn";
+              btn.textContent = "×";
+              wrapper.appendChild(img);
+              wrapper.appendChild(btn);
+              existingImagesDiv.appendChild(wrapper);
+            });
+
+            existingImages = [...result.images];
+
           } else {
             msg.textContent = "❌ שגיאה בעדכון הדירה";
             msg.style.color = "red";

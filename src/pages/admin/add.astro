@@ -33,47 +33,92 @@ const filePath = path.resolve("./src/data/properties.json");
 
       <label>תיאור:</label>
       <textarea name="description" required></textarea>
+      <label>תמונות:</label>
+      <div class="image-upload-wrapper">
+        <input type="file" id="imageInput" name="images" accept="image/*" multiple />
+        <button type="button" id="addMoreBtn">+</button>
+      </div>
+      <div id="preview" class="image-preview"></div>
       <br/>
-
-      <label>תמונה:</label>
-      <input type="file" name="imageFile" accept="image/*" required />
-      <br/>
-
+      
       <button type="submit">שמור</button>
     </form>
 
     <p id="message" style="color:green;"></p>
 
-    <script type="module">
-      const form = document.getElementById("addForm");
-      const msg = document.getElementById("message");
+<script type="module">
+  const form = document.getElementById("addForm");
+  const msg = document.getElementById("message");
+  const imageInput = document.getElementById("imageInput");
+  const addMoreBtn = document.getElementById("addMoreBtn");
+  const preview = document.getElementById("preview");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
+  let allFiles = [];
 
-        try {
-          const res = await fetch("/api/add-property", {
-            method: "POST",
-            body: formData // שולחים FormData כולל קובץ
-          });
+  // עדכון תצוגה מקדימה
+  function updatePreview() {
+    preview.innerHTML = "";
+    allFiles.forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.classList.add("preview-img");
+        // אפשרות למחוק תמונה
+        img.title = "לחץ למחיקה";
+        img.addEventListener("click", () => {
+          allFiles.splice(idx, 1);
+          updatePreview();
+        });
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
-          const result = await res.json();
-          if (result.success) {
-            msg.textContent = "✅ הדירה נוספה בהצלחה!";
-            msg.style.color = "green";
-            form.reset();
-          } else {
-            msg.textContent = "❌ שגיאה בהוספה";
-            msg.style.color = "red";
-          }
-        } catch (err) {
-          console.error(err);
-          msg.textContent = "❌ שגיאה בחיבור לשרת";
-          msg.style.color = "red";
-        }
+  // בחירת קבצים חדשים
+  imageInput.addEventListener("change", (e) => {
+    allFiles = allFiles.concat(Array.from(e.target.files));
+    updatePreview();
+    imageInput.value = ""; // איפוס השדה כדי לאפשר בחירה נוספת
+  });
+
+  // כפתור +
+  addMoreBtn.addEventListener("click", () => {
+    imageInput.click();
+  });
+
+  // שליחת הטופס
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    allFiles.forEach((file) => formData.append("images", file));
+
+    try {
+      const res = await fetch("/api/add-property", {
+        method: "POST",
+        body: formData
       });
-    </script>
+
+      const result = await res.json();
+      if (result.success) {
+        msg.textContent = "✅ הדירה נוספה בהצלחה!";
+        msg.style.color = "green";
+        form.reset();
+        allFiles = [];
+        updatePreview();
+      } else {
+        msg.textContent = "❌ שגיאה בהוספה";
+        msg.style.color = "red";
+      }
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "❌ שגיאה בחיבור לשרת";
+      msg.style.color = "red";
+    }
+  });
+</script>
+
   </main>
 </body>
 </html>

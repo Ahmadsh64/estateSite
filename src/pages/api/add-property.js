@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { Buffer } from "buffer";
 
 export async function POST({ request }) {
@@ -12,21 +11,23 @@ export async function POST({ request }) {
     const price = formData.get("price");
     const location = formData.get("location");
     const description = formData.get("description");
-    const imageFile = formData.get("imageFile");
+    const imageFiles = formData.getAll("images");
 
-    // שמירת התמונה בתיקיית public/uploads
-    let imagePath = "";
-    if (imageFile && imageFile.name) {
-      const uploadDir = path.resolve("./public/uploads");
-      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    const uploadDir = path.resolve("./public/uploads");
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-      const ext = path.extname(imageFile.name);
-      const newFileName = `property_${Date.now()}${ext}`;
-      const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
-      const fullPath = path.join(uploadDir, newFileName);
+    // שמירת כל התמונות במערך
+    const images = [];
 
-      fs.writeFileSync(fullPath, fileBuffer);
-      imagePath = `/uploads/${newFileName}`;
+    for (const file of imageFiles) {
+      if (file && file.name) {
+        const ext = path.extname(file.name);
+        const newFileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}${ext}`;
+        const fileBuffer = Buffer.from(await file.arrayBuffer());
+        const fullPath = path.join(uploadDir, newFileName);
+        fs.writeFileSync(fullPath, fileBuffer);
+        images.push(`/uploads/${newFileName}`);
+      }
     }
 
     // קריאה ושמירה לקובץ JSON
@@ -42,10 +43,10 @@ export async function POST({ request }) {
     const newProperty = {
       id: newId,
       title,
-      price,
+      price: Number(price),
       location,
       description,
-      image: imagePath
+      images // ⬅️ שומר מערך תמונות
     };
 
     properties.push(newProperty);

@@ -4,7 +4,6 @@ import { Buffer } from "buffer";
 
 export async function POST({ request }) {
   try {
-    // מקבלים FormData במקום JSON
     const formData = await request.formData();
 
     const id = Number(formData.get("id"));
@@ -12,7 +11,6 @@ export async function POST({ request }) {
     const price = formData.get("price");
     const location = formData.get("location");
     const description = formData.get("description");
-    const imageFile = formData.get("imageFile"); // אם נבחר קובץ חדש
 
     if (!id) {
       return new Response(JSON.stringify({ success: false, message: "Missing property ID" }), {
@@ -40,33 +38,44 @@ export async function POST({ request }) {
       });
     }
 
-    let imagePath = properties[index].image; // שמירת התמונה הקיימת
-    if (imageFile && imageFile.name) {
-      const uploadDir = path.resolve("./public/uploads");
-      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    // קבלת התמונות הקיימות שנשמרו בדף (לא נמחקו)
+    const existingImages = formData.getAll("existingImages"); // מערך נתיבים
 
-      const ext = path.extname(imageFile.name);
-      const newFileName = `property_${Date.now()}${ext}`;
-      const fileBuffer = Buffer.from(await imageFile.arrayBuffer());
-      const fullPath = path.join(uploadDir, newFileName);
+    // קבלת התמונות החדשות שנבחרו
+    const imageFiles = formData.getAll("images");
 
-      fs.writeFileSync(fullPath, fileBuffer);
-      imagePath = `/uploads/${newFileName}`; // נתיב חדש
+    const uploadDir = path.resolve("./public/uploads");
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+    const newImages = [];
+
+    for (const file of imageFiles) {
+      if (file && file.name) {
+        const ext = path.extname(file.name);
+        const newFileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}${ext}`;
+        const fileBuffer = Buffer.from(await file.arrayBuffer());
+        const fullPath = path.join(uploadDir, newFileName);
+        fs.writeFileSync(fullPath, fileBuffer);
+        newImages.push(`/uploads/${newFileName}`);
+      }
     }
+
+    // עדכון המערך הסופי: existingImages + newImages
+    const finalImages = [...existingImages, ...newImages];
 
     // עדכון הנתונים
     properties[index] = {
       ...properties[index],
       title,
-      price,
+      price: Number(price),
       location,
       description,
-      image: imagePath
+      images: finalImages
     };
 
     fs.writeFileSync(filePath, JSON.stringify(properties, null, 2), "utf-8");
 
-    return new Response(JSON.stringify({ success: true, image: imagePath }), {
+    return new Response(JSON.stringify({ success: true, images: finalImages }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
