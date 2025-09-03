@@ -1,13 +1,6 @@
 ---
 import { supabase } from "../../lib/supabaseClient";
-
-interface Property {
-  id: string;
-  title: string;
-  price: number;
-  location: string;
-  images: string[];
-}
+import type { Property } from "../../types/property";
 
 let properties: Property[] = [];
 
@@ -23,71 +16,129 @@ if (error) {
     id: p.id,
     title: p.title,
     price: p.price,
-    location: p.location || "",
+    location: {
+      city: p.city || "",
+      street: p.street || "",
+      number: p.number || "",
+      floor: p.floor || "",
+    },
     images: p.images || [],
+    occupancy: p.occupancy,
+    bedrooms: p.bedrooms,
+    beds: p.beds,
+    bathrooms: p.bathrooms,
+    kitchen: p.kitchen,
+    washingMachine: p.washingMachine,
+    wifi: p.wifi,
+    tv: p.tv,
+    publicTransportNearby: p.publicTransportNearby,
+    parking: p.parking,
+    checkInTime: p.checkInTime,
+    checkOutTime: p.checkOutTime,
+    minStayDays: p.minStayDays,
+    type: p.type,
+    description: p.description,
+    is_active: p.is_active ?? true, // שדה פעיל/לא פעיל
   }));
 }
 ---
 
 <html lang="he">
-<head>
-  <meta charset="UTF-8" />
-  <title>ניהול דירות - מנהל</title>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
-<body dir="rtl">
-  <header class="admin-header">
-    <h1 class="admin-title">ניהול דירות</h1>
-    <nav class="admin-nav">
-      <a href="/admin/add" class="admin-add-btn">➕ הוספת דירה חדשה</a>
-      <a href="/" class="admin-home-btn">🏠 חזרה לדף הראשי</a>
-    </nav>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ניהול דירות - מנהל</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body dir="rtl">
+    <header class="admin-header">
+      <h1 class="admin-title">ניהול דירות</h1>
+      <nav class="admin-nav">
+        <a href="/admin/add" class="admin-add-btn">➕ הוספת דירה חדשה</a>
+        <a href="/" class="admin-home-btn">🏠 חזרה לדף הראשי</a>
+        <button id="logout-btn" class="admin-logout-btn">🚪 יציאה</button>
+      </nav>
+    </header>
 
-  <main class="admin-main">
-    {properties.map((p: Property) => (
-      <div class="admin-property-card">
-        <img src={p.images[0]} alt={p.title} class="admin-property-img"/>
-        <div class="admin-property-info">
-          <div>
-            <h2 class="admin-property-title">{p.title}</h2>
-            <p class="admin-property-price">{p.price.toLocaleString("he-IL")}</p>
-            <p class="admin-property-location">{p.location}</p>
+    <main class="admin-main">
+      {
+        properties.map((p: Property) => (
+          <div
+            class="admin-property-card"
+            style={`opacity: ${p.is_active ? "1" : "0.5"}`}
+          >
+            <img src={p.images[0]} alt={p.title} class="admin-property-img" />
+            <div class="admin-property-info">
+              <div>
+                <h2 class="admin-property-title">{p.title}</h2>
+                <p class="admin-property-price">
+                  {p.price.toLocaleString("he-IL")}
+                </p>
+                <p class="admin-property-location">
+                  {p.location.city}, {p.location.street} {p.location.number}
+                </p>
+                <p>סטטוס: {p.is_active ? "פעיל" : "מוסתר"}</p>
+              </div>
+              <div class="admin-property-actions">
+                <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">
+                  ✏️ עריכה
+                </a>
+                {p.is_active ? (
+                  <button
+                    type="button"
+                    class="admin-delete-btn"
+                    onclick={`toggleProperty('${p.id}', false)`}
+                  >
+                    🗑️ הסתרה
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    class="admin-restore-btn"
+                    onclick={`toggleProperty('${p.id}', true)`}
+                  >
+                    ♻️ שחזור
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          <div class="admin-property-actions">
-            <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">✏️ עריכה</a>
-            <button type="button" class="admin-delete-btn" onclick={`deleteProperty('${p.id}')`}>🗑️ מחיקה</button>
-          </div>
-        </div>
-      </div>
-    ))}
-  </main>
+        ))
+      }
+    </main>
 
-  <script type="module">
-    document.addEventListener("DOMContentLoaded", () => {
-      window.deleteProperty = async function (id) {
-        if (!confirm("האם אתה בטוח שברצונך למחוק דירה זו?")) return;
+    <script type="module">
+      async function toggleProperty(id, activate) {
+        const token = sessionStorage.getItem("sb-session");
+        if (!token) {
+          alert("❌ אין הרשאה – אנא התחבר מחדש");
+          window.location.href = "/admin/login";
+          return;
+        }
 
         try {
-          const res = await fetch(`/api/delete-property`, {
+          const res = await fetch("/api/toggle-property", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ id, activate }),
           });
 
           const result = await res.json();
           if (result.success) {
-            alert("הדירה נמחקה בהצלחה");
+            alert(
+              activate ? "✅ הדירה שוחזרה בהצלחה" : "✅ הדירה הוסתרה בהצלחה",
+            );
             location.reload();
           } else {
-            alert("שגיאה במחיקה");
+            alert("❌ שגיאה: " + result.message);
           }
         } catch (err) {
           console.error(err);
-          alert("שגיאה בחיבור לשרת");
+          alert("❌ שגיאה בחיבור לשרת");
         }
-      };
-    });
-  </script>
-</body>
+      }
+    </script>
+  </body>
 </html>

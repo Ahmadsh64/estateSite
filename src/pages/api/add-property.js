@@ -2,51 +2,105 @@ import { supabase } from "../../lib/supabaseClient";
 
 export async function POST({ request }) {
   try {
+    // --- אימות משתמש ---
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Missing token" }),
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Invalid or expired session" }),
+        { status: 403 }
+      );
+    }
+
+    // --- נתוני הטופס ---
     const formData = await request.formData();
+    const property = {
+      title: formData.get("title"),
+      price: Number(formData.get("price")),
+      city: formData.get("city"),
+      street: formData.get("street") || "",
+      number: formData.get("number") || "",
+      floor: formData.get("floor") || "",
+      bedrooms: Number(formData.get("bedrooms")) || 0,
+      beds: Number(formData.get("beds")) || 0,
+      bathrooms: Number(formData.get("bathrooms")) || 0,
+      type: formData.get("type") || "",
+      description: formData.get("description") || "",
+      kitchen: formData.get("kitchen") === "on",
+washingmachine: formData.get("washingMachine") === "on",
+publictransportnearby: formData.get("publicTransportNearby") === "on",
+checkintime: formData.get("checkInTime") || null,
+checkouttime: formData.get("checkOutTime") || null,
+minstaydays: Number(formData.get("minStayDays")) || 0,
 
-    const title = formData.get("title")?.toString() || "";
-    const price = parseFloat(formData.get("price")?.toString() || "0");
-    const location = formData.get("location")?.toString() || "";
-    const description = formData.get("description")?.toString() || "";
+      is_active: true,
+      created_at: new Date().toISOString(),
+    };
 
-    const imageFiles = formData.getAll("images");
-    const images = [];
+    // --- העלאת תמונות ל-Supabase Storage ---
+    const images = formData.getAll("images");
+    let imageUrls = [];
 
-    // שמירת תמונות ב-Supabase Storage (תיקייה בשם "properties")
-    for (const file of imageFiles) {
-      if (file instanceof File) {
-        const fileExt = file.name.split(".").pop();
-        const fileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
-        
-        // העלאה ל-Supabase Storage
-        const { data, error } = await supabase.storage
+    for (const file of images) {
+      if (file && file.name) {
+        const ext = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${ext}`;
+
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        const { error: uploadError } = await supabase.storage
           .from("properties")
-          .upload(fileName, file);
+          .upload(fileName, buffer, { contentType: file.type });
 
-        if (error) {
-          console.error("שגיאה בהעלאת תמונה:", error.message);
-        } else {
-          const { publicUrl } = supabase.storage
-            .from("properties")
-            .getPublicUrl(fileName);
-          images.push(publicUrl);
+        if (uploadError) {
+          console.error("Upload failed:", uploadError.message);
+          return new Response(
+            JSON.stringify({
+              success: false,
+              message: `Image upload failed: ${uploadError.message}. ודא שהרשאות ה-bucket פתוחות.`,
+            }),
+            { status: 500 }
+          );
         }
+
+        const { data } = supabase.storage.from("properties").getPublicUrl(fileName);
+        imageUrls.push(data.publicUrl);
       }
     }
 
-    // הוספת הדירה ל-Supabase
-    const { data, error } = await supabase
-      .from("properties")
-      .insert([{ title, price, location, description, images }]);
+    property.images = imageUrls;
 
-    if (error) {
-      return new Response(JSON.stringify({ success: false, message: error.message }), { status: 400 });
+    // --- שמירה בטבלה ---
+    const { error: insertError } = await supabase.from("properties").insert([property]);
+
+    if (insertError) {
+      console.error("DB insert error:", insertError);
+      return new Response(
+        JSON.stringify({ success: false, message: "Database insert failed" }),
+        { status: 500 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true, data }), { status: 200 });
+    return new Response(
+      JSON.stringify({ success: true, message: "Property added successfully" }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
 
   } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ success: false, message: err.message }), { status: 500 });
+    console.error("Server error:", err);
+    return new Response(
+      JSON.stringify({ success: false, message: "Server error" }),
+      { status: 500 }
+    );
   }
 }

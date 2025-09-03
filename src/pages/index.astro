@@ -1,35 +1,7 @@
 ---
 import { supabase } from "../lib/supabaseClient";
+import type { Property } from "../types/property";
 
-// טיפוס Property מעודכן
-interface Property {
-  id: string;
-  title: string;
-  price: number;
-  location: {
-    city: string;
-    street: string;
-    number: string;
-    floor?: string;
-  };
-  description: string;
-  images: string[];
-  occupancy?: number;
-  bedrooms?: number;
-  beds?: number;
-  bathrooms?: number;
-  kitchen?: boolean;
-  washingMachine?: boolean;
-  wifi?: boolean;
-  tv?: boolean;
-  publicTransportNearby?: boolean;
-  parking?: boolean;
-  checkInTime?: string;
-  checkOutTime?: string;
-  minStayDays?: number;
-}
-
-// שליפת כל הדירות מ-Supabase
 let properties: Property[] = [];
 
 const { data, error } = await supabase
@@ -40,30 +12,35 @@ const { data, error } = await supabase
 if (error) {
   console.error("שגיאה בשליפת הדירות:", error.message);
 } else if (data) {
-  // המרה לשדות שאנחנו צריכים, כולל JSON של images
-properties = data.map((p: any) => ({
-  id: p.id,
-  title: p.title,
-  price: p.price,
-  location: { city: p.location, street: "", number: "" }, // או מבנה אחר לפי מה שיש לך
-  description: p.description,
-  images: p.images || [],
-  occupancy: p.occupancy,
-  bedrooms: p.bedrooms,
-  beds: p.beds,
-  bathrooms: p.bathrooms,
-  kitchen: p.kitchen,
-  washingMachine: p.washingMachine,
-  wifi: p.wifi,
-  tv: p.tv,
-  publicTransportNearby: p.publicTransportNearby,
-  parking: p.parking,
-  checkInTime: p.checkInTime,
-  checkOutTime: p.checkOutTime,
-  minStayDays: p.minStayDays,
-}));
-
+  properties = data.map((p: any) => ({
+    id: p.id,
+    title: p.title,
+    price: p.price,
+    location: {
+      city: p.city || "",
+      street: p.street || "",
+      number: p.number || "",
+      floor: p.floor || "",
+    },
+    description: p.description,
+    images: p.images || [],
+    occupancy: p.occupancy,
+    bedrooms: p.bedrooms,
+    beds: p.beds,
+    bathrooms: p.bathrooms,
+    kitchen: p.kitchen,
+    washingMachine: p.washingMachine,
+    wifi: p.wifi,
+    tv: p.tv,
+    publicTransportNearby: p.publicTransportNearby,
+    parking: p.parking,
+    checkInTime: p.checkInTime,
+    checkOutTime: p.checkOutTime,
+    minStayDays: p.minStayDays,
+    type: p.type,
+  }));
 }
+
 ---
 <html lang="he">
 <head>

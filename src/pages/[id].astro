@@ -1,37 +1,10 @@
 ---
 import { supabase } from "../lib/supabaseClient";
-
-interface Property {
-  id: string;
-  title: string;
-  price: number;
-  location: {
-    city: string;
-    street: string;
-    number: string;
-    floor?: string;
-  };
-  description: string;
-  images: string[];
-  rooms?: number;
-  beds?: number;
-  bathrooms?: number;
-  type?: string;
-  hasKitchen?: boolean;
-  hasWashingMachine?: boolean;
-  hasWifi?: boolean;
-  hasTv?: boolean;
-  publicTransport?: boolean;
-  parking?: boolean;
-  checkIn?: string;
-  checkOut?: string;
-  minStay?: number;
-}
+import type { Property } from "../types/property";
 
 const { params } = Astro;
 const id = params.id;
 
-// שליפת הדירה לפי מזהה מ-Supabase
 let property: Property | null = null;
 
 const { data, error } = await supabase
@@ -43,32 +16,32 @@ const { data, error } = await supabase
 if (error) {
   console.error("שגיאה בשליפת הדירה:", error.message);
 } else if (data) {
-  // המרה למבנה Property
   property = {
     id: data.id,
     title: data.title,
     price: data.price,
     location: {
-      city: data.city || data.location || "",
+      city: data.city || "",
       street: data.street || "",
       number: data.number || "",
       floor: data.floor || "",
     },
     description: data.description,
     images: data.images || [],
-    rooms: data.rooms,
+    occupancy: data.occupancy,
+    bedrooms: data.bedrooms,
     beds: data.beds,
     bathrooms: data.bathrooms,
-    type: data.type,
-    hasKitchen: data.hasKitchen,
-    hasWashingMachine: data.hasWashingMachine,
-    hasWifi: data.hasWifi,
-    hasTv: data.hasTv,
-    publicTransport: data.publicTransport,
+    kitchen: data.kitchen,
+    washingMachine: data.washingMachine,
+    wifi: data.wifi,
+    tv: data.tv,
+    publicTransportNearby: data.publicTransportNearby,
     parking: data.parking,
-    checkIn: data.checkIn,
-    checkOut: data.checkOut,
-    minStay: data.minStay,
+    checkInTime: data.checkInTime,
+    checkOutTime: data.checkOutTime,
+    minStayDays: data.minStayDays,
+    type: data.type,
   };
 }
 

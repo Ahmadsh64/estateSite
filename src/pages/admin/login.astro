@@ -23,12 +23,14 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+    // חיבור ל-Supabase
     const supabase = createClient(
       'https://exnsylhgwjvpphistxqz.supabase.co', 
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
     );
 
     const form = document.getElementById('admin-login-form');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = form.email.value;
@@ -39,12 +41,26 @@
       if (error) {
         alert("שגיאה: " + error.message);
       } else {
-        localStorage.setItem("sb-token", JSON.stringify(data.session));
+        // שמירה ב-sessionStorage במקום localStorage
+        sessionStorage.setItem("sb-session", JSON.stringify(data.session));
+
+        // מעבר ללוח הבקרה
         setTimeout(() => {
           window.location.href = "/admin/dashboard";
         }, 500);
       }
     });
+
+    // פונקציות עזר לניהול session
+    export function getCurrentUser() {
+      const session = sessionStorage.getItem("sb-session");
+      return session ? JSON.parse(session) : null;
+    }
+
+    export function logout() {
+      sessionStorage.removeItem("sb-session");
+      window.location.href = "/admin/login";
+    }
   </script>
 </body>
 </html>
