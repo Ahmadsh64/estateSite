@@ -1,10 +1,9 @@
 ---
-import fs from "fs";
-import path from "path";
+import { supabase } from "../lib/supabaseClient";
 
 // טיפוס Property מעודכן
 interface Property {
-  id: number;
+  id: string;
   title: string;
   price: number;
   location: {
@@ -15,30 +14,57 @@ interface Property {
   };
   description: string;
   images: string[];
-  occupancy: number;
-  bedrooms: number;
-  beds: number;
-  bathrooms: number;
-  kitchen: boolean;
-  washingMachine: boolean;
-  wifi: boolean;
-  tv: boolean;
-  publicTransportNearby: boolean;
-  parking: boolean;
-  checkInTime: string;
-  checkOutTime: string;
-  minStayDays: number;
+  occupancy?: number;
+  bedrooms?: number;
+  beds?: number;
+  bathrooms?: number;
+  kitchen?: boolean;
+  washingMachine?: boolean;
+  wifi?: boolean;
+  tv?: boolean;
+  publicTransportNearby?: boolean;
+  parking?: boolean;
+  checkInTime?: string;
+  checkOutTime?: string;
+  minStayDays?: number;
 }
 
-const filePath = path.resolve("./src/data/properties.json");
+// שליפת כל הדירות מ-Supabase
 let properties: Property[] = [];
 
-if (fs.existsSync(filePath)) {
-  const fileData = fs.readFileSync(filePath, "utf-8");
-  properties = JSON.parse(fileData) as Property[];
+const { data, error } = await supabase
+  .from("properties")
+  .select("*")
+  .order("created_at", { ascending: false });
+
+if (error) {
+  console.error("שגיאה בשליפת הדירות:", error.message);
+} else if (data) {
+  // המרה לשדות שאנחנו צריכים, כולל JSON של images
+properties = data.map((p: any) => ({
+  id: p.id,
+  title: p.title,
+  price: p.price,
+  location: { city: p.location, street: "", number: "" }, // או מבנה אחר לפי מה שיש לך
+  description: p.description,
+  images: p.images || [],
+  occupancy: p.occupancy,
+  bedrooms: p.bedrooms,
+  beds: p.beds,
+  bathrooms: p.bathrooms,
+  kitchen: p.kitchen,
+  washingMachine: p.washingMachine,
+  wifi: p.wifi,
+  tv: p.tv,
+  publicTransportNearby: p.publicTransportNearby,
+  parking: p.parking,
+  checkInTime: p.checkInTime,
+  checkOutTime: p.checkOutTime,
+  minStayDays: p.minStayDays,
+}));
+
 }
 ---
-
 <html lang="he">
 <head>
   <meta charset="UTF-8" />

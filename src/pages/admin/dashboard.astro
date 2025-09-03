@@ -1,13 +1,31 @@
 ---
-import fs from "fs";
-import path from "path";
+import { supabase } from "../../lib/supabaseClient";
 
-const filePath = path.resolve("./src/data/properties.json");
-let properties = [];
+interface Property {
+  id: string;
+  title: string;
+  price: number;
+  location: string;
+  images: string[];
+}
 
-if (fs.existsSync(filePath)) {
-  const fileData = fs.readFileSync(filePath, "utf-8");
-  properties = JSON.parse(fileData);
+let properties: Property[] = [];
+
+const { data, error } = await supabase
+  .from("properties")
+  .select("*")
+  .order("created_at", { ascending: false });
+
+if (error) {
+  console.error("שגיאה בשליפת הדירות:", error.message);
+} else if (data) {
+  properties = data.map((p: any) => ({
+    id: p.id,
+    title: p.title,
+    price: p.price,
+    location: p.location || "",
+    images: p.images || [],
+  }));
 }
 ---
 
@@ -27,18 +45,18 @@ if (fs.existsSync(filePath)) {
   </header>
 
   <main class="admin-main">
-    {properties.map((p: { id: number; title: string; price: number; location: string; images: string[] }) => (
+    {properties.map((p: Property) => (
       <div class="admin-property-card">
         <img src={p.images[0]} alt={p.title} class="admin-property-img"/>
         <div class="admin-property-info">
           <div>
             <h2 class="admin-property-title">{p.title}</h2>
-            <p class="admin-property-price">{p.price.toLocaleString("he-IL")} ₪</p>
+            <p class="admin-property-price">{p.price.toLocaleString("he-IL")}</p>
             <p class="admin-property-location">{p.location}</p>
           </div>
           <div class="admin-property-actions">
             <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">✏️ עריכה</a>
-            <button type="button" class="admin-delete-btn" onclick={`deleteProperty(${p.id})`}>🗑️ מחיקה</button>
+            <button type="button" class="admin-delete-btn" onclick={`deleteProperty('${p.id}')`}>🗑️ מחיקה</button>
           </div>
         </div>
       </div>

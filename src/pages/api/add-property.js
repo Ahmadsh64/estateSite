@@ -1,67 +1,52 @@
-import fs from "fs";
-import path from "path";
-import { Buffer } from "buffer";
+import { supabase } from "../../lib/supabaseClient";
 
 export async function POST({ request }) {
   try {
-    // מקבלים את הנתונים כ-FormData
     const formData = await request.formData();
 
-    const title = formData.get("title");
-    const price = formData.get("price");
-    const location = formData.get("location");
-    const description = formData.get("description");
+    const title = formData.get("title")?.toString() || "";
+    const price = parseFloat(formData.get("price")?.toString() || "0");
+    const location = formData.get("location")?.toString() || "";
+    const description = formData.get("description")?.toString() || "";
+
     const imageFiles = formData.getAll("images");
-
-    const uploadDir = path.resolve("./public/uploads");
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-    // שמירת כל התמונות במערך
     const images = [];
 
+    // שמירת תמונות ב-Supabase Storage (תיקייה בשם "properties")
     for (const file of imageFiles) {
-      if (file && file.name) {
-        const ext = path.extname(file.name);
-        const newFileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}${ext}`;
-        const fileBuffer = Buffer.from(await file.arrayBuffer());
-        const fullPath = path.join(uploadDir, newFileName);
-        fs.writeFileSync(fullPath, fileBuffer);
-        images.push(`/uploads/${newFileName}`);
+      if (file instanceof File) {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
+        
+        // העלאה ל-Supabase Storage
+        const { data, error } = await supabase.storage
+          .from("properties")
+          .upload(fileName, file);
+
+        if (error) {
+          console.error("שגיאה בהעלאת תמונה:", error.message);
+        } else {
+          const { publicUrl } = supabase.storage
+            .from("properties")
+            .getPublicUrl(fileName);
+          images.push(publicUrl);
+        }
       }
     }
 
-    // קריאה ושמירה לקובץ JSON
-    const filePath = path.resolve("./src/data/properties.json");
-    let properties = [];
-    if (fs.existsSync(filePath)) {
-      const fileData = fs.readFileSync(filePath, "utf-8");
-      properties = JSON.parse(fileData);
+    // הוספת הדירה ל-Supabase
+    const { data, error } = await supabase
+      .from("properties")
+      .insert([{ title, price, location, description, images }]);
+
+    if (error) {
+      return new Response(JSON.stringify({ success: false, message: error.message }), { status: 400 });
     }
 
-    const newId = properties.length ? Math.max(...properties.map(p => p.id)) + 1 : 1;
-
-    const newProperty = {
-      id: newId,
-      title,
-      price: Number(price),
-      location,
-      description,
-      images // ⬅️ שומר מערך תמונות
-    };
-
-    properties.push(newProperty);
-    fs.writeFileSync(filePath, JSON.stringify(properties, null, 2), "utf-8");
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({ success: true, data }), { status: 200 });
 
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ success: false, error: err.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({ success: false, message: err.message }), { status: 500 });
   }
 }

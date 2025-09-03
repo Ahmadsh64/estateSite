@@ -1,29 +1,34 @@
 ---
-import fs from "fs";
-import path from "path";
+import { supabase } from "../../../lib/supabaseClient";
 
 const { params } = Astro;
-const filePath = path.resolve("./src/data/properties.json");
 
-interface Property {
-  id: number;
-  title: string;
-  price: number;
-  location: string;
-  description: string;
-  images: string[];
+// מוודאים ש-id תמיד מחרוזת
+const id: string = params.id as string;
+
+// פונקציה לטעינת נכס מ-Supabase לפי ID
+async function getProperty(id: string) {
+  const { data, error } = await supabase
+    .from("properties")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) return null;
+  return data as {
+    id: number;
+    title: string;
+    price: number;
+    location: string;
+    description: string;
+    images: string[];
+  };
 }
 
-let properties: Property[] = [];
-if (fs.existsSync(filePath)) {
-  const fileData = fs.readFileSync(filePath, "utf-8");
-  properties = JSON.parse(fileData);
-}
-
-const property = properties.find((p: Property) => p.id === Number(params.id));
+const property = await getProperty(id);
 
 if (!property) {
-  throw new Error(`Property with id ${params.id} not found`);
+  throw new Error(`Property with id ${id} not found`);
 }
 ---
 
@@ -59,7 +64,7 @@ if (!property) {
 
       <label>תמונות קיימות:</label>
       <div id="existingImages" class="edit-property-existing-images">
-        {property.images.map((img, i) => (
+        {property.images.map((img: string, i: number) => (
           <div class="edit-property-image-wrapper" data-index={i}>
             <img src={img} alt="תמונה קיימת" />
             <button type="button" class="edit-property-remove-btn">×</button>

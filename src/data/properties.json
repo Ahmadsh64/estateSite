@@ -57,5 +57,25 @@
       "http://localhost:4321/uploads/property_1756808037099_661.jpg",
       "http://localhost:4321/uploads/property_1756808037100_550.jpg"
     ]
+  },
+  {
+    "id": 6,
+    "title": "ה בצפון ",
+    "price": 235235,
+    "location": "משגב",
+    "description": "wvevdsv",
+    "images": [
+      "/uploads/property_1756839201412_972.png"
+    ]
+  },
+  {
+    "id": 7,
+    "title": "ה בצפון ",
+    "price": 235235,
+    "location": "משגב",
+    "description": "scacas",
+    "images": [
+      "/uploads/property_1756839240523_530.png"
+    ]
   }
 ]

@@ -1,12 +1,10 @@
-import fs from "fs";
-import path from "path";
-import { Buffer } from "buffer";
+import { supabase } from "../../lib/supabaseClient";
 
 export async function POST({ request }) {
   try {
     const formData = await request.formData();
 
-    const id = Number(formData.get("id"));
+    const id = formData.get("id");
     const title = formData.get("title");
     const price = formData.get("price");
     const location = formData.get("location");
@@ -19,61 +17,62 @@ export async function POST({ request }) {
       });
     }
 
-    const filePath = path.resolve("./src/data/properties.json");
-    if (!fs.existsSync(filePath)) {
-      return new Response(JSON.stringify({ success: false, message: "Properties file not found" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    // קבלת התמונות הקיימות (שלא הוסרו)
+    const existingImages = formData.getAll("existingImages");
 
-    const fileData = fs.readFileSync(filePath, "utf-8");
-    let properties = JSON.parse(fileData);
-
-    const index = properties.findIndex(p => p.id === id);
-    if (index === -1) {
-      return new Response(JSON.stringify({ success: false, message: "Property not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // קבלת התמונות הקיימות שנשמרו בדף (לא נמחקו)
-    const existingImages = formData.getAll("existingImages"); // מערך נתיבים
-
-    // קבלת התמונות החדשות שנבחרו
+    // קבלת התמונות החדשות להעלאה
     const imageFiles = formData.getAll("images");
-
-    const uploadDir = path.resolve("./public/uploads");
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
     const newImages = [];
 
     for (const file of imageFiles) {
       if (file && file.name) {
-        const ext = path.extname(file.name);
-        const newFileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}${ext}`;
-        const fileBuffer = Buffer.from(await file.arrayBuffer());
-        const fullPath = path.join(uploadDir, newFileName);
-        fs.writeFileSync(fullPath, fileBuffer);
-        newImages.push(`/uploads/${newFileName}`);
+        const ext = file.name.split(".").pop();
+        const newFileName = `property_${Date.now()}_${Math.floor(Math.random() * 1000)}.${ext}`;
+
+        // העלאה ל-Supabase storage
+        const { error: uploadError } = await supabase.storage
+          .from("properties") // 👈 השם של ה-bucket שלך ב-Supabase
+          .upload(newFileName, file, { cacheControl: "3600", upsert: false });
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          continue;
+        }
+
+        // קבלת URL ציבורי
+        const { data: publicUrlData } = supabase.storage
+          .from("properties")
+          .getPublicUrl(newFileName);
+
+        if (publicUrlData?.publicUrl) {
+          newImages.push(publicUrlData.publicUrl);
+        }
       }
     }
 
-    // עדכון המערך הסופי: existingImages + newImages
+    // התמונות הסופיות: קיימות + חדשות
     const finalImages = [...existingImages, ...newImages];
 
-    // עדכון הנתונים
-    properties[index] = {
-      ...properties[index],
-      title,
-      price: Number(price),
-      location,
-      description,
-      images: finalImages
-    };
+    // עדכון הרשומה ב-Supabase
+    const { error: updateError } = await supabase
+      .from("properties")
+      .update({
+        title,
+        price: Number(price),
+        location,
+        description,
+        images: finalImages,
+      })
+      .eq("id", id);
 
-    fs.writeFileSync(filePath, JSON.stringify(properties, null, 2), "utf-8");
+    if (updateError) {
+      console.error(updateError);
+      return new Response(JSON.stringify({ success: false, message: "DB update failed" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     return new Response(JSON.stringify({ success: true, images: finalImages }), {
       status: 200,

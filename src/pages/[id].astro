@@ -1,9 +1,8 @@
 ---
-import fs from "fs";
-import path from "path";
+import { supabase } from "../lib/supabaseClient";
 
 interface Property {
-  id: number;
+  id: string;
   title: string;
   price: number;
   location: {
@@ -14,36 +13,67 @@ interface Property {
   };
   description: string;
   images: string[];
-  rooms: number;
-  beds: number;
-  bathrooms: number;
-  type: string;
-  hasKitchen: boolean;
-  hasWashingMachine: boolean;
-  hasWifi: boolean;
-  hasTv: boolean;
-  publicTransport: boolean;
-  parking: boolean;
-  checkIn: string;
-  checkOut: string;
-  minStay: number;
+  rooms?: number;
+  beds?: number;
+  bathrooms?: number;
+  type?: string;
+  hasKitchen?: boolean;
+  hasWashingMachine?: boolean;
+  hasWifi?: boolean;
+  hasTv?: boolean;
+  publicTransport?: boolean;
+  parking?: boolean;
+  checkIn?: string;
+  checkOut?: string;
+  minStay?: number;
 }
 
 const { params } = Astro;
-const id = parseInt(params.id ?? "0");
+const id = params.id;
 
-const filePath = path.resolve("./src/data/properties.json");
-let properties: Property[] = [];
+// שליפת הדירה לפי מזהה מ-Supabase
+let property: Property | null = null;
 
-if (fs.existsSync(filePath)) {
-  const fileData = fs.readFileSync(filePath, "utf-8");
-  properties = JSON.parse(fileData) as Property[];
+const { data, error } = await supabase
+  .from("properties")
+  .select("*")
+  .eq("id", id)
+  .single();
+
+if (error) {
+  console.error("שגיאה בשליפת הדירה:", error.message);
+} else if (data) {
+  // המרה למבנה Property
+  property = {
+    id: data.id,
+    title: data.title,
+    price: data.price,
+    location: {
+      city: data.city || data.location || "",
+      street: data.street || "",
+      number: data.number || "",
+      floor: data.floor || "",
+    },
+    description: data.description,
+    images: data.images || [],
+    rooms: data.rooms,
+    beds: data.beds,
+    bathrooms: data.bathrooms,
+    type: data.type,
+    hasKitchen: data.hasKitchen,
+    hasWashingMachine: data.hasWashingMachine,
+    hasWifi: data.hasWifi,
+    hasTv: data.hasTv,
+    publicTransport: data.publicTransport,
+    parking: data.parking,
+    checkIn: data.checkIn,
+    checkOut: data.checkOut,
+    minStay: data.minStay,
+  };
 }
 
-const property = properties.find((p: Property) => p.id === id);
 const images = property ? (Array.isArray(property.images) ? property.images : [property.images]) : [];
 ---
-
 <html lang="he">
 <head>
   <meta charset="UTF-8" />
@@ -58,7 +88,6 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
   <main class="detail-container">
     {property ? (
       <>
-        <!-- צד שמאל - גלריה -->
         <div class="detail-gallery">
           <img id="detailMainImage" src={images[0]} alt={property.title} class="detail-main-image" />
           <div class="detail-thumbs">
@@ -73,7 +102,6 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
           </div>
         </div>
 
-        <!-- צד ימין - פרטים -->
         <div class="detail-info">
           <h1 class="detail-title">{property.title}</h1>
           <p class="detail-price">מחיר: {property.price.toLocaleString("he-IL")}</p>
@@ -98,18 +126,6 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
             <li>⏰ שעת יציאה: {property.checkOut}</li>
             <li>🗓 מינימום הזמנה בימים: {property.minStay}</li>
           </ul>
-
-          <div class="detail-contact-box">
-            <h3>מעוניין בנכס זה?</h3>
-            <p>השאירו פרטים ונחזור אליכם בהקדם!</p>
-            <form class="detail-contact-form">
-              <input type="text" name="name" placeholder="שם מלא" required />
-              <input type="email" name="email" placeholder="אימייל" required />
-              <input type="tel" name="phone" placeholder="טלפון" required />
-              <textarea name="message" placeholder="הודעה"></textarea>
-              <button type="submit">שליחה 📩</button>
-            </form>
-          </div>
         </div>
       </>
     ) : (

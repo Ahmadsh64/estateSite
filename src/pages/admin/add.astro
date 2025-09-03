@@ -1,8 +1,5 @@
 ---
-import fs from "fs";
-import path from "path";
-
-const filePath = path.resolve("./src/data/properties.json");
+import { supabase } from "../../lib/supabaseClient";
 ---
 
 <html lang="he">
@@ -100,7 +97,7 @@ const filePath = path.resolve("./src/data/properties.json");
             allFiles = [];
             updatePreview();
           } else {
-            msg.textContent = "❌ שגיאה בהוספה";
+            msg.textContent = `❌ שגיאה: ${result.message}`;
             msg.style.color = "red";
           }
         } catch (err) {
