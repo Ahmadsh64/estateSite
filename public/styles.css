@@ -291,11 +291,12 @@ header .admin-btn:hover {
   color: #fff;
   font-weight: bold;
   text-decoration: none;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .admin-nav a:hover {
   background-color: #7e620f;
+  transform: scale(1.05);
 }
 
 .admin-main {
@@ -351,36 +352,33 @@ header .admin-btn:hover {
   gap: 10px;
 }
 
-.admin-edit-btn {
-  background-color: #0077cc;
-  color: white;
+.admin-edit-btn,
+.admin-delete-btn {
   padding: 6px 12px;
   border-radius: 6px;
   text-align: center;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s;
+  cursor: pointer;
+}
+
+.admin-edit-btn {
+  background-color: #0077cc;
+  color: white;
 }
 
 .admin-edit-btn:hover {
   background-color: #005fa3;
+  transform: scale(1.05);
 }
 
 .admin-delete-btn {
   background-color: #e91e63;
   color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background 0.3s;
 }
 
 .admin-delete-btn:hover {
   background-color: #b71c1c;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .admin-main {
-    grid-template-columns: 1fr;
-  }
+  transform: scale(1.05);
 }
 
 /* =================== Property Page =================== */
@@ -420,11 +418,12 @@ header .admin-btn:hover {
   object-fit: cover;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: border 0.2s;
+  transition: border 0.2s, transform 0.2s;
 }
 
 .detail-thumb:hover {
   border: 2px solid #0077cc;
+  transform: scale(1.05);
 }
 
 .detail-info {
@@ -662,28 +661,23 @@ header .admin-btn:hover {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s;
+}
+
+.admin-login-main:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
 .admin-login-title {
   margin-bottom: 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .admin-login-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.admin-login-field label {
-  font-weight: bold;
-}
-
-.admin-login-input {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
 }
 
 .admin-login-btn {
@@ -694,123 +688,157 @@ header .admin-btn:hover {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s;
 }
 
 .admin-login-btn:hover {
   background-color: #7e620f;
+  transform: scale(1.05);
 }
 
 /* =================== Edit Property =================== */
-.edit-property-header h1 {
-  margin-bottom: 1rem;
+.edit-property-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
-.edit-property-back {
-  text-decoration: none;
-  color: #333;
+
+.edit-property-header h1 {
+  font-size: 2rem;
   font-weight: bold;
-  display: inline-block;
+  color: #333;
   margin-bottom: 1rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.edit-property-back {
+  font-size: 1.2rem;
+  color: #D9AF41;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.edit-property-back:hover {
+  color: #7e620f;
 }
 
 .edit-property-main {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
-  padding: 1rem;
+  padding: 2rem;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-property-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.edit-property-form label {
+  font-weight: bold;
+  color: #555;
+  font-size: 1rem;
 }
 
 .edit-property-input,
 .edit-property-textarea {
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 6px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 1rem;
+  background-color: #fff;
 }
 
-.edit-property-existing-images,
-.edit-property-preview {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+.edit-property-input:focus,
+.edit-property-textarea:focus {
+  border-color: #D9AF41;
+  box-shadow: 0 0 5px rgba(217, 175, 65, 0.5);
 }
 
 .edit-property-image-wrapper {
-  position: relative;
   display: inline-block;
+  margin-right: 15px;
+  margin-bottom: 10px;
 }
 
 .edit-property-image-wrapper img {
   width: 150px;
-  height: auto;
-  display: block;
-  border-radius: 6px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .edit-property-remove-btn {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  background: red;
+  background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
+  padding: 5px;
   border-radius: 50%;
   cursor: pointer;
-  width: 22px;
-  height: 22px;
-  font-weight: bold;
-  text-align: center;
-  line-height: 18px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 1.2rem;
+}
+
+.edit-property-remove-btn:hover {
+  background: #ff4d4d;
 }
 
 .edit-property-submit-btn {
-  padding: 0.5rem 1rem;
+  width: 100%;
+  padding: 0.8rem;
   background-color: #D9AF41;
   color: white;
   font-weight: bold;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .edit-property-submit-btn:hover {
   background-color: #7e620f;
+  transform: scale(1.05);
 }
 
-.edit-property-msg {
+.edit-property-submit-btn:active {
+  transform: scale(1.02);
+}
+
+#message {
+  text-align: center;
+  font-size: 1.2rem;
   margin-top: 1rem;
-  font-weight: bold;
 }
 
-/* =================== Image Upload & Preview =================== */
-.image-upload-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+#message.green {
+  color: green;
+}
+
+#message.red {
+  color: red;
+}
+
+/* תצוגת מקדימה של תמונות */
+#previewContainer img {
+  margin-right: 15px;
   margin-bottom: 10px;
-}
-
-.image-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.preview-img {
-  width: 100px;
+  width: 150px;
   height: 100px;
   object-fit: cover;
-  border-radius: 6px;
-  border: 2px solid #ccc;
-  transition: transform 0.2s, border-color 0.2s;
-  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.preview-img:hover {
-  transform: scale(1.1);
-  border-color: #0077cc;
-}
 
 /* =================== Footer =================== */
 footer {
@@ -832,11 +860,6 @@ footer {
   .property-gallery,
   .property-details {
     flex: 1 1 100%;
-  }
-
-  .property-gallery .thumb {
-    width: 60px;
-    height: 60px;
   }
 
   header {

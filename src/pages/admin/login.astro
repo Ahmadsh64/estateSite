@@ -18,6 +18,7 @@
       </div>
       <button type="submit" class="admin-login-btn">כניסה</button>
     </form>
+    <p id="login-message" class="admin-login-message"></p> <!-- הודעות שגיאה -->
   </main>
 
   <script type="module">
@@ -30,6 +31,7 @@
     );
 
     const form = document.getElementById('admin-login-form');
+    const message = document.getElementById('login-message');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -39,9 +41,10 @@
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        alert("שגיאה: " + error.message);
+        message.textContent = `❌ שגיאה: ${error.message}`;
+        message.style.color = "red";
       } else {
-        // שמירה ב-sessionStorage במקום localStorage
+        // שמירה ב-sessionStorage
         sessionStorage.setItem("sb-session", JSON.stringify(data.session));
 
         // מעבר ללוח הבקרה
@@ -50,17 +53,6 @@
         }, 500);
       }
     });
-
-    // פונקציות עזר לניהול session
-    export function getCurrentUser() {
-      const session = sessionStorage.getItem("sb-session");
-      return session ? JSON.parse(session) : null;
-    }
-
-    export function logout() {
-      sessionStorage.removeItem("sb-session");
-      window.location.href = "/admin/login";
-    }
   </script>
 </body>
 </html>

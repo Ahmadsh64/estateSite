@@ -1,3 +1,5 @@
+// types/property.ts
+
 export interface Location {
   city: string;
   street?: string;

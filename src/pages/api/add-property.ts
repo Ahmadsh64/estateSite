@@ -1,6 +1,29 @@
 import { supabase } from "../../lib/supabaseClient";
 
-export async function POST({ request }) {
+interface Property {
+  title: string;
+  price: number;
+  city: string;
+  street: string;
+  number: string;
+  floor: string;
+  bedrooms: number;
+  beds: number;
+  bathrooms: number;
+  type: string;
+  description: string;
+  kitchen: boolean;
+  washingmachine: boolean;
+  publictransportnearby: boolean;
+  checkintime: string | null;
+  checkouttime: string | null;
+  minstaydays: number;
+  is_active: boolean;
+  created_at: string;
+  images?: string[];
+}
+
+export async function POST({ request }: { request: Request }): Promise<Response> {
   try {
     // --- אימות משתמש ---
     const authHeader = request.headers.get("Authorization");
@@ -21,36 +44,47 @@ export async function POST({ request }) {
       );
     }
 
+    // --- בדיקת role של המשתמש ---
+    const { data: roleData, error: roleError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (roleError || roleData?.role !== 'admin') {
+      return new Response(
+        JSON.stringify({ success: false, message: "Access denied, admin role required" }),
+        { status: 403 }
+      );
+    }
+
     // --- נתוני הטופס ---
     const formData = await request.formData();
-    const property = {
-      title: formData.get("title"),
+    const property: Property = {
+      title: formData.get("title") as string,
       price: Number(formData.get("price")),
-      city: formData.get("city"),
-      street: formData.get("street") || "",
-      number: formData.get("number") || "",
-      floor: formData.get("floor") || "",
+      city: formData.get("city") as string,
+      street: formData.get("street") ? formData.get("street") as string : "",
+      number: formData.get("number") ? formData.get("number") as string : "",
+      floor: formData.get("floor") ? formData.get("floor") as string : "",
       bedrooms: Number(formData.get("bedrooms")) || 0,
       beds: Number(formData.get("beds")) || 0,
       bathrooms: Number(formData.get("bathrooms")) || 0,
-      type: formData.get("type") || "",
-      description: formData.get("description") || "",
+      type: formData.get("type") ? formData.get("type") as string : "",
+      description: formData.get("description") ? formData.get("description") as string : "",
       kitchen: formData.get("kitchen") === "on",
       washingmachine: formData.get("washingMachine") === "on",
-      wifi: formData.get("wifi") === "on",
-      tv: formData.get("tv") === "on",
       publictransportnearby: formData.get("publicTransportNearby") === "on",
-      parking: formData.get("parking") === "on",
-      checkintime: formData.get("checkInTime") || null,
-      checkouttime: formData.get("checkOutTime") || null,
+      checkintime: formData.get("checkInTime") ? formData.get("checkInTime") as string : null,
+      checkouttime: formData.get("checkOutTime") ? formData.get("checkOutTime") as string : null,
       minstaydays: Number(formData.get("minStayDays")) || 0,
       is_active: true,
       created_at: new Date().toISOString(),
     };
 
     // --- העלאת תמונות ל-Supabase Storage ---
-    const images = formData.getAll("images");
-    let imageUrls = [];
+    const images = formData.getAll("images") as File[];
+    let imageUrls: string[] = [];
 
     for (const file of images) {
       if (file && file.name) {
@@ -88,7 +122,7 @@ export async function POST({ request }) {
     if (insertError) {
       console.error("DB insert error:", insertError);
       return new Response(
-        JSON.stringify({ success: false, message: "Database insert failed" }),
+        JSON.stringify({ success: false, message: `Database insert failed: ${insertError.message}` }),
         { status: 500 }
       );
     }

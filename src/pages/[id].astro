@@ -1,12 +1,13 @@
 ---
 import { supabase } from "../lib/supabaseClient";
-import type { Property } from "../types/property";
+import type { Property } from "../types/property";  // ייבוא טיפוס Property
 
 const { params } = Astro;
 const id = params.id;
 
-let property: Property | null = null;
+let property: Property | null = null; // הגדרת property כ-Property או null
 
+// שליפת הדירה לפי ID מ-Supabase
 const { data, error } = await supabase
   .from("properties")
   .select("*")
@@ -15,7 +16,9 @@ const { data, error } = await supabase
 
 if (error) {
   console.error("שגיאה בשליפת הדירה:", error.message);
-} else if (data) {
+} 
+if (data) {
+  // המרת הנתונים לטיפוס Property
   property = {
     id: data.id,
     title: data.title,
@@ -26,84 +29,103 @@ if (error) {
       number: data.number || "",
       floor: data.floor || "",
     },
-    description: data.description,
+    description: data.description || "",
     images: data.images || [],
     occupancy: data.occupancy,
     bedrooms: data.bedrooms,
     beds: data.beds,
     bathrooms: data.bathrooms,
-    kitchen: data.kitchen,
-    washingMachine: data.washingMachine,
-    wifi: data.wifi,
-    tv: data.tv,
+    hasKitchen: data.kitchen, 
+    hasWashingMachine: data.washingMachine,
+    hasWifi: data.wifi,
+    hasTv: data.tv,
     publicTransportNearby: data.publicTransportNearby,
     parking: data.parking,
     checkInTime: data.checkInTime,
     checkOutTime: data.checkOutTime,
     minStayDays: data.minStayDays,
     type: data.type,
+    is_active: data.is_active, // הוספת השדה החסר
+    created_at: data.created_at, // הוספת השדה החסר
   };
 }
 
 const images = property ? (Array.isArray(property.images) ? property.images : [property.images]) : [];
 ---
+
 <html lang="he">
-<head>
-  <meta charset="UTF-8" />
-  <title>{property ? property.title : "דירה לא נמצאה"}</title>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
-<body dir="rtl">
-  <header class="detail-header">
-    <a href="/" class="detail-back-btn">⬅ חזרה לרשימת דירות</a>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <title>{property ? property.title : "דירה לא נמצאה"}</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body dir="rtl">
+    <header class="detail-header">
+      <a href="/" class="detail-back-btn">⬅ חזרה לרשימת דירות</a>
+    </header>
 
-  <main class="detail-container">
-    {property ? (
-      <>
-        <div class="detail-gallery">
-          <img id="detailMainImage" src={images[0]} alt={property.title} class="detail-main-image" />
-          <div class="detail-thumbs">
-            {images.map((img, i) => (
-              <img 
-                src={img} 
-                alt={`תמונה ${i+1} של ${property.title}`} 
-                class="detail-thumb" 
-                onclick={`document.getElementById('detailMainImage').src='${img}'`}
-              />
-            ))}
+    <main class="detail-container">
+      {property ? (
+        <>
+          <div class="detail-gallery">
+            <img id="detailMainImage" src={images[0] || "/images/default.jpg"} alt={property.title} class="detail-main-image" />
+            <div class="detail-thumbs">
+              {images.map((img, i) => (
+                <img 
+                  src={img} 
+                  alt={`תמונה ${i+1} של ${property.title}`} 
+                  class="detail-thumb" 
+                  id={`thumb-${i}`} 
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div class="detail-info">
-          <h1 class="detail-title">{property.title}</h1>
-          <p class="detail-price">מחיר: {property.price.toLocaleString("he-IL")}</p>
+          <div class="detail-info">
+            <h1 class="detail-title">{property.title}</h1>
+            <p class="detail-price">מחיר: {property.price.toLocaleString("he-IL")}</p>
 
-          <h3>מיקום:</h3>
-          <p class="detail-location">{property.location.city}, {property.location.street} {property.location.number}{property.location.floor ? `, קומה ${property.location.floor}` : ""}</p>
+            <h3>מיקום:</h3>
+            <p class="detail-location">
+              {property.location.city}, {property.location.street} {property.location.number}
+              {property.location.floor ? `, קומה ${property.location.floor}` : ""}
+            </p>
 
-          <p class="detail-description">{property.description}</p>
+            <p class="detail-description">{property.description}</p>
 
-          <ul class="detail-info-list">
-            <li>🛏 מספר חדרים: {property.rooms}</li>
-            <li>🛌 מיטות: {property.beds}</li>
-            <li>🚿 חדרי אמבטיה: {property.bathrooms}</li>
-            <li>🏠 סוג נכס: {property.type}</li>
-            <li>🍳 מטבח: {property.hasKitchen ? "כן" : "לא"}</li>
-            <li>🧺 מכונת כביסה: {property.hasWashingMachine ? "כן" : "לא"}</li>
-            <li>📶 Wi-Fi: {property.hasWifi ? "כן" : "לא"}</li>
-            <li>📺 טלוויזיה: {property.hasTv ? "כן" : "לא"}</li>
-            <li>🚌 תחבורה ציבורית בסביבה: {property.publicTransport ? "כן" : "לא"}</li>
-            <li>🚗 חניה: {property.parking ? "כן" : "לא"}</li>
-            <li>⏰ שעת כניסה: {property.checkIn}</li>
-            <li>⏰ שעת יציאה: {property.checkOut}</li>
-            <li>🗓 מינימום הזמנה בימים: {property.minStay}</li>
-          </ul>
-        </div>
-      </>
-    ) : (
-      <p class="detail-not-found">דירה זו לא קיימת.</p>
-    )}
-  </main>
-</body>
+            <ul class="detail-info-list">
+              <li>🛏 מספר חדרים: {property.bedrooms}</li>
+              <li>🛌 מיטות: {property.beds}</li>
+              <li>🚿 חדרי אמבטיה: {property.bathrooms}</li>
+              <li>🏠 סוג נכס: {property.type}</li>
+              <li>🍳 מטבח: {property.hasKitchen ? "כן" : "לא"}</li>
+              <li>🧺 מכונת כביסה: {property.hasWashingMachine ? "כן" : "לא"}</li>
+              <li>📶 Wi-Fi: {property.hasWifi ? "כן" : "לא"}</li>
+              <li>📺 טלוויזיה: {property.hasTv ? "כן" : "לא"}</li>
+              <li>🚌 תחבורה ציבורית בסביבה: {property.publicTransportNearby ? "כן" : "לא"}</li>
+              <li>🚗 חניה: {property.parking ? "כן" : "לא"}</li>
+              <li>⏰ שעת כניסה: {property.checkInTime || "לא צוינה"}</li>
+              <li>⏰ שעת יציאה: {property.checkOutTime || "לא צוינה"}</li>
+              <li>🗓 מינימום הזמנה בימים: {property.minStayDays || "לא צוינה"}</li>
+            </ul>
+          </div>
+        </>
+      ) : (
+        <p class="detail-not-found">דירה זו לא קיימת.</p>
+      )}
+    </main>
+
+    <script>
+      // הפונקציה שתחליף את התמונה הראשית כאשר נלחץ על תמונה בתצוגה הקטנה
+      document.querySelectorAll('.detail-thumb').forEach((thumb) => {
+        thumb.addEventListener('click', (event) => {
+          const mainImage = document.getElementById('detailMainImage') as HTMLImageElement; // טיפוס ספציפי
+          const target = event.target as HTMLImageElement; // טיפוס ספציפי
+          if (mainImage && target) {
+            mainImage.src = target.src;
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "lib": ["ESNext", "DOM"],
-    "jsx": "preserve",
+    "jsx": "react",  // שונה מ-preserve
     "strict": true,
     "noEmit": true,
     "allowJs": true,

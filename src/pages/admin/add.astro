@@ -109,7 +109,9 @@ import type { Property } from "../../types/property";
     try {
       const res = await fetch("/api/add-property", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 

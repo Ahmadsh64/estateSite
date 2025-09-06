@@ -18,7 +18,12 @@ async function getProperty(id: string) {
 
 const property = await getProperty(id);
 if (!property) throw new Error(`Property with id ${id} not found`);
-
+// ודא שהמיקום קיים לפני הגישה
+const location = property.location || {};
+const city = location.city || ""; // שים ערך ברירת מחדל אם העיר לא קיימת
+const street = location.street || "";
+const number = location.number || "";
+const floor = location.floor || "";
 ---
 
 <html lang="he">
@@ -28,166 +33,168 @@ if (!property) throw new Error(`Property with id ${id} not found`);
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body dir="rtl">
-<header class="edit-property-header">
-  <h1>עריכת דירה - {property.title}</h1>
-  <a href="/admin/dashboard" class="edit-property-back">⬅️ חזרה לדשבורד</a>
-</header>
+  <header class="edit-property-header">
+    <h1>עריכת דירה - {property.title}</h1>
+    <a href="/admin/dashboard" class="edit-property-back">⬅️ חזרה לדשבורד</a>
+  </header>
 
-<main class="edit-property-main">
-  <form id="editForm" class="edit-property-form" data-id={property.id}>
-    <!-- כותרת ומחיר -->
-    <label>כותרת:</label>
-    <input type="text" name="title" value={property.title} required />
-    <label>מחיר:</label>
-    <input type="number" name="price" value={property.price} required />
+  <main class="edit-property-main">
+    <form id="editForm" class="edit-property-form" data-id={property.id}>
+      <!-- כותרת ומחיר -->
+      <label>כותרת:</label>
+      <input type="text" name="title" value={property.title} required />
+      
+      <label>מחיר:</label>
+      <input type="number" name="price" value={property.price} required />
 
-    <!-- מיקום -->
-    <label>עיר:</label>
-    <input type="text" name="city" value={property.location.city} />
-    <label>רחוב:</label>
-    <input type="text" name="street" value={property.location.street} />
-    <label>מספר:</label>
-    <input type="text" name="number" value={property.location.number} />
-    <label>קומה:</label>
-    <input type="text" name="floor" value={property.location.floor || ""} />
+      <!-- מיקום -->
+      <label>עיר:</label>
+      <input type="text" name="city" value={city} />
+      <label>רחוב:</label>
+      <input type="text" name="street" value={street} />
+      <label>מספר:</label>
+      <input type="text" name="number" value={number} />
+      <label>קומה:</label>
+      <input type="text" name="floor" value={floor || ""} />
 
-    <!-- תיאור -->
-    <label>תיאור:</label>
-    <textarea name="description">{property.description}</textarea>
+      <!-- תיאור -->
+      <label>תיאור:</label>
+      <textarea name="description">{property.description || ""}</textarea>
 
-    <!-- תמונות -->
-    <label>תמונות קיימות:</label>
-    <div id="existingImages">
-      {property.images.map((img, i) => (
-        <div class="edit-property-image-wrapper" data-index={i}>
-          <img src={img} alt="תמונה קיימת" />
-          <button type="button" class="edit-property-remove-btn">×</button>
-        </div>
-      ))}
-    </div>
-    <label>הוסף תמונות חדשות:</label>
-    <input type="file" id="imageInput" multiple accept="image/*" />
-    <div id="previewContainer"></div>
+      <!-- תמונות -->
+      <label>תמונות קיימות:</label>
+      <div id="existingImages">
+        {property.images.map((img, i) => (
+          <div class="edit-property-image-wrapper" data-index={i}>
+            <img src={img} alt="תמונה קיימת" />
+            <button type="button" class="edit-property-remove-btn">×</button>
+          </div>
+        ))}
+      </div>
 
-    <!-- פרטים נוספים -->
-    <label>מספר חדרים:</label>
-    <input type="number" name="bedrooms" value={property.bedrooms || ""} />
-    <label>מספר מיטות:</label>
-    <input type="number" name="beds" value={property.beds || ""} />
-    <label>חדרי אמבטיה:</label>
-    <input type="number" name="bathrooms" value={property.bathrooms || ""} />
-    <label>סוג נכס:</label>
-    <input type="text" name="type" value={property.type || ""} />
+      <label>הוסף תמונות חדשות:</label>
+      <input type="file" id="imageInput" multiple accept="image/*" />
+      <div id="previewContainer"></div>
 
-    <label>מטבח:</label>
-    <input type="checkbox" name="kitchen" checked={property.kitchen || false} />
-    <label>מכונת כביסה:</label>
-    <input type="checkbox" name="washingMachine" checked={property.washingMachine || false} />
-    <label>Wi-Fi:</label>
-    <input type="checkbox" name="wifi" checked={property.wifi || false} />
-    <label>טלוויזיה:</label>
-    <input type="checkbox" name="tv" checked={property.tv || false} />
-    <label>תחבורה ציבורית בסביבה:</label>
-    <input type="checkbox" name="publicTransportNearby" checked={property.publicTransportNearby || false} />
-    <label>חניה:</label>
-    <input type="checkbox" name="parking" checked={property.parking || false} />
+      <!-- פרטים נוספים -->
+      <label>מספר חדרים:</label>
+      <input type="number" name="bedrooms" value={property.bedrooms || ""} />
+      <label>מספר מיטות:</label>
+      <input type="number" name="beds" value={property.beds || ""} />
+      <label>חדרי אמבטיה:</label>
+      <input type="number" name="bathrooms" value={property.bathrooms || ""} />
+      <label>סוג נכס:</label>
+      <input type="text" name="type" value={property.type || ""} />
 
-    <label>שעת כניסה:</label>
-    <input type="time" name="checkInTime" value={property.checkInTime || ""} />
-    <label>שעת יציאה:</label>
-    <input type="time" name="checkOutTime" value={property.checkOutTime || ""} />
-    <label>מינימום ימים:</label>
-    <input type="number" name="minStayDays" value={property.minStayDays || ""} />
+      <label>מטבח:</label>
+      <input type="checkbox" name="kitchen" checked={property.kitchen || false} />
+      <label>מכונת כביסה:</label>
+      <input type="checkbox" name="washingMachine" checked={property.washingMachine || false} />
+      <label>Wi-Fi:</label>
+      <input type="checkbox" name="wifi" checked={property.wifi || false} />
+      <label>טלוויזיה:</label>
+      <input type="checkbox" name="tv" checked={property.tv || false} />
+      <label>תחבורה ציבורית בסביבה:</label>
+      <input type="checkbox" name="publicTransportNearby" checked={property.publicTransportNearby || false} />
+      <label>חניה:</label>
+      <input type="checkbox" name="parking" checked={property.parking || false} />
 
-    <button type="submit">שמור שינויים</button>
-  </form>
+      <label>שעת כניסה:</label>
+      <input type="time" name="checkInTime" value={property.checkInTime || ""} />
+      <label>שעת יציאה:</label>
+      <input type="time" name="checkouttime" value={property.checkouttime || ""} />
+      <label>מינימום ימים:</label>
+      <input type="number" name="minStayDays" value={property.minStayDays || ""} />
 
-  <p id="message"></p>
-</main>
+      <button type="submit">שמור שינויים</button>
+    </form>
 
-<script type="module">
-  const form = document.getElementById("editForm");
-  const msg = document.getElementById("message");
-  const imageInput = document.getElementById("imageInput");
-  const previewContainer = document.getElementById("previewContainer");
-  const existingImagesDiv = document.getElementById("existingImages");
+    <p id="message"></p>
+  </main>
 
-  let existingImages = Array.from(existingImagesDiv.querySelectorAll("img")).map(img => img.src);
+  <script type="module">
+    const form = document.getElementById("editForm");
+    const msg = document.getElementById("message");
+    const imageInput = document.getElementById("imageInput");
+    const previewContainer = document.getElementById("previewContainer");
+    const existingImagesDiv = document.getElementById("existingImages");
 
-  existingImagesDiv.addEventListener("click", (e) => {
-    if (e.target.classList.contains("edit-property-remove-btn")) {
-      const wrapper = e.target.parentElement;
-      const index = Number(wrapper.dataset.index);
-      existingImages.splice(index, 1);
-      wrapper.remove();
-    }
-  });
+    let existingImages = Array.from(existingImagesDiv.querySelectorAll("img")).map((img) => img.src);
 
-  imageInput.addEventListener("change", () => {
-    previewContainer.innerHTML = "";
-    Array.from(imageInput.files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        img.width = 150;
-        previewContainer.appendChild(img);
-      };
-      reader.readAsDataURL(file);
+    existingImagesDiv.addEventListener("click", (e) => {
+      if (e.target.classList.contains("edit-property-remove-btn")) {
+        const wrapper = e.target.parentElement;
+        const index = Number(wrapper.dataset.index);
+        existingImages.splice(index, 1);
+        wrapper.remove();
+      }
     });
-  });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    formData.append("id", form.dataset.id);
-    existingImages.forEach(src => formData.append("existingImages", src));
-    Array.from(imageInput.files).forEach(file => formData.append("images", file));
-
-    try {
-      const token = sessionStorage.getItem("token");
-      if (!token) {
-        msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
-        msg.style.color = "red";
-        return;
-      }
-
-      const res = await fetch("/api/edit-property", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      const result = await res.json();
-      if (result.success) {
-        msg.textContent = "✅ הדירה עודכנה בהצלחה!";
-        msg.style.color = "green";
-        existingImagesDiv.innerHTML = "";
-        previewContainer.innerHTML = "";
-        result.images.forEach((src) => {
-          const wrapper = document.createElement("div");
-          wrapper.className = "edit-property-image-wrapper";
+    imageInput.addEventListener("change", () => {
+      previewContainer.innerHTML = "";
+      Array.from(imageInput.files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
           const img = document.createElement("img");
-          img.src = src;
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "edit-property-remove-btn";
-          btn.textContent = "×";
-          wrapper.appendChild(img);
-          wrapper.appendChild(btn);
-          existingImagesDiv.appendChild(wrapper);
+          img.src = e.target.result;
+          img.width = 150;
+          previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      formData.append("id", form.dataset.id);
+      existingImages.forEach((src) => formData.append("existingImages", src));
+      Array.from(imageInput.files).forEach((file) => formData.append("images", file));
+
+      try {
+        const token = sessionStorage.getItem("sb-session");
+        if (!token) {
+          msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
+          msg.style.color = "red";
+          return;
+        }
+
+        const res = await fetch("/api/edit-property", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
         });
-        existingImages = [...result.images];
-      } else {
-        msg.textContent = `❌ שגיאה: ${result.message}`;
+
+        const result = await res.json();
+        if (result.success) {
+          msg.textContent = "✅ הדירה עודכנה בהצלחה!";
+          msg.style.color = "green";
+          existingImagesDiv.innerHTML = "";
+          previewContainer.innerHTML = "";
+          result.images.forEach((src) => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "edit-property-image-wrapper";
+            const img = document.createElement("img");
+            img.src = src;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "edit-property-remove-btn";
+            btn.textContent = "×";
+            wrapper.appendChild(img);
+            wrapper.appendChild(btn);
+            existingImagesDiv.appendChild(wrapper);
+          });
+          existingImages = [...result.images];
+        } else {
+          msg.textContent = `❌ שגיאה: ${result.message}`;
+          msg.style.color = "red";
+        }
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "❌ שגיאה בחיבור לשרת";
         msg.style.color = "red";
       }
-    } catch (err) {
-      console.error(err);
-      msg.textContent = "❌ שגיאה בחיבור לשרת";
-      msg.style.color = "red";
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
