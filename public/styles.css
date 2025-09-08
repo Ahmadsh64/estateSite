@@ -214,7 +214,13 @@ header .admin-btn:hover {
   color: #e91e63;
   margin: 5px 0;
 }
-
+.home-property-price::after {
+  content: " ₪";
+  font-size: 1rem;
+  font-weight: bold;
+  color: #e91e63;
+  margin: 5px 0;
+}
 .home-property-location,
 .home-property-details,
 .home-property-check-times {
@@ -446,6 +452,12 @@ header .admin-btn:hover {
   margin: 15px 0;
 }
 
+.detail-price::after {
+  content: " ₪";
+  font-weight: bold;
+  color: #e91e63;
+}
+
 .detail-description {
   margin: 15px 0;
   line-height: 1.6;
@@ -634,23 +646,28 @@ header .admin-btn:hover {
 
 .admin-add-submit-btn {
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   font-weight: bold;
   background-color: #D9AF41;
   color: white;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .admin-add-submit-btn:hover {
   background-color: #7e620f;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* הוספתי צל רך */
 }
 
-.admin-add-message {
-  margin-top: 15px;
-  font-weight: bold;
+.admin-add-submit-btn:active {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* הצל יהיה פחות חזק בעת לחיצה */
 }
+
 
 /* =================== Admin Login =================== */
 .admin-login-main {

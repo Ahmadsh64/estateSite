@@ -68,7 +68,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
       {property ? (
         <>
           <div class="detail-gallery">
-            <img id="detailMainImage" src={images[0] || "/images/default.jpg"} alt={property.title} class="detail-main-image" />
+            <img id="detailMainImage" src={images[0] } alt={property.title} class="detail-main-image" />
             <div class="detail-thumbs">
               {images.map((img, i) => (
                 <img 

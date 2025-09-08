@@ -1,7 +1,7 @@
---- 
+---
 import i18next from "../i18n";
 import { supabase } from "../lib/supabaseClient";
-import type { Property } from "../types/property";  // ייבוא הטיפוס
+import type { Property } from "../types/property"; // ייבוא הטיפוס
 
 // שליפת ערים וכלל הנתונים
 let availableCities: string[] = [];
@@ -16,7 +16,7 @@ if (!citiesError && citiesData) {
   availableCities = [...new Set(citiesData.map((item: any) => item["city"]))];
 }
 
-let properties: Property[] = [];  // הגדרת טיפוס למשתנה
+let properties: Property[] = []; // הגדרת טיפוס למשתנה
 const url = new URL(Astro.request.url);
 const selectedRooms = url.searchParams.get("rooms");
 const selectedAmenities = url.searchParams.getAll("amenities");
@@ -52,7 +52,7 @@ if (selectedAmenities.length > 0) {
 const { data, error } = await query;
 
 if (!error && data) {
-  properties = data as Property[];  // המרת הנתונים לטיפוס Property[]
+  properties = data as Property[]; // המרת הנתונים לטיפוס Property[]
 } else {
   console.error("שגיאה בשליפת הדירות:", error?.message);
 }
@@ -65,6 +65,7 @@ if (!error && data) {
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body dir="rtl">
+    <!-- Header -->
     <header>
       <div class="logo">
         <img src="/images/logo.png" alt={i18next.t("property.title")} />
@@ -76,112 +77,146 @@ if (!error && data) {
       <a href="/admin/login" class="admin-btn">{i18next.t("admin.login")}</a>
     </header>
 
+    <!-- Hero Section -->
     <section class="hero">
       <div class="overlay">
         <h1>{i18next.t("search.title")}</h1>
         <p>{i18next.t("search.description")}</p>
+        <!-- Search Form -->
         <form class="filters" action="/" method="get">
-          <select name="rooms">
-            <option value="">{i18next.t("search.rooms")}</option>
-            {
-              availableBedrooms.map((room) => (
-                <option value={room}>{room}</option>
-              ))
-            }
-            <option value="5+">5+</option>
-          </select>
-
-          <select name="location">
-            <option value="">{i18next.t("search.location")}</option>
-            {
-              availableCities.map((city) => (
-                <option value={city}>{city}</option>
-              ))
-            }
-          </select>
-
-          <div>
-            <label>{i18next.t("search.amenities")}:</label>
-            <label
-              ><input type="checkbox" name="amenities" value="מכונת כביסה" />
-              {i18next.t("property.washingMachine")}</label
-            >
-            <label
-              ><input type="checkbox" name="amenities" value="WiFi" />
-              {i18next.t("property.wifi")}</label
-            >
-            <label
-              ><input type="checkbox" name="amenities" value="חניה" />
-              {i18next.t("property.parking")}</label
-            >
-            <label
-              ><input type="checkbox" name="amenities" value="טלוויזיה" />
-              {i18next.t("property.tv")}</label
-            >
+          <!-- Filter for Rooms -->
+          <div class="filter-group">
+            <select name="rooms">
+              <option value="">{i18next.t("search.rooms")}</option>
+              {
+                availableBedrooms.map((room) => (
+                  <option value={room}>{room}</option>
+                ))
+              }
+              <option value="5+">5+</option>
+            </select>
           </div>
 
-          <button type="submit">{i18next.t("search.searchButton")}</button>
+          <!-- Filter for Location -->
+          <div class="filter-group">
+            <select name="location">
+              <option value="">{i18next.t("search.location")}</option>
+              {
+                availableCities.map((city) => (
+                  <option value={city}>{city}</option>
+                ))
+              }
+            </select>
+          </div>
+
+          <!-- Filter for Amenities -->
+          <div class="filter-group">
+            <label>{i18next.t("search.amenities")}:</label>
+            <div class="amenities-checkboxes">
+              <label
+                ><input type="checkbox" name="amenities" value="מכונת כביסה" />{
+                  i18next.t("property.washingMachine")
+                }</label
+              >
+              <label
+                ><input type="checkbox" name="amenities" value="WiFi" />{
+                  i18next.t("property.wifi")
+                }</label
+              >
+              <label
+                ><input type="checkbox" name="amenities" value="חניה" />{
+                  i18next.t("property.parking")
+                }</label
+              >
+              <label
+                ><input type="checkbox" name="amenities" value="טלוויזיה" />{
+                  i18next.t("property.tv")
+                }</label
+              >
+            </div>
+          </div>
+
+          <button type="submit" class="search-btn"
+            >{i18next.t("search.searchButton")}</button
+          >
         </form>
       </div>
     </section>
 
+    <!-- Property Listings -->
     <main>
       <ul class="home-property-list">
         {
           properties.map((p: Property) => (
             <li class="home-property-item">
-              <a href={`/${p.id}`}>
+              <a href={`/${p.id}`} class="home-property-link">
                 <div class="home-property-images">
                   <img
+                    id={`main-image-${p.id}`}
                     loading="lazy"
-                    src={p.images[0] || "/images/default.jpg"}
+                    src={p.images[0]}
                     alt={p.title}
+                    class="property-main-image"
                   />
+                  <div class="property-thumbs">
+                    {p.images.map((img, i) => (
+                      <img
+                        src={img}
+                        alt={`תמונה ${i + 1} של ${p.title}`}
+                        class="property-thumb"
+                        data-index={i}
+                        onclick={`document.getElementById('main-image-${p.id}').src='${img}'`}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <h2 class="home-property-title">{p.title}</h2>
-                <p class="home-property-price">
-                  {i18next.t("property.price")}:{" "}
-                  {p.price.toLocaleString("he-IL")}
-                </p>
-                <p class="home-property-location">
-                  {p.location?.city || ""} {p.location?.street || ""}{" "}
-                  {p.location?.number || ""}
-                  {p.location?.floor ? `, קומה ${p.location.floor}` : ""}
-                </p>
 
-                <p class="home-property-details">
-                  {[{
-                    key: "bedrooms",
-                    label: i18next.t("property.rooms"),
-                    value: p.bedrooms,
-                  },
-                  {
-                    key: "washingMachine",
-                    label: i18next.t("property.washingMachine"),
-                    value: p.washingMachine ? "✔️" : "❌",
-                  },
-                  {
-                    key: "wifi",
-                    label: i18next.t("property.wifi"),
-                    value: p.wifi ? "✔️" : "❌",
-                  },
-                  {
-                    key: "parking",
-                    label: i18next.t("property.parking"),
-                    value: p.parking ? "✔️" : "❌",
-                  },
-                  {
-                    key: "tv",
-                    label: i18next.t("property.tv"),
-                    value: p.tv ? "✔️" : "❌",
-                  }].map((feature) =>
-                    feature.value ? (
-                      <span>
-                        {feature.label}: {feature.value} |{" "}
+                <div class="property-details">
+                  <h2 class="home-property-title">{p.title}</h2>
+                  <p class="home-property-price">
+                    {i18next.t("property.price")}:{" "}
+                    {p.price.toLocaleString("he-IL")}
+                  </p>
+                  <p class="home-property-location">
+                    {p.location?.city || ""} {p.location?.street || ""}{" "}
+                    {p.location?.number || ""}
+                    {p.location?.floor ? `, קומה ${p.location.floor}` : ""}
+                  </p>
+
+                  <p class="home-property-features">
+                    {[
+                      { label: "חדרים", value: p.bedrooms },
+                      { label: "מיטות", value: p.beds },
+                      { label: "חדרי אמבטיה", value: p.bathrooms },
+                      { label: "נפשות מקסימום", value: p.occupancy },
+                      { label: "מטבח", value: p.kitchen ? "✔️" : "❌" },
+                      {
+                        label: "מכונת כביסה",
+                        value: p.washingMachine ? "✔️" : "❌",
+                      },
+                      { label: "WiFi", value: p.wifi ? "✔️" : "❌" },
+                      { label: "טלוויזיה", value: p.tv ? "✔️" : "❌" },
+                      { label: "חניה", value: p.parking ? "✔️" : "❌" },
+                    ].map((feature, i) => (
+                      <span class="property-feature">
+                        {feature.label}: {feature.value} {i < 8 ? "| " : ""}{" "}
+                        {/* כדי לא להוסיף "|" בסוף */}
                       </span>
-                    ) : null,
-                  )}
-                </p>
+                    ))}
+                  </p>
+
+                  <p class="property-times">
+                    {[
+                      { label: "כניסה", value: p.checkInTime || "-" },
+                      { label: "יציאה", value: p.checkOutTime || "-" },
+                      { label: "מינימום ימים", value: p.minStayDays || "-" },
+                    ].map((time, i) => (
+                      <span class="property-time">
+                        {time.label}: {time.value} {i < 2 ? "| " : ""}
+                      </span>
+                    ))}
+                  </p>
+                </div>
               </a>
             </li>
           ))

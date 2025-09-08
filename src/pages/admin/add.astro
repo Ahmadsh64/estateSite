@@ -6,7 +6,7 @@ import type { Property } from "../../types/property";
 <html lang="he">
 <head>
   <meta charset="UTF-8" />
-  <title>הוספת דירה חדשה</title>
+  <title>➕ הוספת דירה חדשה</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body dir="rtl">
@@ -96,7 +96,7 @@ import type { Property } from "../../types/property";
     e.preventDefault();
     const formData = new FormData(form);
 
-    // שליפת ה-session מה־sessionStorage
+    // --- בדיקה אם המשתמש מחובר ---
     const session = sessionStorage.getItem("sb-session");
     if (!session) {
       msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
@@ -107,6 +107,7 @@ import type { Property } from "../../types/property";
     const token = JSON.parse(session).access_token;
 
     try {
+      // --- שליחה ל-API ---
       const res = await fetch("/api/add-property", {
         method: "POST",
         headers: { 
@@ -116,6 +117,7 @@ import type { Property } from "../../types/property";
       });
 
       const result = await res.json();
+
       if (result.success) {
         msg.textContent = "✅ הדירה נוספה בהצלחה!";
         msg.style.color = "green";
@@ -123,6 +125,13 @@ import type { Property } from "../../types/property";
       } else {
         msg.textContent = `❌ שגיאה: ${result.message}`;
         msg.style.color = "red";
+
+        // אם אין הרשאה (403) – הפנייה ל-login
+        if (res.status === 403) {
+          setTimeout(() => {
+            window.location.href = "/admin/login";
+          }, 1000);
+        }
       }
     } catch (err) {
       console.error(err);

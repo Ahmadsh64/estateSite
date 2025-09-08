@@ -18,12 +18,8 @@ async function getProperty(id: string) {
 
 const property = await getProperty(id);
 if (!property) throw new Error(`Property with id ${id} not found`);
-// ודא שהמיקום קיים לפני הגישה
+
 const location = property.location || {};
-const city = location.city || ""; // שים ערך ברירת מחדל אם העיר לא קיימת
-const street = location.street || "";
-const number = location.number || "";
-const floor = location.floor || "";
 ---
 
 <html lang="he">
@@ -36,6 +32,7 @@ const floor = location.floor || "";
   <header class="edit-property-header">
     <h1>עריכת דירה - {property.title}</h1>
     <a href="/admin/dashboard" class="edit-property-back">⬅️ חזרה לדשבורד</a>
+    <button id="logout-btn">🚪 יציאה</button>
   </header>
 
   <main class="edit-property-main">
@@ -49,19 +46,19 @@ const floor = location.floor || "";
 
       <!-- מיקום -->
       <label>עיר:</label>
-      <input type="text" name="city" value={city} />
+      <input type="text" name="city" value={location.city || ""} required/>
       <label>רחוב:</label>
-      <input type="text" name="street" value={street} />
+      <input type="text" name="street" value={location.street || ""} />
       <label>מספר:</label>
-      <input type="text" name="number" value={number} />
+      <input type="text" name="number" value={location.number || ""} />
       <label>קומה:</label>
-      <input type="text" name="floor" value={floor || ""} />
+      <input type="text" name="floor" value={location.floor || ""} />
 
       <!-- תיאור -->
       <label>תיאור:</label>
       <textarea name="description">{property.description || ""}</textarea>
 
-      <!-- תמונות -->
+      <!-- תמונות קיימות -->
       <label>תמונות קיימות:</label>
       <div id="existingImages">
         {property.images.map((img, i) => (
@@ -72,6 +69,7 @@ const floor = location.floor || "";
         ))}
       </div>
 
+      <!-- העלאת תמונות חדשות -->
       <label>הוסף תמונות חדשות:</label>
       <input type="file" id="imageInput" multiple accept="image/*" />
       <div id="previewContainer"></div>
@@ -102,7 +100,7 @@ const floor = location.floor || "";
       <label>שעת כניסה:</label>
       <input type="time" name="checkInTime" value={property.checkInTime || ""} />
       <label>שעת יציאה:</label>
-      <input type="time" name="checkouttime" value={property.checkouttime || ""} />
+      <input type="time" name="checkOutTime" value={property.checkOutTime || ""} />
       <label>מינימום ימים:</label>
       <input type="number" name="minStayDays" value={property.minStayDays || ""} />
 
@@ -118,9 +116,18 @@ const floor = location.floor || "";
     const imageInput = document.getElementById("imageInput");
     const previewContainer = document.getElementById("previewContainer");
     const existingImagesDiv = document.getElementById("existingImages");
+    const logoutBtn = document.getElementById("logout-btn");
 
-    let existingImages = Array.from(existingImagesDiv.querySelectorAll("img")).map((img) => img.src);
+    // כפתור יציאה
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem("sb-session");
+      window.location.href = "/admin/login";
+    });
 
+    // מערך התמונות הקיימות
+    let existingImages = Array.from(existingImagesDiv.querySelectorAll("img")).map(img => img.src);
+
+    // הסרת תמונה קיימת
     existingImagesDiv.addEventListener("click", (e) => {
       if (e.target.classList.contains("edit-property-remove-btn")) {
         const wrapper = e.target.parentElement;
@@ -130,6 +137,7 @@ const floor = location.floor || "";
       }
     });
 
+    // הצגת תצוגה מקדימה של תמונות חדשות
     imageInput.addEventListener("change", () => {
       previewContainer.innerHTML = "";
       Array.from(imageInput.files).forEach((file) => {
@@ -144,20 +152,27 @@ const floor = location.floor || "";
       });
     });
 
+    // שמירת שינויים
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(form);
       formData.append("id", form.dataset.id);
-      existingImages.forEach((src) => formData.append("existingImages", src));
-      Array.from(imageInput.files).forEach((file) => formData.append("images", file));
+
+      // צרף את התמונות הקיימות
+      existingImages.forEach(src => formData.append("existingImages", src));
+
+      // הוסף את התמונות החדשות
+      Array.from(imageInput.files).forEach(file => formData.append("images", file));
 
       try {
-        const token = sessionStorage.getItem("sb-session");
-        if (!token) {
+        const session = sessionStorage.getItem("sb-session");
+        if (!session) {
           msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
           msg.style.color = "red";
           return;
         }
+
+        const token = JSON.parse(session).access_token;
 
         const res = await fetch("/api/edit-property", {
           method: "POST",
@@ -166,14 +181,18 @@ const floor = location.floor || "";
         });
 
         const result = await res.json();
+
         if (result.success) {
           msg.textContent = "✅ הדירה עודכנה בהצלחה!";
           msg.style.color = "green";
+
+          // עדכון תמונות קיימות אחרי עריכה
           existingImagesDiv.innerHTML = "";
           previewContainer.innerHTML = "";
-          result.images.forEach((src) => {
+          result.images.forEach((src, i) => {
             const wrapper = document.createElement("div");
             wrapper.className = "edit-property-image-wrapper";
+            wrapper.dataset.index = i;
             const img = document.createElement("img");
             img.src = src;
             const btn = document.createElement("button");

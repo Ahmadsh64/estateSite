@@ -4,7 +4,7 @@ import type { Property } from "../../types/property";
 
 let properties: Property[] = [];
 
-// שליפת דירות מ-Supabase
+// --- שליפת דירות מ-Supabase ---
 const { data, error } = await supabase
   .from("properties")
   .select("*")
@@ -24,7 +24,7 @@ if (error) {
       number: p.number || "",
       floor: p.floor || "",
     },
-    images: p.images || [],  // אם אין תמונה, תציג תמונה ברירת מחדל
+    images: p.images || [], // אם אין תמונה, תציג תמונה ברירת מחדל
     occupancy: p.occupancy,
     bedrooms: p.bedrooms,
     beds: p.beds,
@@ -40,8 +40,8 @@ if (error) {
     minStayDays: p.minStayDays,
     type: p.type,
     description: p.description,
-    is_active: p.is_active ?? true, // שדה פעיל/לא פעיל
-    created_at: p.created_at, // הוספת השדה `created_at`
+    is_active: p.is_active ?? true,
+    created_at: p.created_at,
   }));
 }
 ---
@@ -63,115 +63,160 @@ if (error) {
     </header>
 
     <main class="admin-main">
-      <!-- סמן טעינה -->
       <div id="loading-spinner" style="display:none;">טעינה...</div>
 
-      {properties.map((p: Property) => (
-        <div class="admin-property-card" data-id={p.id} style={`opacity: ${p.is_active ? "1" : "0.5"}`}>
-          <img src={p.images[0] || "/images/default.jpg"} alt={p.title} class="admin-property-img" loading="lazy" />
-          <div class="admin-property-info">
-            <div>
-              <h2 class="admin-property-title">{p.title}</h2>
-              <p class="admin-property-price">{p.price.toLocaleString("he-IL")}</p>
-              <p class="admin-property-location">
-                {p.location.city}, {p.location.street} {p.location.number}
-              </p>
-              <p class="admin-property-status">סטטוס: {p.is_active ? "פעיל" : "מוסתר"}</p>
-            </div>
-            <div class="admin-property-actions">
-              <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">✏️ עריכה</a>
-              {p.is_active ? (
-                <button type="button" class="admin-delete-btn" data-id={p.id} data-activate="false">🗑️ הסתרה</button>
-              ) : (
-                <button type="button" class="admin-restore-btn" data-id={p.id} data-activate="true">♻️ שחזור</button>
-              )}
+      {
+        properties.map((p: Property) => (
+          <div
+            class="admin-property-card"
+            data-id={p.id}
+            style={`opacity: ${p.is_active ? "1" : "0.5"}`}
+          >
+            <img
+              src={p.images[0]}
+              alt={p.title}
+              class="admin-property-img"
+              loading="lazy"
+            />
+            <div class="admin-property-info">
+              <div>
+                <h2 class="admin-property-title">{p.title}</h2>
+                <p class="admin-property-price">
+                  {p.price.toLocaleString("he-IL")}
+                </p>
+                <p class="admin-property-location">
+                  {p.location.city}, {p.location.street} {p.location.number}
+                </p>
+                <p class="admin-property-status">
+                  סטטוס: {p.is_active ? "פעיל" : "מוסתר"}
+                </p>
+              </div>
+              <div class="admin-property-actions">
+                <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">
+                  ✏️ עריכה
+                </a>
+                {p.is_active ? (
+                  <button
+                    type="button"
+                    class="admin-delete-btn"
+                    data-id={p.id}
+                    data-activate="false"
+                  >
+                    🗑️ הסתרה
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    class="admin-restore-btn"
+                    data-id={p.id}
+                    data-activate="true"
+                  >
+                    ♻️ שחזור
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </main>
 
     <script type="module">
-      // הפונקציה לניהול שינוי סטטוס הדירה
+      // --- בדיקת סשן ---
+      const session = JSON.parse(sessionStorage.getItem("sb-session"));
+      if (!session || !session.access_token) {
+        alert("❌ אין הרשאה – אנא התחבר");
+        window.location.href = "/admin/login";
+      }
+
+      // --- המשך טעינת הדף ---
       async function toggleProperty(id, activate) {
-        const token = sessionStorage.getItem("sb-session");
+        const token = session.access_token;
         if (!token) {
           alert("❌ אין הרשאה – אנא התחבר מחדש");
           window.location.href = "/admin/login";
           return;
         }
 
-        try {
-          // הצגת סמן טעינה
-          const loadingSpinner = document.getElementById("loading-spinner");
-          if (loadingSpinner) {
-            loadingSpinner.style.display = 'block';
-          }
+        const loadingSpinner = document.getElementById("loading-spinner");
+        if (loadingSpinner) loadingSpinner.style.display = "block";
 
+        try {
           const res = await fetch("/api/toggle-property", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ id, activate }),
           });
 
           const result = await res.json();
 
-          // הסתרת סמן טעינה
-          if (loadingSpinner) {
-            loadingSpinner.style.display = 'none';
-          }
+          if (loadingSpinner) loadingSpinner.style.display = "none";
 
           if (result.success) {
-            alert(activate ? "✅ הדירה שוחזרה בהצלחה" : "✅ הדירה הוסתרה בהצלחה");
+            alert(
+              activate ? "✅ הדירה שוחזרה בהצלחה" : "✅ הדירה הוסתרה בהצלחה",
+            );
 
-            // עדכון הסטטוס ישירות בעמוד מבלי לרענן את הדף
-            const propertyCard = document.querySelector(`.admin-property-card[data-id='${id}']`);
+            const propertyCard = document.querySelector(
+              `.admin-property-card[data-id='${id}']`,
+            );
             if (propertyCard) {
-              const statusText = propertyCard.querySelector('.admin-property-status');
-              const statusButton = propertyCard.querySelector('.admin-delete-btn, .admin-restore-btn');
+              const statusText = propertyCard.querySelector(
+                ".admin-property-status",
+              );
+              const statusButton = propertyCard.querySelector(
+                ".admin-delete-btn, .admin-restore-btn",
+              );
 
-              if (statusText) {
-                statusText.innerText = activate ? "פעיל" : "מוסתר";
-              }
+              if (statusText)
+                statusText.innerText = `סטטוס: ${activate ? "פעיל" : "מוסתר"}`;
 
               if (statusButton) {
+                statusButton.setAttribute(
+                  "data-activate",
+                  activate ? "false" : "true",
+                );
                 if (activate) {
-                  statusButton.classList.remove('admin-restore-btn');
-                  statusButton.classList.add('admin-delete-btn');
-                  statusButton.innerText = '🗑️ הסתרה';
+                  statusButton.classList.remove("admin-restore-btn");
+                  statusButton.classList.add("admin-delete-btn");
+                  statusButton.innerText = "🗑️ הסתרה";
                 } else {
-                  statusButton.classList.remove('admin-delete-btn');
-                  statusButton.classList.add('admin-restore-btn');
-                  statusButton.innerText = '♻️ שחזור';
+                  statusButton.classList.remove("admin-delete-btn");
+                  statusButton.classList.add("admin-restore-btn");
+                  statusButton.innerText = "♻️ שחזור";
                 }
               }
             }
           } else {
-            alert("❌ שגיאה: " + result.message);
+            if (result.status === 403) window.location.href = "/admin/login";
+            else alert("❌ שגיאה: " + result.message);
           }
         } catch (err) {
+          if (loadingSpinner) loadingSpinner.style.display = "none";
           console.error(err);
           alert("❌ שגיאה בחיבור לשרת");
         }
       }
 
-      // כפתור יציאה
+      // יציאה מהמערכת
       document.getElementById("logout-btn").addEventListener("click", () => {
         sessionStorage.removeItem("sb-session");
         window.location.href = "/admin/login";
       });
 
-      // חיבור הכפתורים לפונקציה
-      document.querySelectorAll('.admin-delete-btn, .admin-restore-btn').forEach(button => {
-        button.addEventListener('click', () => {
-          const id = button.getAttribute('data-id');
-          const activate = button.getAttribute('data-activate') === "true";
-          toggleProperty(id, activate);
+      // חיבור כפתורים לפונקציה
+      document
+        .querySelectorAll(".admin-delete-btn, .admin-restore-btn")
+        .forEach((button) => {
+          button.addEventListener("click", () => {
+            const id = button.getAttribute("data-id");
+            const activate = button.getAttribute("data-activate") === "true";
+            toggleProperty(id, activate);
+          });
         });
-      });
     </script>
   </body>
 </html>
