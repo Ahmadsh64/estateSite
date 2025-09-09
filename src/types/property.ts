@@ -19,14 +19,14 @@ export interface Property {
   beds?: number;
   bathrooms?: number;
   kitchen?: boolean;
-  washingMachine?: boolean;
+  washingmachine?: boolean;
   wifi?: boolean;
   tv?: boolean;
-  publicTransportNearby?: boolean;
+  publictransportnearby?: boolean;
   parking?: boolean;
-  checkInTime?: string;
-  checkOutTime?: string;
-  minStayDays?: number;
+  checkintime?: string;
+  checkouttime?: string;
+  minstaydays?: number;
   type?: string;
   [key: string]: any; // מאפשר להוסיף שדות חדשים בקלות
 }

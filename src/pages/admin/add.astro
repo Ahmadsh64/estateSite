@@ -88,7 +88,7 @@ import type { Property } from "../../types/property";
 
   // כפתור יציאה
   logoutBtn.addEventListener("click", () => {
-    sessionStorage.removeItem("sb-session");
+    sessionStorage.removeItem("sb-token");
     window.location.href = "/admin/login";
   });
 
@@ -96,13 +96,6 @@ import type { Property } from "../../types/property";
     e.preventDefault();
     const formData = new FormData(form);
 
-    // --- בדיקה אם המשתמש מחובר ---
-    const session = sessionStorage.getItem("sb-session");
-    if (!session) {
-      msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
-      msg.style.color = "red";
-      return;
-    }
 
     const token = JSON.parse(session).access_token;
 

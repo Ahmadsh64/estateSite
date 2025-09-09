@@ -5,82 +5,49 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body dir="rtl">
-  <main class="admin-login-main">
-    <h1 class="admin-login-title">🔑 כניסת אדמין</h1>
-    <form id="admin-login-form" class="admin-login-form">
-      <div class="admin-login-field">
+  <main style="max-width:400px; margin:auto; padding:2rem; text-align:center;">
+    <h1>🔑 כניסת אדמין</h1>
+    <form id="loginForm">
+      <div style="margin:1rem 0;">
         <label>אימייל:</label><br/>
-        <input type="email" name="email" class="admin-login-input" required />
+        <input type="email" name="email" required style="width:100%; padding:0.5rem;" />
       </div>
-      <div class="admin-login-field">
+      <div style="margin:1rem 0;">
         <label>סיסמה:</label><br/>
-        <input type="password" name="password" class="admin-login-input" required />
+        <input type="password" name="password" required style="width:100%; padding:0.5rem;" />
       </div>
-      <button type="submit" class="admin-login-btn">כניסה</button>
+      <button type="submit" style="padding:0.5rem 1rem;">כניסה</button>
     </form>
-    <p id="login-message" class="admin-login-message"></p>
   </main>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabase = createClient(
-      'https://uhvdtumhgllcypfoogdy.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodmR0dW1oZ2xsY3lwZm9vZ2R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyNTI5MDAsImV4cCI6MjA3MjgyODkwMH0.Dm4oLq302u7qV2R6srF8ejBoxuYE2LfdMFSpcM2g9as' // השתמש במפתח ה-PUBLIC_ANON שלך
+      'https://exnsylhgwjvpphistxqz.supabase.co', 
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
     );
 
-    const form = document.getElementById('admin-login-form');
-    const message = document.getElementById('login-message');
-
+    const form = document.getElementById('loginForm');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const email = form.email.value;
       const password = form.password.value;
 
-      // --- התחברות ל-Supabase ---
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error || !data.session) {
-        message.textContent = `❌ שגיאה: ${error?.message || 'כניסה נכשלה'}`;
-        message.style.color = "red";
-        return;
+      if (error) {
+        alert("שגיאה: " + error.message);
+      } else {
+        // שומרים session בלוקאל סטורג' (אופציונלי לשימוש בהמשך)
+        localStorage.setItem("sb-token", JSON.stringify(data.session));
+
+        // מפנים לדשבורד (שזה בעצם /admin/index.astro)
+        setTimeout(() => {
+          window.location.href = "/admin/dashboard";
+        }, 500);
       }
-
-      const session = data.session;
-      const accessToken = session.access_token;
-
-      // --- שמירה ב-sessionStorage כדי שה-API יוכל להשתמש בו ---
-      sessionStorage.setItem("sb-session", accessToken);
-
-      // --- בדיקה אם המשתמש הוא אדמין (role) ---
-      const { data: userRoleData, error: roleError } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-      if (roleError || userRoleData?.role !== 'admin') {
-        message.textContent = "❌ אין לך הרשאות אדמין";
-        message.style.color = "red";
-        await supabase.auth.signOut();
-        sessionStorage.removeItem("sb-session");
-        return;
-      }
-
-      message.textContent = "✅ כניסה בוצעה בהצלחה, מועבר ללוח הבקרה...";
-      message.style.color = "green";
-
-      // --- מעבר ללוח הבקרה אחרי חצי שניה ---
-      setTimeout(() => {
-        window.location.href = "/admin/dashboard";
-      }, 500);
     });
-
-    // --- פונקציה עזר לאחזור ה-token מכל קובץ JS ---
-    export function getAccessToken() {
-      return sessionStorage.getItem("sb-session") || null;
-    }
   </script>
 </body>
 </html>

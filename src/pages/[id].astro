@@ -36,7 +36,7 @@ if (data) {
     beds: data.beds,
     bathrooms: data.bathrooms,
     hasKitchen: data.kitchen, 
-    hasWashingMachine: data.washingMachine,
+    washingmachine: data.washingmachine,
     hasWifi: data.wifi,
     hasTv: data.tv,
     publicTransportNearby: data.publicTransportNearby,
@@ -99,7 +99,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
               <li>🚿 חדרי אמבטיה: {property.bathrooms}</li>
               <li>🏠 סוג נכס: {property.type}</li>
               <li>🍳 מטבח: {property.hasKitchen ? "כן" : "לא"}</li>
-              <li>🧺 מכונת כביסה: {property.hasWashingMachine ? "כן" : "לא"}</li>
+              <li>🧺 מכונת כביסה: {property.washingmachine ? "כן" : "לא"}</li>
               <li>📶 Wi-Fi: {property.hasWifi ? "כן" : "לא"}</li>
               <li>📺 טלוויזיה: {property.hasTv ? "כן" : "לא"}</li>
               <li>🚌 תחבורה ציבורית בסביבה: {property.publicTransportNearby ? "כן" : "לא"}</li>

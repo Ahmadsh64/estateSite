@@ -42,7 +42,7 @@ if (selectedLocation) {
 
 if (selectedAmenities.length > 0) {
   selectedAmenities.forEach((amenity) => {
-    if (amenity === "מכונת כביסה") query = query.eq("washingMachine", true);
+    if (amenity === "מכונת כביסה") query = query.eq("washingmachine", true);
     if (amenity === "WiFi") query = query.eq("wifi", true);
     if (amenity === "חניה") query = query.eq("parking", true);
     if (amenity === "טלוויזיה") query = query.eq("tv", true);
@@ -115,7 +115,7 @@ if (!error && data) {
             <div class="amenities-checkboxes">
               <label
                 ><input type="checkbox" name="amenities" value="מכונת כביסה" />{
-                  i18next.t("property.washingMachine")
+                  i18next.t("property.washingmachine")
                 }</label
               >
               <label
@@ -192,7 +192,7 @@ if (!error && data) {
                       { label: "מטבח", value: p.kitchen ? "✔️" : "❌" },
                       {
                         label: "מכונת כביסה",
-                        value: p.washingMachine ? "✔️" : "❌",
+                        value: p.washingmachine ? "✔️" : "❌",
                       },
                       { label: "WiFi", value: p.wifi ? "✔️" : "❌" },
                       { label: "טלוויזיה", value: p.tv ? "✔️" : "❌" },
@@ -223,5 +223,6 @@ if (!error && data) {
         }
       </ul>
     </main>
+    
   </body>
 </html>

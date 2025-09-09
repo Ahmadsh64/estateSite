@@ -8,7 +8,7 @@ i18next.init({
     "title": "Property Listings",
     "price": "Price",
     "rooms": "Rooms",
-    "washingMachine": "Washing Machine",
+    "washingmachine": "Washing Machine",
     "wifi": "Wi-Fi",
     "parking": "Parking",
     "tv": "TV"
@@ -31,7 +31,7 @@ i18next.init({
     "title": "רשימת דירות",
     "price": "מחיר",
     "rooms": "חדרים",
-    "washingMachine": "מכונת כביסה",
+    "washingmachine": "מכונת כביסה",
     "wifi": "WiFi",
     "parking": "חניה",
     "tv": "טלוויזיה"
