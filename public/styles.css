@@ -58,12 +58,11 @@ header nav {
 }
 
 header nav a {
+  padding: 10px 20px;
   background-color: #D9AF41;
-  padding: 8px 16px;
   border-radius: 6px;
-  font-size: 0.95rem;
-  transition: background-color 0.3s;
-  color: #fff;
+  color: white;
+  transition: all 0.3s ease;
 }
 
 header nav a:hover {
@@ -72,8 +71,9 @@ header nav a:hover {
 
 header .admin-btn {
   background-color: #D9AF41;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
+  color: white;
   font-weight: bold;
   transition: background-color 0.3s;
 }
@@ -106,13 +106,13 @@ header .admin-btn:hover {
 }
 
 .hero h1 {
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin-bottom: 15px;
   color : #D9AF41;
 }
 
 .hero p {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   margin-bottom: 20px;
 }
 
@@ -130,6 +130,7 @@ header .admin-btn:hover {
 }
 
 /* Filters */
+/* =================== סינון =================== */
 .filters {
   display: flex;
   gap: 15px;
@@ -137,29 +138,56 @@ header .admin-btn:hover {
   justify-content: center;
 }
 
-.filters select,
-.filters button {
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: none;
+.filter-group {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+#priceRange {
+  width: 100%;
+}
+
+#price-range-value {
   font-size: 1rem;
-}
-
-.filters select {
-  background: white;
-  color: #333;
-  min-width: 150px;
-}
-
-.filters button {
-  background: #D9AF41;
+  font-weight: 600;
   color: white;
-  transition: background 0.3s;
+  margin-top: 10px;
 }
 
-.filters button:hover {
-  background: #7e620f;
+
+.filter-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: white;
 }
+
+input[type="date"], select {
+  background-color: #f5f6fa;
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+button.search-btn {
+  background-color: #0077cc;
+  color: white;
+  padding: 14px 30px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  margin-top: 20px;
+}
+
+button.search-btn:hover {
+  background-color: #005fa3;
+  transform: scale(1.05);
+}
+
 
 /* =================== רשימת נכסים =================== */
 /* =================== Property List - Home Page =================== */

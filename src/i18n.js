@@ -19,7 +19,15 @@ i18next.init({
     "rooms": "Rooms",
     "location": "Location",
     "amenities": "Amenities",
-    "searchButton": "Search 🔎"
+    "price": "Price",
+    "searchButton": "Search 🔎",
+    "apartments": "דירות",
+    "houses": "בתים",
+    "cabins": "בקתות",
+    "villas": "וילות",
+    "hotels": "מלונות",
+    "attractions": "אטרקציות",
+    "camping": "קמפינג",
   },
   "admin": {
     "login": "Admin Login"
@@ -34,15 +42,33 @@ i18next.init({
     "washingmachine": "מכונת כביסה",
     "wifi": "WiFi",
     "parking": "חניה",
-    "tv": "טלוויזיה"
-  },
+    "tv": "טלוויזיה",
+    "apartments": "דירות",
+    "hotels": "מלונות",
+    "houses": "בתים",
+    "cabins": "בקתות",
+    "villas": "וילות",
+    "attractions": "אטרקציות",
+    "camping": "קמפינג",
+},
   "search": {
     "title": "חפש דירות",
     "description": "מצא את הדירה המושלמת מתוך מאות נכסים",
     "rooms": "חדרים",
     "location": "אזור",
     "amenities": "תוספות",
-    "searchButton": "חפש 🔎"
+    "searchButton": "חפש 🔎",
+    "occupancy": "אנשים",
+    "price": "מחיר",
+    "checkouttime": "תאריך יציאה",
+    "checkintime": "תאריך כניסה",
+    "apartments": "דירות",
+    "houses": "בתים",
+    "cabins": "בקתות",
+    "hotels": "מלונות",
+    "villas": "וילות",
+    "attractions": "אטרקציות",
+    "camping": "קמפינג",
   },
   "admin": {
     "login": "כניסת מנהל"
