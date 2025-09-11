@@ -18,6 +18,7 @@
       </div>
       <button type="submit" style="padding:0.5rem 1rem;">כניסה</button>
     </form>
+    <p id="loginMessage" style="color:red; margin-top:1rem;"></p>
   </main>
 
   <script type="module">
@@ -29,23 +30,37 @@
     );
 
     const form = document.getElementById('loginForm');
+    const msg = document.getElementById('loginMessage');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = form.email.value;
+      msg.textContent = "";
+
+      const email = form.email.value.trim();
       const password = form.password.value;
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (!email || !password) {
+        msg.textContent = "❌ אנא מלא את כל השדות";
+        return;
+      }
 
-      if (error) {
-        alert("שגיאה: " + error.message);
-      } else {
-        // שומרים session בלוקאל סטורג' (אופציונלי לשימוש בהמשך)
-        localStorage.setItem("sb-token", JSON.stringify(data.session));
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-        // מפנים לדשבורד (שזה בעצם /admin/index.astro)
-        setTimeout(() => {
-          window.location.href = "/admin/dashboard";
-        }, 500);
+        if (error || !data.session) {
+          msg.textContent = "❌ שגיאה בהתחברות: " + (error?.message || "Session לא נוצר");
+          return;
+        }
+
+        // שמירת session ב-sessionStorage
+        sessionStorage.setItem("sb-session", JSON.stringify(data.session));
+
+        // הפנייה לדשבורד
+        window.location.href = "/admin/dashboard";
+
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "❌ שגיאה בשרת – נסה שוב";
       }
     });
   </script>

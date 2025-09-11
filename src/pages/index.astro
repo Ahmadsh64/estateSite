@@ -45,7 +45,6 @@ if (selectedRooms) {
   }
 }
 
-
 // סינון לפי מיקום (location)
 if (selectedLocation) {
   properties = properties.filter((p) => p.city === selectedLocation);
@@ -74,24 +73,24 @@ if (selectedAmenities.length > 0) {
   </head>
   <body dir="rtl">
     <!-- Header -->
-    <header>
-      <div class="logo">
-        <img src="/images/logo.png" alt={i18next.t("property.title")} />
-        <span>{i18next.t("property.title")}</span>
-      </div>
-      <nav>
-        <!-- כפתורים לסוגי נכסים -->
-                 <a href="/">{i18next.t("search.rooms")}</a>
-        <a href="/?type=דירה" class="filter-btn">{i18next.t("search.apartments")}</a>
-        <a href="/?type=בית" class="filter-btn">{i18next.t("search.houses")}</a>
-        <a href="/?type=צימר" class="filter-btn">{i18next.t("search.cabins")}</a>
-        <a href="/?type=וילה" class="filter-btn">{i18next.t("search.villas")}</a>
-        <a href="/?type=מלון" class="filter-btn">{i18next.t("search.hotels")}</a>
-        <a href="/?type=אטרקציה" class="filter-btn">{i18next.t("search.attractions")}</a>
-        <a href="/?type=קמפינג" class="filter-btn">{i18next.t("search.camping")}</a>
-        <a href="/admin/login" class="admin-btn">{i18next.t("admin.login")}</a>
-      </nav>
-    </header>
+<header>
+  <div class="logo">
+    <img src="/images/logo.png" alt={i18next.t("property.title")} />
+    <span>{i18next.t("property.title")}</span>
+  </div>
+  <nav>
+    <!-- כפתורים לסוגי נכסים -->
+    <a href="/" class="filter-btn">{i18next.t("search.apartments")}</a>
+    <a href="/?type=בית" class="filter-btn">{i18next.t("search.houses")}</a>
+    <a href="/?type=צימר" class="filter-btn">{i18next.t("search.cabins")}</a>
+    <a href="/?type=וילה" class="filter-btn">{i18next.t("search.villas")}</a>
+    <a href="/?type=מלון" class="filter-btn">{i18next.t("search.hotels")}</a>
+    <a href="/?type=אטרקציה" class="filter-btn">{i18next.t("search.attractions")}</a>
+    <a href="/?type=קמפינג" class="filter-btn">{i18next.t("search.camping")}</a>
+  </nav>
+  <a href="/admin/login" class="admin-btn">{i18next.t("admin.login")}</a>
+</header>
+
     <!-- Hero Section -->
     <section class="hero">
       <div class="overlay">
@@ -150,9 +149,9 @@ if (selectedAmenities.length > 0) {
 
           <!-- Filter for Price Range -->
           <div class="filter-group">
-            <label for="price">{i18next.t("search.price")}</label>
-            <input type="range" name="price" id="price" min="0" max="100000" step="100" />
-            <div id="price-range-value">0 - 100,000 ₪</div>
+            <label for="priceRange">{i18next.t("search.price")}</label>
+            <input type="range" name="price" id="priceRange" min="0" max="20000" step="100" />
+            <div id="price-range-value">0 - 20,000 ₪</div>
           </div>
 
           <!-- Filter for Amenities -->
@@ -180,75 +179,61 @@ if (selectedAmenities.length > 0) {
     </section>
 
     <!-- Property Listings -->
-    <main>
-      <ul class="home-property-list">
-        {
-          properties.map((p: Property) => (
-            <li class="home-property-item" data-property={JSON.stringify(p)}>
-              <a href={`/${p.id}`} class="home-property-link">
-                <div class="home-property-images">
-                  <img
-                    id={`main-image-${p.id}`}
-                    loading="lazy"
-                    src={p.images[0]}
-                    alt={p.title}
-                    class="property-main-image"
-                  />
-                  <div class="property-thumbs">
-                    {p.images.map((img, i) => (
-                      <img
-                        src={img}
-                        alt={`תמונה ${i + 1} של ${p.title}`}
-                        class="property-thumb"
-                        data-index={i}
-                        onclick={`document.getElementById('main-image-${p.id}').src='${img}'`}
-                      />
-                    ))}
-                  </div>
-                </div>
+<main>
+  <ul class="home-property-list">
+    {
+      properties.map((p: Property) => (
+        <li class="home-property-item" data-property={JSON.stringify(p)}>
+          <a href={`/${p.id}`} class="home-property-link">
+            <div class="home-property-images">
+              <img
+                id={`main-image-${p.id}`}
+                loading="lazy"
+                src={p.images[0]}
+                alt={p.title}
+                class="property-main-image"
+              />
+            </div>
 
-                <div class="property-details">
-                  <h2 class="home-property-title">{p.title}</h2>
-                  <p class="home-property-price">
-                    {i18next.t("property.price")}: {p.price.toLocaleString("he-IL")}
-                  </p>
-                  <p class="home-property-location">
-                    {p.location?.city || ""} {p.location?.street || ""} {p.location?.number || ""}
-                    {p.location?.floor ? `, קומה ${p.location.floor}` : ""}
-                  </p>
+            <div class="property-details">
+              <h2 class="home-property-title">{p.title}</h2>
+              <p class="home-property-price">
+                {i18next.t("property.price")}: {p.price.toLocaleString("he-IL")}
+              </p>
+              
+              <div class="home-property-info">
+                <p class="home-property-location">
+                  {p.location?.city || ""} {p.location?.street || ""} {p.location?.number || ""}
+                  {p.location?.floor ? `, קומה ${p.location.floor}` : ""}
+                </p>
 
-                  <p class="home-property-features">
-                    {[{ label: "חדרים", value: p.bedrooms },
-                      { label: "מיטות", value: p.beds },
-                      { label: "חדרי אמבטיה", value: p.bathrooms },
-                      { label: "נפשות מקסימום", value: p.occupancy },
-                      { label: "מטבח", value: p.kitchen ? "✔️" : "❌" },
-                      { label: "מכונת כביסה", value: p.washingmachine ? "✔️" : "❌" },
-                      { label: "WiFi", value: p.wifi ? "✔️" : "❌" },
-                      { label: "טלוויזיה", value: p.tv ? "✔️" : "❌" },
-                      { label: "חניה", value: p.parking ? "✔️" : "❌" }].map((feature, i) => (
-                        <span class="property-feature">
-                          {feature.label}: {feature.value} {i < 8 ? "| " : ""}
-                        </span>
-                    ))}
-                  </p>
+                <p class="home-property-features">
+                  {[{ label: "חדרים", value: p.bedrooms },
+                    { label: "מיטות", value: p.beds },
+                    { label: "חדרי אמבטיה", value: p.bathrooms },
+                    { label: "נפשות מקסימום", value: p.occupancy },
+                  ].map((feature, i) => (
+                    <span class="property-feature">
+                      {feature.label}: {feature.value} {i < 8 ? "| " : ""}
+                    </span>
+                  ))}
+                </p>
+              </div>
+              
+              <hr class="property-divider" />
 
-                  <p class="property-times">
-                    {[{ label: "כניסה", value: p.checkInTime || "-" },
-                      { label: "יציאה", value: p.checkOutTime || "-" },
-                      { label: "מינימום ימים", value: p.minStayDays || "-" }].map((time, i) => (
-                        <span class="property-time">
-                          {time.label}: {time.value} {i < 2 ? "| " : ""}
-                        </span>
-                    ))}
-                  </p>
-                </div>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </main>
+              <div class="home-property-contact">
+                <p class="home-property-whatsapp">
+                  {p.whatsapp ? `📞 ${p.whatsapp}` : "אין פרטי קשר"}
+                </p>
+              </div>
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</main>
 
     <script type="module">
       // שליפה של selectedAmenities מה-URL
@@ -259,6 +244,20 @@ if (selectedAmenities.length > 0) {
       const selectedType = new URLSearchParams(window.location.search).get("type");
 
       const propertyItems = document.querySelectorAll(".home-property-item");
+
+      // קבלת אלמנט הסרגל והאלמנט של הצגת המחיר
+      const priceRange = document.getElementById("priceRange");
+      const priceValueDisplay = document.getElementById("price-range-value");
+
+      // פונקציה לעדכון המחיר
+      priceRange.addEventListener("input", function() {
+        const minPrice = priceRange.min;
+        const maxPrice = priceRange.max;
+        const value = priceRange.value;
+
+        // עדכון טקסט הצגת המחיר
+        priceValueDisplay.textContent = `${value} - ${maxPrice} ₪`;
+      });
 
       propertyItems.forEach((item) => {
         if (item instanceof HTMLElement) {

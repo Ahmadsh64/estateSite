@@ -34,6 +34,7 @@ header {
   z-index: 1000;
 }
 
+/* צד ימין - לוגו */
 header .logo {
   display: flex;
   align-items: center;
@@ -51,6 +52,32 @@ header .logo span {
   color: #f5f6fa;
 }
 
+/* צד שמאל - כניסת מנהל */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+header .admin-btn {
+  background-color: #D9AF41;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+header .admin-btn:hover {
+  background-color: #7e620f;
+}
+
+/* מרכז - כפתורים */
+.header-center {
+  display: flex;
+  justify-content: center;
+  flex: 1; /* תופס את השטח המרכזי */
+}
+
 header nav {
   display: flex;
   gap: 15px;
@@ -66,19 +93,6 @@ header nav a {
 }
 
 header nav a:hover {
-  background-color: #7e620f;
-}
-
-header .admin-btn {
-  background-color: #D9AF41;
-  padding: 12px 24px;
-  border-radius: 8px;
-  color: white;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-header .admin-btn:hover {
   background-color: #7e620f;
 }
 
@@ -207,6 +221,8 @@ button.search-btn:hover {
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
 }
 
 .home-property-item:hover {
@@ -230,44 +246,49 @@ button.search-btn:hover {
 }
 
 .home-property-title {
-  font-size: 1.2rem;
-  margin: 10px 0 5px;
+  font-size: 1.3rem; /* Increase the font size */
+  margin: 15px 0 10px; /* More spacing around title */
   font-weight: bold;
   color: #222;
 }
 
 .home-property-price {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #e91e63;
-  margin: 5px 0;
+  margin: 10px 0;
 }
+
 .home-property-price::after {
   content: " ₪";
-  font-size: 1rem;
+  font-size: 1.2rem; /* Consistent with price font size */
   font-weight: bold;
   color: #e91e63;
-  margin: 5px 0;
+  margin-left: 5px;
 }
+
 .home-property-location,
 .home-property-details,
 .home-property-check-times {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #555;
   margin: 5px 0;
-  line-height: 1.4;
+  line-height: 1.6; /* Increased line height for readability */
 }
 
 .home-property-item button,
 .home-property-item a.edit-btn {
-  margin-top: 10px;
-  padding: 8px 12px;
+  margin-top: 15px;
+  padding: 10px 15px;
   border-radius: 6px;
   border: none;
-  font-size: 0.9rem;
+  font-size: 1rem; /* Slightly larger for better usability */
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
+  text-align: center;
+  display: block;
+  width: 100%; /* Make buttons full-width on mobile */
 }
 
 .home-property-item a.edit-btn {
@@ -283,6 +304,7 @@ button.search-btn:hover {
 .home-property-item button.delete-btn {
   background-color: #e91e63;
   color: white;
+  margin-top: 10px;
 }
 
 .home-property-item button.delete-btn:hover {
@@ -297,6 +319,31 @@ button.search-btn:hover {
 
   .home-property-images img {
     height: 150px;
+  }
+
+  /* Buttons take full width on mobile */
+  .home-property-item button,
+  .home-property-item a.edit-btn {
+    width: 100%;
+  }
+
+  /* Adjust the font size and padding for smaller screens */
+  .home-property-title {
+    font-size: 1.1rem;
+    margin: 10px 0;
+  }
+
+  .home-property-price {
+    font-size: 1.1rem;
+  }
+
+  .home-property-location,
+  .home-property-details {
+    font-size: 0.9rem;
+  }
+
+  .home-property-item {
+    margin: 10px;
   }
 }
 
@@ -417,162 +464,168 @@ button.search-btn:hover {
 
 /* =================== Property Page =================== */
 /* =================== Property Detail Page =================== */
-.detail-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
+/* סרגל ראשי */
+/* כללי */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f8f8;
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
+/* סרגל ראשי */
+.detail-header-bar {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.detail-header-bar h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.detail-header-bar .detail-location {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.detail-header-bar .detail-rating {
+  font-size: 1.1rem;
+  color: #e91e63;
+}
+
+.detail-header-bar .detail-summary {
+  font-size: 1rem;
+  color: #555;
+  margin-top: 10px;
+}
+
+/* גלריית תמונות */
 .detail-gallery {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  margin-bottom: 30px;
 }
 
-.detail-main-image {
+.detail-gallery .detail-main-image {
   width: 100%;
+  height: 400px;
+  object-fit: cover;
   border-radius: 12px;
-  object-fit: cover;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
-.detail-thumbs {
+.detail-gallery .detail-thumbs {
+  margin-top: 15px;
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
 
-.detail-thumb {
-  width: 70px;
-  height: 70px;
-  border-radius: 6px;
+.detail-gallery .detail-thumb {
+  width: 80px;
+  height: 80px;
   object-fit: cover;
+  border-radius: 8px;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: border 0.2s, transform 0.2s;
+  transition: transform 0.3s ease;
 }
 
-.detail-thumb:hover {
-  border: 2px solid #0077cc;
-  transform: scale(1.05);
+.detail-gallery .detail-thumb:hover {
+  transform: scale(1.1);
 }
 
-.detail-info {
+/* תיבת מידע על הדירה */
+.detail-info-box {
   background-color: #fff;
   padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  transition: box-shadow 0.3s ease;
 }
 
-.detail-title {
-  margin-top: 0;
-  font-size: 2rem;
-  color: #222;
-}
-
-.detail-price {
+.detail-info-box h3 {
   font-size: 1.5rem;
-  color: #e91e63;
   font-weight: bold;
-  margin: 15px 0;
-}
-
-.detail-price::after {
-  content: " ₪";
-  font-weight: bold;
-  color: #e91e63;
+  margin-bottom: 15px;
 }
 
 .detail-description {
-  margin: 15px 0;
-  line-height: 1.6;
-  color: #555;
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 20px;
 }
 
 .detail-info-list {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
-  margin: 20px 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
 }
 
 .detail-info-list li {
-  background-color: #f5f6fa;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.detail-contact-box {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #f1f8ff;
-  border-radius: 12px;
-}
-
-.detail-contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.detail-contact-form input,
-.detail-contact-form textarea {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
   font-size: 1rem;
-  width: 100%;
+  color: #555;
+  margin-bottom: 12px;
 }
 
-.detail-contact-form textarea {
-  min-height: 100px;
-  resize: vertical;
+/* תיבת מאפייני הדירה */
+.detail-features-box {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
 }
 
-.detail-contact-form button {
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
+.detail-features-box h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.detail-features-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.detail-features-list li {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+/* הוספת מעבר חיבור */
+.detail-info-box:hover,
+.detail-features-box:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* אחידות בין כל הכרטיסים */
+.detail-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* חזרה לרשימה */
+.detail-back-btn {
   background-color: #0077cc;
   color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
 }
 
-.detail-contact-form button:hover {
+.detail-back-btn:hover {
   background-color: #005fa3;
-}
-
-.detail-not-found {
-  text-align: center;
-  font-size: 1.3rem;
-  color: #e91e63;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .detail-container {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-info-list {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-thumb {
-    width: 60px;
-    height: 60px;
-  }
 }
 
 /* =================== Forms =================== */

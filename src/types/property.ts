@@ -11,7 +11,7 @@ export interface Property {
   id: string;
   title: string;
   price: number;
-  location: Location;  
+  location: Location;
   description?: string;
   images: string[];
   occupancy?: number;
@@ -22,11 +22,21 @@ export interface Property {
   washingmachine?: boolean;
   wifi?: boolean;
   tv?: boolean;
-  publictransportnearby?: boolean;
+  publicTransportNearby?: boolean;
   parking?: boolean;
-  checkintime?: string;
-  checkouttime?: string;
-  minstaydays?: number;
+  checkInTime?: string;
+  checkOutTime?: string;
+  minStayDays?: number;
   type?: string;
-  [key: string]: any; // מאפשר להוסיף שדות חדשים בקלות
+  has_pool?: boolean;             // בריכה
+  has_private_pool?: boolean;      // בריכה פרטית
+  hasJacuzzi?: boolean;          // ג'קוזי
+  hasGrill?: boolean;            // מנגל
+  suitableFor?: string[];        // מתאים ל: משפחות, דתיים, קבוצות
+  nearby?: string[];             // בקרבת המקום: בית כנסת, מסעדות, תחבורה ציבורית
+  rating?: number;               // דירוג
+  reviewsCount?: number;         // מספר חוות דעת
+  phone?: string;                // מספר טלפון
+  whatsapp?: string;             // מספר WhatsApp
+  [key: string]: any;            // מאפשר להוסיף שדות חדשים בקלות
 }

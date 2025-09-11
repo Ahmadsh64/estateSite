@@ -1,4 +1,5 @@
 ---
+import { date } from "astro:schema";
 import { supabase } from "../lib/supabaseClient";
 import type { Property } from "../types/property";  // ייבוא טיפוס Property
 
@@ -35,18 +36,28 @@ if (data) {
     bedrooms: data.bedrooms,
     beds: data.beds,
     bathrooms: data.bathrooms,
-    hasKitchen: data.kitchen, 
+    kitchen: data.kitchen, 
     washingmachine: data.washingmachine,
-    hasWifi: data.wifi,
-    hasTv: data.tv,
-    publicTransportNearby: data.publicTransportNearby,
+    wifi: data.wifi,
+    tv: data.tv,
+    publictransportnearby: data.publictransportnearby,
     parking: data.parking,
     checkInTime: data.checkInTime,
     checkOutTime: data.checkOutTime,
     minStayDays: data.minStayDays,
     type: data.type,
     is_active: data.is_active, // הוספת השדה החסר
-    created_at: data.created_at, // הוספת השדה החסר
+    created_at: data.created_at,
+    has_pool: data.has_pool,            // בריכה
+  has_private_pool: data.has_private_pool,    // בריכה פרטית
+has_jacuzzi: data.has_jacuzzi,          // ג'קוזי
+  has_grill: data.has_grill,            // מנגל
+  suitable_for: data.suitable_for,        // מתאים ל: משפחות, דתיים, קבוצות
+  nearby: data.nearby,            // בקרבת המקום: בית כנסת, מסעדות, תחבורה ציבורית
+  rating: data.rating,               // דירוג
+  reviews_count: data.reviews_count,        // מספר חוות דעת
+  phone: data.phone,                // מספר טלפון
+  whatsapp: data.whatsapp,             // מספר WhatsApp
   };
 }
 
@@ -64,68 +75,126 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
       <a href="/" class="detail-back-btn">⬅ חזרה לרשימת דירות</a>
     </header>
 
-    <main class="detail-container">
-      {property ? (
-        <>
-          <div class="detail-gallery">
-            <img id="detailMainImage" src={images[0] } alt={property.title} class="detail-main-image" />
-            <div class="detail-thumbs">
-              {images.map((img, i) => (
-                <img 
-                  src={img} 
-                  alt={`תמונה ${i+1} של ${property.title}`} 
-                  class="detail-thumb" 
-                  id={`thumb-${i}`} 
-                />
-              ))}
-            </div>
-          </div>
+<main class="detail-container">
+  {property ? (
+    <>
+      <!-- סרגל ראשי -->
+      <div class="detail-header-bar">
+        <h1>{property.title}</h1>
+        <p class="detail-location">{property.location.city}, {property.location.street}, {property.location.number} - קומה {property.location.floor}</p>
+        <p class="detail-rating">
+          ⭐ {property.rating || 'לא דירוג'} מצוין ({property.reviewsCount || 0} חוות דעת)
+        </p>
+        <p class="detail-summary">
+          חדרי שינה: {property.bedrooms} | חדרי רחצה: {property.bathrooms} | מקס' נופשים במתחם: {property.occupancy}
+        </p>
+      </div>
 
-          <div class="detail-info">
-            <h1 class="detail-title">{property.title}</h1>
-            <p class="detail-price">מחיר: {property.price.toLocaleString("he-IL")}</p>
+      <!-- גלריית תמונות -->
+      <div class="detail-gallery">
+        <img id="detailMainImage" src={property.images[0]} alt={property.title} class="detail-main-image" />
+        <div class="detail-thumbs">
+          {property.images.map((img, i) => (
+            <img 
+              src={img} 
+              alt={`תמונה ${i+1} של ${property.title}`} 
+              class="detail-thumb" 
+              id={`thumb-${i}`} 
+              onclick="changeImage(event)"
+            />
+          ))}
+        </div>
+      </div>
 
-            <h3>מיקום:</h3>
-            <p class="detail-location">
-              {property.location.city}, {property.location.street} {property.location.number}
-              {property.location.floor ? `, קומה ${property.location.floor}` : ""}
-            </p>
+      <!-- מידע על הדירה -->
+      <div class="detail-info-box">
+        <h3>מידע על הדירה</h3>
+        <p class="detail-description">{property.description}</p>
+        <ul class="detail-info-list">
+          <li><strong>מחיר ללילה:</strong> {property.price} ₪</li>
+          <li><strong>סוג נכס:</strong> {property.type}</li>
+          <li><strong>מיקום:</strong> {property.location.city}, {property.location.street} {property.location.number}, קומה {property.location.floor}</li>
+          <li><strong>נפשות מקסימום:</strong> {property.occupancy}</li>
+          <li><strong>חדרי שינה:</strong> {property.bedrooms}</li>
+          <li><strong>מיטות:</strong> {property.beds}</li>
+        </ul>
+      </div>
 
-            <p class="detail-description">{property.description}</p>
+      <!-- מאפייני הדירה -->
+      <div class="detail-info-box">
+        <h3>מאפייני המתחם</h3>
+        <h4>כללי</h4>
+        <ul class="feature-list">
+          <li><strong>נפשות מקסימום:</strong> {property.occupancy}</li>
+          <li><strong>חדרי שינה:</strong> {property.bedrooms}</li>
+          <li><strong>מיטות:</strong> {property.beds}</li>
+          <li><strong>חדרי אמבטיה:</strong> {property.bathrooms}</li>
+          <li><strong>מטבח:</strong> {property.kitchen ? "✔️" : "❌"}</li>
+          <li><strong>מכונת כביסה:</strong> {property.washingmachine ? "✔️" : "❌"}</li>
+          <li><strong>WiFi:</strong> {property.wifi ? "✔️" : "❌"}</li>
+          <li><strong>טלוויזיה:</strong> {property.tv ? "✔️" : "❌"}</li>
+          <li><strong>תחבורה ציבורית בקרבת מקום:</strong> {property.publictransportnearby ? "✔️" : "❌"}</li>
+          <li><strong>חניה:</strong> {property.parking ? "✔️" : "❌"}</li>
+        </ul>
+      </div>
 
-            <ul class="detail-info-list">
-              <li>🛏 מספר חדרים: {property.bedrooms}</li>
-              <li>🛌 מיטות: {property.beds}</li>
-              <li>🚿 חדרי אמבטיה: {property.bathrooms}</li>
-              <li>🏠 סוג נכס: {property.type}</li>
-              <li>🍳 מטבח: {property.hasKitchen ? "כן" : "לא"}</li>
-              <li>🧺 מכונת כביסה: {property.washingmachine ? "כן" : "לא"}</li>
-              <li>📶 Wi-Fi: {property.hasWifi ? "כן" : "לא"}</li>
-              <li>📺 טלוויזיה: {property.hasTv ? "כן" : "לא"}</li>
-              <li>🚌 תחבורה ציבורית בסביבה: {property.publicTransportNearby ? "כן" : "לא"}</li>
-              <li>🚗 חניה: {property.parking ? "כן" : "לא"}</li>
-              <li>⏰ שעת כניסה: {property.checkInTime || "לא צוינה"}</li>
-              <li>⏰ שעת יציאה: {property.checkOutTime || "לא צוינה"}</li>
-              <li>🗓 מינימום הזמנה בימים: {property.minStayDays || "לא צוינה"}</li>
-            </ul>
-          </div>
-        </>
-      ) : (
-        <p class="detail-not-found">דירה זו לא קיימת.</p>
-      )}
-    </main>
+      <!-- מאפיינים בחוץ -->
+      <div class="detail-info-box">
+        <h3>מתקנים בחוץ</h3>
+        <ul class="feature-list">
+          <li><strong>בריכה פרטית ליחידה:</strong> {property.has_private_pool ? "✔️" : "❌"}</li>
+          <li><strong>בריכה במתחם:</strong> {property.has_pool ? "✔️" : "❌"}</li>
+          <li><strong>ג'קוזי ספא זרמים:</strong> {property.has_jacuzzi ? "✔️" : "❌"}</li>
+          <li><strong>מנגל:</strong> {property.has_grill ? "✔️" : "❌"}</li>
+        </ul>
+      </div>
 
-    <script>
-      // הפונקציה שתחליף את התמונה הראשית כאשר נלחץ על תמונה בתצוגה הקטנה
-      document.querySelectorAll('.detail-thumb').forEach((thumb) => {
-        thumb.addEventListener('click', (event) => {
-          const mainImage = document.getElementById('detailMainImage') as HTMLImageElement; // טיפוס ספציפי
-          const target = event.target as HTMLImageElement; // טיפוס ספציפי
-          if (mainImage && target) {
-            mainImage.src = target.src;
-          }
-        });
-      });
-    </script>
+      <!-- מתאים ל -->
+      <div class="detail-info-box">
+        <h4>מתאים ל</h4>
+<ul class="feature-list">
+  {property.suitable_for && property.suitable_for.map((group: string) => (
+    <li >{group}</li>  // key נמצא ישירות בתוך ה-map
+  ))}
+</ul>
+
+
+      </div>
+
+      <!-- בקרבת המקום -->
+      <div class="detail-info-box">
+        <h4>בקרבת המקום</h4>
+        <ul class="feature-list">
+          {property.nearby && property.nearby.map((place) => (
+            <li >{place}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- פרטי יצירת קשר -->
+      <div class="detail-info-box">
+        <h3>פרטי יצירת קשר</h3>
+        <ul class="feature-list">
+          <li><strong>טלפון:</strong> {property.phone}</li>
+          <li><strong>WhatsApp:</strong> {property.whatsapp}</li>
+        </ul>
+      </div>
+
+      <!-- תנאים -->
+      <div class="detail-info-box">
+        <h3>תנאים</h3>
+        <ul class="feature-list">
+          <li><strong>שעת כניסה:</strong> {property.checkInTime}</li>
+          <li><strong>שעת יציאה:</strong> {property.checkOutTime}</li>
+          <li><strong>מינימום לילות שהייה:</strong> {property.minStayDays}</li>
+        </ul>
+      </div>
+    </>
+  ) : (
+    <p class="detail-not-found">דירה זו לא קיימת.</p>
+  )}
+</main>
+
   </body>
 </html>
+

@@ -59,34 +59,52 @@ export async function POST({ request }: { request: Request }): Promise<Response>
       images: [],
       is_active: true,
       created_at: new Date().toISOString(),
+      has_pool: formData.get("has_pool") === "on", // בריכה
+      has_private_pool: formData.get("has_private_pool") === "on", // בריכה פרטית
+      has_jacuzzi: formData.get("has_jacuzzi") === "on", // ג'קוזי
+      has_grill: formData.get("has_grill") === "on", // מנגל
+      suitable_for: formData.getAll("suitable_for[]") as string[], // מתאים ל
+      nearby: formData.getAll("nearby[]") as string[], // בקרבת המקום
+      rating: Number(formData.get("rating")) || 0, // דירוג
+      reviews_count: Number(formData.get("reviews_count")) || 0, // חוות דעת
+      phone: formData.get("phone") as string, // טלפון
+      whatsapp: formData.get("whatsapp") as string, // WhatsApp
     };
 
-    // --- העלאת תמונות ---
-    const images = formData.getAll("images") as File[];
-    const imageUrls: string[] = [];
+// --- העלאת תמונות ---
+const images = formData.getAll("images") as File[];
+const imageUrls: string[] = [];
 
-    for (const file of images) {
-      if (file && file.name) {
-        const ext = file.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
+for (const file of images) {
+  if (file && file.name) {
+    // קביעת שם קובץ ייחודי
+    const ext = file.name.split(".").pop();  // הוצאת סיומת הקובץ
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
 
-        const arrayBuffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(arrayBuffer);
+    // המרת הקובץ לאובייקט Uint8Array
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
 
-        const { error: uploadError } = await supabase.storage
-          .from("properties")
-          .upload(fileName, bytes, { contentType: file.type });
+    try {
+      // העלאת התמונה לסטורג' ב-Supabase
+      const { error: uploadError } = await supabase.storage
+        .from("properties") // כאן אתה מציין את שם הבקט שלך בסטורג'
+        .upload(fileName, bytes, { contentType: file.type });
 
-        if (uploadError) {
-          return new Response(JSON.stringify({ success: false, message: `Image upload failed: ${uploadError.message}` }), { status: 500 });
-        }
-
-        const { data } = supabase.storage.from("properties").getPublicUrl(fileName);
-        imageUrls.push(data.publicUrl);
+      if (uploadError) {
+        throw new Error(`Image upload failed: ${uploadError.message}`);
       }
-    }
 
-    property.images = imageUrls;
+      // קבלת כתובת ה-URL הציבורית של התמונה
+      const { data } = await supabase.storage.from("properties").getPublicUrl(fileName);
+      imageUrls.push(data.publicUrl);
+    } catch (error) {
+      return new Response(JSON.stringify({ success: false, message: error }), { status: 500 });
+    }
+  }
+}
+
+property.images = imageUrls; // עדכון התמונות של הנכס עם כתובת ה-URL
 
     // --- שמירה בטבלה ---
     const dbRow = mapPropertyToDb(property);
