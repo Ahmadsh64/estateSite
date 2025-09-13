@@ -84,6 +84,7 @@ const location = property.location || {};
       <label>סוג נכס:</label>
       <input type="text" name="type" value={property.type || ""} />
 
+      <!-- מתקנים -->
       <label>מטבח:</label>
       <input type="checkbox" name="kitchen" checked={property.kitchen || false} />
       <label>מכונת כביסה:</label>
@@ -97,12 +98,37 @@ const location = property.location || {};
       <label>חניה:</label>
       <input type="checkbox" name="parking" checked={property.parking || false} />
 
+      
+      <!-- פרטי יצירת קשר -->
+      <label>מספר טלפון:</label>
+      <input type="text" name="phone" value={property.phone || ""} />
+      <label>מספר WhatsApp:</label>
+      <input type="text" name="whatsapp" value={property.whatsapp || ""} />
+
+      <!-- תנאים -->
       <label>שעת כניסה:</label>
       <input type="time" name="checkInTime" value={property.checkInTime || ""} />
       <label>שעת יציאה:</label>
       <input type="time" name="checkOutTime" value={property.checkOutTime || ""} />
       <label>מינימום ימים:</label>
       <input type="number" name="minStayDays" value={property.minStayDays || ""} />
+
+      <!-- קטגוריות -->
+<fieldset>
+  <legend>🎯 מתאים ל</legend>
+  <label><input type="checkbox" name="suitable_for" value="משפחות" checked={property.suitable_for?.includes('משפחות') || false} /> משפחות</label>
+  <label><input type="checkbox" name="suitable_for" value="דתיים" checked={property.suitable_for?.includes('דתיים') || false} /> דתיים</label>
+  <label><input type="checkbox" name="suitable_for" value="קבוצות" checked={property.suitable_for?.includes('קבוצות') || false} /> קבוצות</label>
+  <label><input type="checkbox" name="suitable_for" value="זוגות" checked={property.suitable_for?.includes('זוגות') || false} /> זוגות</label>
+</fieldset>
+
+<fieldset>
+  <legend>📍 בקרבת המקום</legend>
+  <label><input type="checkbox" name="nearby" value="בית כנסת" checked={property.nearby?.includes('בית כנסת') || false} /> בית כנסת</label>
+  <label><input type="checkbox" name="nearby" value="מסעדות" checked={property.nearby?.includes('מסעדות') || false} /> מסעדות</label>
+  <label><input type="checkbox" name="nearby" value="מרכז קניות" checked={property.nearby?.includes('מרכז קניות') || false} /> מרכז קניות</label>
+  <label><input type="checkbox" name="nearby" value="תחבורה ציבורית" checked={property.nearby?.includes('תחבורה ציבורית') || false} /> תחבורה ציבורית</label>
+</fieldset>
 
       <button type="submit">שמור שינויים</button>
     </form>

@@ -48,14 +48,14 @@ export async function POST({ request }: { request: Request }): Promise<Response>
       type: (formData.get("type") as string) || "",
       description: (formData.get("description") as string) || "",
       kitchen: formData.get("kitchen") === "on",
-      washingMachine: formData.get("washingMachine") === "on",
+      washingmachine: formData.get("washingmachine") === "on",
       wifi: formData.get("wifi") === "on",
       tv: formData.get("tv") === "on",
-      publicTransportNearby: formData.get("publicTransportNearby") === "on",
+      publictransportnearby: formData.get("publictransportnearby") === "on",
       parking: formData.get("parking") === "on",
-      checkInTime: (formData.get("checkInTime") as string) || undefined,
-      checkOutTime: (formData.get("checkOutTime") as string) || undefined,
-      minStayDays: Number(formData.get("minStayDays")) || 0,
+      checkintime: (formData.get("checkintime") as string) || undefined,
+      checkouttime: (formData.get("checkouttime") as string) || undefined,
+      minstaydays: Number(formData.get("minstaydays")) || 0,
       images: [],
       is_active: true,
       created_at: new Date().toISOString(),
@@ -71,40 +71,49 @@ export async function POST({ request }: { request: Request }): Promise<Response>
       whatsapp: formData.get("whatsapp") as string, // WhatsApp
     };
 
-// --- העלאת תמונות ---
-const images = formData.getAll("images") as File[];
-const imageUrls: string[] = [];
+    // --- העלאת תמונות ---
+    const images = formData.getAll("images") as File[];
+    const imageUrls: string[] = [];
 
-for (const file of images) {
-  if (file && file.name) {
-    // קביעת שם קובץ ייחודי
-    const ext = file.name.split(".").pop();  // הוצאת סיומת הקובץ
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
+    for (const file of images) {
+      if (file && file.name) {
+        const ext = file.name.split(".").pop(); // הוצאת סיומת הקובץ
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
 
-    // המרת הקובץ לאובייקט Uint8Array
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
 
-    try {
-      // העלאת התמונה לסטורג' ב-Supabase
-      const { error: uploadError } = await supabase.storage
-        .from("properties") // כאן אתה מציין את שם הבקט שלך בסטורג'
-        .upload(fileName, bytes, { contentType: file.type });
+        try {
+          // העלאת התמונה לסטורג' ב-Supabase
+          const { error: uploadError } = await supabase.storage
+            .from("properties") // שם הבקט
+            .upload(fileName, bytes, { contentType: file.type });
 
-      if (uploadError) {
-        throw new Error(`Image upload failed: ${uploadError.message}`);
+          if (uploadError) {
+            throw new Error(`Image upload failed: ${uploadError.message}`);
+          }
+
+          // קבלת כתובת ה-URL הציבורית של התמונה
+          const { data } = await supabase.storage.from("properties").getPublicUrl(fileName);
+
+          // אם לא הצלחנו לקבל את ה-URL, נזרוק שגיאה
+          if (!data?.publicUrl) {
+            throw new Error("Error fetching public URL: URL is empty");
+          }
+
+          imageUrls.push(data.publicUrl);
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            return new Response(JSON.stringify({ success: false, message: error.message }), { status: 500 });
+          } else {
+            return new Response(JSON.stringify({ success: false, message: "Unknown error" }), { status: 500 });
+          }
+        }
       }
-
-      // קבלת כתובת ה-URL הציבורית של התמונה
-      const { data } = await supabase.storage.from("properties").getPublicUrl(fileName);
-      imageUrls.push(data.publicUrl);
-    } catch (error) {
-      return new Response(JSON.stringify({ success: false, message: error }), { status: 500 });
     }
-  }
-}
 
-property.images = imageUrls; // עדכון התמונות של הנכס עם כתובת ה-URL
+    // עדכון התמונות של הנכס עם כתובת ה-URL
+    property.images = imageUrls;
 
     // --- שמירה בטבלה ---
     const dbRow = mapPropertyToDb(property);

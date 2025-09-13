@@ -464,168 +464,247 @@ button.search-btn:hover {
 
 /* =================== Property Page =================== */
 /* =================== Property Detail Page =================== */
-/* סרגל ראשי */
-/* כללי */
+
+/* הכללים הכלליים */
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f8f8f8;
-  color: #333;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
   margin: 0;
   padding: 0;
+  background-color: #f4f4f4;
+}
+
+.detail-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* סרגל ראשי */
 .detail-header-bar {
-  background-color: #ffffff;
+  display: flex;
+  justify-content: space-between;
   padding: 20px;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
-  text-align: center;
-  transition: background-color 0.3s ease;
 }
 
-.detail-header-bar h1 {
-  font-size: 2rem;
-  font-weight: 600;
+.detail-header-right h1 {
+  margin: 0;
   color: #333;
 }
 
-.detail-header-bar .detail-location {
-  font-size: 1.1rem;
-  color: #666;
-}
-
-.detail-header-bar .detail-rating {
-  font-size: 1.1rem;
-  color: #e91e63;
-}
-
-.detail-header-bar .detail-summary {
-  font-size: 1rem;
-  color: #555;
-  margin-top: 10px;
-}
-
-/* גלריית תמונות */
-.detail-gallery {
-  margin-bottom: 30px;
-}
-
-.detail-gallery .detail-main-image {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.detail-gallery .detail-thumbs {
-  margin-top: 15px;
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.detail-gallery .detail-thumb {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.detail-gallery .detail-thumb:hover {
-  transform: scale(1.1);
-}
-
-/* תיבת מידע על הדירה */
-.detail-info-box {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  transition: box-shadow 0.3s ease;
-}
-
-.detail-info-box h3 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.detail-description {
-  font-size: 1rem;
-  color: #777;
-  margin-bottom: 20px;
-}
-
-.detail-info-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.detail-info-list li {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 12px;
-}
-
-/* תיבת מאפייני הדירה */
-.detail-features-box {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.detail-features-box h3 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.detail-features-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.detail-features-list li {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 12px;
-}
-
-/* הוספת מעבר חיבור */
-.detail-info-box:hover,
-.detail-features-box:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-/* אחידות בין כל הכרטיסים */
-.detail-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* חזרה לרשימה */
-.detail-back-btn {
-  background-color: #0077cc;
-  color: white;
+.detail-header-left button {
   padding: 10px 20px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.detail-back-btn:hover {
-  background-color: #005fa3;
+.detail-header-left button:hover {
+  background-color: #0056b3;
+}
+
+/* גלריית תמונות ומפה */
+.detail-gallery-map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+}
+
+.detail-gallery {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.detail-main-image {
+  width: 100%;      /* רוחב 100% מהקונטיינר, כלומר היא תתפוס את כל רוחב האלמנט */
+  height: auto;     /* גובה יתואם באופן אוטומטי לפי הרוחב */
+  max-width: 600px; /* הגבלת הרוחב המקסימלי של התמונה */
+  object-fit: cover; /* התמונה תכסה את האזור מבלי לשנות את יחס הגובה-רוחב שלה */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.detail-gallery img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.detail-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* תמונות קטנות תופסות מקום קבוע גם כן */
+.detail-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover; /* תוודא שהתמונה תתפוס את כל המידות */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.detail-thumb:hover {
+  transform: scale(1.1);
+}
+
+/* המפה */
+.map-box {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  max-height: 400px;
+  overflow: hidden;
+  position: relative;
+}
+
+.map-box img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.map-btn-expand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 25px;
+  background-color: rgba(0, 123, 255, 0.8);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.map-btn-expand:hover {
+  background-color: rgba(0, 123, 255, 1);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+/* תיבת מידע */
+.detail-info-box {
+  flex: 1 1 calc(50% - 20px); /* שני טורים */
+  box-sizing: border-box;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.feature-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.feature-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-summary {
+  color: #666;
+}
+
+/* עיצוב טופס */
+.contact-form {
+  flex: 1 1 100%; /* הטופס יתפוס את כל השורה */
+  box-sizing: border-box;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+/* שדות הטופס */
+.contact-form .form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* רווח בין השדות */
+  margin-bottom: 20px;
+}
+
+.contact-form .form-group {
+  flex: 1; /* כל שדה יתפוס חצי מהשורה */
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form label {
+  display: block;
+  margin-top: 10px;
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.contact-form button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.contact-form button:hover {
+  background-color: #218838;
+}
+
+
+/* התאמות רספונסיביות */
+@media (max-width: 768px) {
+  .detail-gallery-map {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .detail-info-box, .contact-form {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .map-box {
+    max-width: 100%;
+  }
 }
 
 /* =================== Forms =================== */
@@ -795,148 +874,183 @@ body {
 }
 
 /* =================== Edit Property =================== */
-.edit-property-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+/* כללי */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
 
-.edit-property-header h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 1rem;
-  font-family: 'Roboto', sans-serif;
-}
+    header {
+      background-color: #000;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.edit-property-back {
-  font-size: 1.2rem;
-  color: #D9AF41;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s;
-}
+    header h1 {
+      font-size: 24px;
+      margin: 0;
+    }
 
-.edit-property-back:hover {
-  color: #7e620f;
-}
+    header a, header button {
+      font-size: 16px;
+      color: white;
+      text-decoration: none;
+      background-color: #D9AF41;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+    }
 
-.edit-property-main {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
-  background-color: #f4f4f4;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+    header a:hover, header button:hover {
+      background-color: #555;
+    }
 
-.edit-property-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+    main {
+      padding: 30px;
+      max-width: 900px;
+      margin: 30px auto;
+      background-color: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
 
-.edit-property-form label {
-  font-weight: bold;
-  color: #555;
-  font-size: 1rem;
-}
+    form {
+      display: grid;
+      gap: 20px;
+    }
 
-.edit-property-input,
-.edit-property-textarea {
-  width: 100%;
-  padding: 0.8rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  background-color: #fff;
-}
+    form label {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
 
-.edit-property-input:focus,
-.edit-property-textarea:focus {
-  border-color: #D9AF41;
-  box-shadow: 0 0 5px rgba(217, 175, 65, 0.5);
-}
+    input[type="text"], input[type="number"], input[type="time"], input[type="file"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      color: #333;
+    }
 
-.edit-property-image-wrapper {
-  display: inline-block;
-  margin-right: 15px;
-  margin-bottom: 10px;
-}
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
 
-.edit-property-image-wrapper img {
-  width: 150px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
+    fieldset {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #fafafa;
+    }
 
-.edit-property-remove-btn {
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  padding: 5px;
-  border-radius: 50%;
-  cursor: pointer;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  font-size: 1.2rem;
-}
+    fieldset legend {
+      font-weight: bold;
+      color: #4CAF50;
+    }
 
-.edit-property-remove-btn:hover {
-  background: #ff4d4d;
-}
+    button[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
 
-.edit-property-submit-btn {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: #D9AF41;
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+    button[type="submit"]:hover {
+      background-color: #45a049;
+    }
 
-.edit-property-submit-btn:hover {
-  background-color: #7e620f;
-  transform: scale(1.05);
-}
+    #previewContainer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-.edit-property-submit-btn:active {
-  transform: scale(1.02);
-}
+    #previewContainer img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
 
-#message {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 1rem;
-}
+    #existingImages {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-#message.green {
-  color: green;
-}
+    .edit-property-image-wrapper {
+      position: relative;
+      display: inline-block;
+    }
 
-#message.red {
-  color: red;
-}
+    .edit-property-image-wrapper img {
+      width: 150px;
+      height: 150px;
+      border-radius: 8px;
+    }
 
-/* תצוגת מקדימה של תמונות */
-#previewContainer img {
-  margin-right: 15px;
-  margin-bottom: 10px;
-  width: 150px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
+    .edit-property-remove-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      padding: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
 
+    .edit-property-remove-btn:hover {
+      background-color: red;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .message.success {
+      color: green;
+    }
+
+    .message.error {
+      color: red;
+    }
+
+    /* עיצוב רספונסיבי */
+    @media (max-width: 768px) {
+      main {
+        padding: 20px;
+      }
+
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      header a, header button {
+        margin-top: 10px;
+      }
+    }
 
 /* =================== Footer =================== */
 footer {

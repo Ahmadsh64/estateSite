@@ -66,15 +66,15 @@ import type { Property } from "../../types/property";
     <fieldset>
       <legend>⚙️ מתקנים</legend>
       <label><input type="checkbox" name="kitchen" /> מטבח</label>
-      <label><input type="checkbox" name="washingMachine" /> מכונת כביסה</label>
+      <label><input type="checkbox" name="washingmachine" /> מכונת כביסה</label>
       <label><input type="checkbox" name="wifi" /> Wi-Fi</label>
       <label><input type="checkbox" name="tv" /> טלוויזיה</label>
-      <label><input type="checkbox" name="publicTransportNearby" /> תחבורה ציבורית בסביבה</label>
+      <label><input type="checkbox" name="publictransportnearby" /> תחבורה ציבורית בסביבה</label>
       <label><input type="checkbox" name="parking" /> חניה</label>
-      <label><input type="checkbox" name="hasPool" /> בריכה</label>
+      <label><input type="checkbox" name="has_pool" /> בריכה</label>
       <label><input type="checkbox" name="has_private_pool" /> בריכה פרטית</label>
-      <label><input type="checkbox" name="hasJacuzzi" /> ג'קוזי</label>
-      <label><input type="checkbox" name="hasGrill" /> מנגל</label>
+      <label><input type="checkbox" name="has_jacuzzi" /> ג'קוזי</label>
+      <label><input type="checkbox" name="has_grill" /> מנגל</label>
     </fieldset>
 
     <!-- פרטי יצירת קשר -->
@@ -94,16 +94,16 @@ import type { Property } from "../../types/property";
       <label>שעת יציאה:</label>
       <input type="time" name="checkOutTime" />
       <label>מינימום לילות שהייה:</label>
-      <input type="number" name="minStayDays" />
+      <input type="number" name="minstaydays" />
     </fieldset>
 
     <!-- קטגוריות -->
     <fieldset>
       <legend>🎯 מתאים ל</legend>
-      <label><input type="checkbox" name="suitableFor" value="משפחות" /> משפחות</label>
-      <label><input type="checkbox" name="suitableFor" value="דתיים" /> דתיים</label>
-      <label><input type="checkbox" name="suitableFor" value="קבוצות" /> קבוצות</label>
-      <label><input type="checkbox" name="suitableFor" value="זוגות" /> זוגות</label>
+      <label><input type="checkbox" name="suitable_for" value="משפחות" /> משפחות</label>
+      <label><input type="checkbox" name="suitable_for" value="דתיים" /> דתיים</label>
+      <label><input type="checkbox" name="suitable_for" value="קבוצות" /> קבוצות</label>
+      <label><input type="checkbox" name="suitable_for" value="זוגות" /> זוגות</label>
     </fieldset>
 
     <fieldset>
@@ -136,10 +136,10 @@ import type { Property } from "../../types/property";
     const formData = new FormData(form);
 
     // דוגמה: איסוף כל ה-checkboxes מסוג suitableFor ו-nearby כמערכים
-    const suitableFor = Array.from(form.querySelectorAll('input[name="suitableFor"]:checked')).map(cb => cb.value);
+    const suitableFor = Array.from(form.querySelectorAll('input[name="suitable_for"]:checked')).map(cb => cb.value);
     const nearby = Array.from(form.querySelectorAll('input[name="nearby"]:checked')).map(cb => cb.value);
 
-    formData.append("suitableFor", JSON.stringify(suitableFor));
+    formData.append("suitable_for", JSON.stringify(suitableFor));
     formData.append("nearby", JSON.stringify(nearby));
 
     // קבלת הטוקן מה-sessionStorage

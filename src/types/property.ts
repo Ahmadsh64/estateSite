@@ -22,17 +22,17 @@ export interface Property {
   washingmachine?: boolean;
   wifi?: boolean;
   tv?: boolean;
-  publicTransportNearby?: boolean;
+  publictransportnearby?: boolean;
   parking?: boolean;
-  checkInTime?: string;
-  checkOutTime?: string;
-  minStayDays?: number;
+  checkintime?: string;
+  checkouttime?: string;
+  minstaydays?: number;
   type?: string;
   has_pool?: boolean;             // בריכה
   has_private_pool?: boolean;      // בריכה פרטית
-  hasJacuzzi?: boolean;          // ג'קוזי
-  hasGrill?: boolean;            // מנגל
-  suitableFor?: string[];        // מתאים ל: משפחות, דתיים, קבוצות
+  has_jacuzzi?: boolean;          // ג'קוזי
+  has_grill?: boolean;            // מנגל
+  suitable_for?: string[];        // מתאים ל: משפחות, דתיים, קבוצות
   nearby?: string[];             // בקרבת המקום: בית כנסת, מסעדות, תחבורה ציבורית
   rating?: number;               // דירוג
   reviewsCount?: number;         // מספר חוות דעת
