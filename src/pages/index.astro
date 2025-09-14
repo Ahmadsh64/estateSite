@@ -36,23 +36,19 @@ if (!error && data) {
   console.error("שגיאה בשליפת הדירות:", error?.message);
 }
 
-// סינון לפי חדרים (rooms)
-if (selectedRooms) {
-  if (selectedRooms === "5+") {
-    properties = properties.filter((p) => (p.bedrooms ?? 0) >= 5);  
-  } else {
-    properties = properties.filter((p) => (p.bedrooms ?? 0) === Number(selectedRooms));
-  }
-}
+// מערך של כל התנאים לסינון
+const filters = [
+  { condition: selectedRooms, filter: (p: Property) => {
+    if (selectedRooms === "5+") {
+      return (p.bedrooms ?? 0) >= 5;
+    } else {
+      return (p.bedrooms ?? 0) === Number(selectedRooms);
+    }
+  }},
+  
+  { condition: selectedLocation, filter: (p: Property) => p.city === selectedLocation },
 
-// סינון לפי מיקום (location)
-if (selectedLocation) {
-  properties = properties.filter((p) => p.city === selectedLocation);
-}
-
-// סינון לפי amenities
-if (selectedAmenities.length > 0) {
-  properties = properties.filter((p) => {
+  { condition: selectedAmenities.length > 0, filter: (p: Property) => {
     return selectedAmenities.every((amenity) => {
       if (amenity === "washingmachine" && !p.washingmachine) return false;
       if (amenity === "WiFi" && !p.wifi) return false;
@@ -60,8 +56,16 @@ if (selectedAmenities.length > 0) {
       if (amenity === "tv" && !p.tv) return false;
       return true;
     });
-  });
-}
+  }},
+];
+
+// סינון הדירות לפי כל התנאים
+filters.forEach(({ condition, filter }) => {
+  if (condition) {
+    properties = properties.filter(filter);
+  }
+});
+
 
 ---
 
@@ -235,68 +239,63 @@ if (selectedAmenities.length > 0) {
   </ul>
 </main>
 
-    <script type="module">
-      // שליפה של selectedAmenities מה-URL
-      const selectedAmenities = new URLSearchParams(window.location.search).getAll("amenities");
-      const selectedRooms = new URLSearchParams(window.location.search).get("rooms");
-      const selectedLocation = new URLSearchParams(window.location.search).get("location");
-      const selectedPriceRange = new URLSearchParams(window.location.search).get("price");
-      const selectedType = new URLSearchParams(window.location.search).get("type");
+<script type="module">
+  // שליפה של selectedAmenities מה-URL
+  const selectedAmenities = new URLSearchParams(window.location.search).getAll("amenities");
+  const selectedRooms = new URLSearchParams(window.location.search).get("rooms");
+  const selectedLocation = new URLSearchParams(window.location.search).get("location");
+  const selectedPriceRange = new URLSearchParams(window.location.search).get("price");
+  const selectedType = new URLSearchParams(window.location.search).get("type");
 
-      const propertyItems = document.querySelectorAll(".home-property-item");
+  const propertyItems = document.querySelectorAll(".home-property-item");
 
-      // קבלת אלמנט הסרגל והאלמנט של הצגת המחיר
-      const priceRange = document.getElementById("priceRange");
-      const priceValueDisplay = document.getElementById("price-range-value");
+  // קבלת אלמנט הסרגל והאלמנט של הצגת המחיר
+  const priceRange = document.getElementById("priceRange");
+  const priceValueDisplay = document.getElementById("price-range-value");
 
-      // פונקציה לעדכון המחיר
-      priceRange.addEventListener("input", function() {
-        const minPrice = priceRange.min;
-        const maxPrice = priceRange.max;
-        const value = priceRange.value;
+  // פונקציה לעדכון המחיר
+  priceRange.addEventListener("input", function() {
+    const minPrice = priceRange.min;
+    const maxPrice = priceRange.max;
+    const value = priceRange.value;
 
-        // עדכון טקסט הצגת המחיר
-        priceValueDisplay.textContent = `${value} - ${maxPrice} ₪`;
-      });
+    // עדכון טקסט הצגת המחיר
+    priceValueDisplay.textContent = `${value} - ${maxPrice} ₪`;
+  });
 
-      propertyItems.forEach((item) => {
-        if (item instanceof HTMLElement) {
-          const p = JSON.parse(item.dataset.property);
-          let isMatch = true;
+  propertyItems.forEach((item) => {
+    if (item instanceof HTMLElement) {
+      const p = JSON.parse(item.dataset.property);
+      let isMatch = true;
 
-          // סינון לפי סוג הנכס
-          if (selectedType && p.type !== selectedType) {
-            isMatch = false;
-          }
+      // מערך של כל התנאים לסינון
+      const filters = [
+        { condition: selectedType && p.type !== selectedType, field: "type" },
+        { condition: selectedRooms && selectedRooms !== "5+" && p.bedrooms !== Number(selectedRooms), field: "rooms" },
+        { condition: selectedLocation && p.city !== selectedLocation, field: "location" },
+        { condition: selectedPriceRange && p.price > Number(selectedPriceRange), field: "price" },
+        ...selectedAmenities.map((amenity) => ({
+          condition: (amenity === "wifi" && !p.wifi) ||
+                     (amenity === "washingmachine" && !p.washingmachine) ||
+                     (amenity === "parking" && !p.parking) ||
+                     (amenity === "tv" && !p.tv),
+          field: `amenity: ${amenity}`
+        }))
+      ];
 
-          // סינון לפי חדרים
-          if (selectedRooms && selectedRooms !== "5+" && p.bedrooms !== Number(selectedRooms)) {
-            isMatch = false;
-          }
-
-          // סינון לפי מיקום
-          if (selectedLocation && p.city !== selectedLocation) {
-            isMatch = false;
-          }
-
-          // סינון לפי מחיר
-          if (selectedPriceRange && p.price > Number(selectedPriceRange)) {
-            isMatch = false;
-          }
-
-          // סינון לפי amenities
-          selectedAmenities.forEach((amenity) => {
-            if (amenity === "wifi" && !p.wifi) isMatch = false;
-            if (amenity === "washingmachine" && !p.washingmachine) isMatch = false;
-            if (amenity === "parking" && !p.parking) isMatch = false;
-            if (amenity === "tv" && !p.tv) isMatch = false;
-          });
-
-          if (!isMatch) {
-            item.style.display = "none";
-          }
+      // לולאת סינון אחת
+      filters.forEach((filter) => {
+        if (filter.condition) {
+          isMatch = false;
         }
       });
-    </script>
+
+      if (!isMatch) {
+        item.style.display = "none";
+      }
+    }
+  });
+</script>
+
   </body>
 </html>

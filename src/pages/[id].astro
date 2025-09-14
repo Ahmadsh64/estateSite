@@ -1,4 +1,5 @@
 ---
+import i18next from "../i18n";
 import { supabase } from "../lib/supabaseClient";
 import type { Property } from "../types/property";  // ייבוא טיפוס Property
 
@@ -41,8 +42,8 @@ if (data) {
     tv: data.tv,
     publictransportnearby: data.publictransportnearby,
     parking: data.parking,
-    checkInTime: data.checkInTime,
-    checkOutTime: data.checkOutTime,
+    checkintime: data.checkintime,
+    checkouttime: data.checkouttime,
     minStayDays: data.minStayDays,
     type: data.type,
     is_active: data.is_active, // הוספת השדה החסר
@@ -66,36 +67,34 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
 <html lang="he">
   <head>
     <meta charset="UTF-8" />
-    <title>{property ? property.title : "דירה לא נמצאה"}</title>
+    <title>{property ? property.title : i18next.t("property.notFound")}</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body dir="rtl">
     <header class="detail-header">
-      <a href="/" class="detail-back-btn">⬅ חזרה לרשימת דירות</a>
+      <a href="/" class="detail-back-btn">⬅ {i18next.t("property.backToList")}</a>
     </header>
 
     <main class="detail-container">
       {property ? (
         <>
-          <!-- סרגל ראשי -->
           <div class="detail-header-bar">
             <div class="detail-header-right">
               <h1>{property.title}</h1>
-              <p class="detail-location">{property.location.city}, {property.location.street}, {property.location.number} - קומה {property.location.floor}</p>
+              <p class="detail-location">{property.location.city}, {property.location.street}, {property.location.number} - {i18next.t("property.floor")} {property.location.floor}</p>
               <p class="detail-rating">
-                ⭐ {property.rating || 'לא דירוג'} מצוין ({property.reviews_count || 0} חוות דעת)
+                ⭐ {property.rating || i18next.t("property.noRating")} {i18next.t("property.excellent")} ({property.reviews_count || 0} {i18next.t("property.reviews")})
               </p>
               <p class="detail-summary">
-                חדרי שינה: {property.bedrooms} | חדרי רחצה: {property.bathrooms} | מקס' נופשים במתחם: {property.occupancy}
+                {i18next.t("property.bedrooms")}: {property.bedrooms} | {i18next.t("property.bathrooms")}: {property.bathrooms} | {i18next.t("property.maxGuests")}: {property.occupancy}
               </p>
             </div>
             <div class="detail-header-left">
               <button class="contact-btn" onclick="window.location.href='tel:{property.phone}'">📞 {property.phone}</button>
-              <button class="contact-btn" onclick="window.location.href='https://wa.me/{property.whatsapp}'">WhatsApp</button>
+              <button class="contact-btn" onclick="window.location.href='https://wa.me/{property.whatsapp}'">{i18next.t("property.whatsapp")}</button>
             </div>
           </div>
 
-          <!-- גלריית תמונות ומפה -->
           <div class="detail-gallery-map">
             <div class="detail-gallery">
               <img id="detailMainImage" src={property.images[0]} alt={property.title} class="detail-main-image" />
@@ -110,22 +109,96 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
                     />
                   ))
                 ) : (
-                  <p>אין תמונות זמינות</p> 
+                  <p>{i18next.t("property.noImages")}</p>
                 )}
               </div>
             </div>
-
-            <!-- הוספת המפה ליד התמונות -->
             <div class="map-box">
               <div class="map-item">
-                <img src="/images/map.png" alt="מפת הדירה" title="מפת הדירה" />
+                <img src="/images/map.png" alt={i18next.t("property.map")} title={i18next.t("property.map")} />
                 <button class="map-btn-expand" onclick="window.open('https://www.google.com/maps?q={property.location.city}+{property.location.street}', '_blank')">
-                  פתח מפה בחלון חדש
+                  {i18next.t("property.openMap")}
                 </button>
               </div>
             </div>
           </div>
-          <div class="detail-gallery-map">
+
+          <div class="detail-info-box">
+            <h3>{i18next.t("property.details")}</h3>
+            <p class="detail-description">{property.description}</p>
+            <ul class="detail-info-list">
+              <li><strong>{i18next.t("property.pricePerNight")}:</strong> {property.price} ₪</li>
+              <li><strong>{i18next.t("property.propertyType")}:</strong> {property.type}</li>
+              <li><strong>{i18next.t("property.location")}:</strong> {property.location.city}, {property.location.street} {property.location.number}, {i18next.t("property.floor")} {property.location.floor}</li>
+              <li><strong>{i18next.t("property.maxGuests")}:</strong> {property.occupancy}</li>
+              <li><strong>{i18next.t("property.bedrooms")}:</strong> {property.bedrooms}</li>
+              <li><strong>{i18next.t("property.beds")}:</strong> {property.beds}</li>
+            </ul>
+          </div>
+
+          <div class="detail-info-box">
+            <h3>{i18next.t("property.features")}</h3>
+            <h4>{i18next.t("property.general")}</h4>
+            <ul class="feature-list">
+              <li><strong>{i18next.t("property.maxGuests")}:</strong> {property.occupancy}</li>
+              <li><strong>{i18next.t("property.bedrooms")}:</strong> {property.bedrooms}</li>
+              <li><strong>{i18next.t("property.beds")}:</strong> {property.beds}</li>
+              <li><strong>{i18next.t("property.bathrooms")}:</strong> {property.bathrooms}</li>
+              <li><strong>{i18next.t("property.kitchen")}:</strong> {property.kitchen ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.washingmachine")}:</strong> {property.washingmachine ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.wifi")}:</strong> {property.wifi ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.tv")}:</strong> {property.tv ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.publictransportnearby")}</strong> {property.publictransportnearby ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.parking")}:</strong> {property.parking ? "✔️" : "❌"}</li>
+            </ul>
+          </div>
+
+          <div class="detail-info-box">
+            <h3>{i18next.t("property.outdoorFacilities")}</h3>
+            <ul class="feature-list">
+              <li><strong>{i18next.t("property.privatePool")}:</strong> {property.has_private_pool ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.sharedPool")}:</strong> {property.has_pool ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.jacuzzi")}:</strong> {property.has_jacuzzi ? "✔️" : "❌"}</li>
+              <li><strong>{i18next.t("property.grill")}:</strong> {property.has_grill ? "✔️" : "❌"}</li>
+            </ul>
+          </div>
+
+          <div class="detail-info-box">
+            <h4>{i18next.t("property.suitableFor")}</h4>
+            <ul class="feature-list">
+              {Array.isArray(property.suitable_for) && property.suitable_for.map((group, i) => (
+                <li>{group}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="detail-info-box">
+            <h4>{i18next.t("property.nearby")}</h4>
+            <ul class="feature-list">
+              {Array.isArray(property.nearby) && property.nearby.map((group, i) => (
+                <li>{group}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="detail-info-box">
+            <h3>{i18next.t("property.contactInfo")}</h3>
+            <ul class="feature-list">
+              <li><strong>{i18next.t("property.phone")}:</strong> {property.phone || i18next.t("property.notAvailable")}</li>
+              <li><strong>{i18next.t("property.whatsapp")}:</strong> {property.whatsapp || i18next.t("property.notAvailable")}</li>
+            </ul>
+          </div>
+
+          <div class="detail-info-box">
+            <h3>{i18next.t("property.terms")}</h3>
+            <ul class="feature-list">
+              <li><strong>{i18next.t("property.checkintime")}:</strong> {property.checkintime || i18next.t("property.notSpecified")}</li>
+              <li><strong>{i18next.t("property.checkouttime")}:</strong> {property.checkouttime || i18next.t("property.notSpecified")}</li>
+              <li><strong>{i18next.t("property.minstaydays")}:</strong> {property.minStayDays || 0}</li>
+            </ul>
+          </div>
+
+          <!-- טופס יצירת קשר -->
 <div class="contact-form">
             <h3>אני רוצה להתארח כאן</h3>
             <form action="#" method="POST">
@@ -161,94 +234,9 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
               <button type="submit" class="submit-btn">חזרו אלי</button>
             </form>
           </div>
-          <!-- מידע על הדירה -->
-          <div class="detail-info-box">
-            <h3>מידע על הדירה</h3>
-            <p class="detail-description">{property.description}</p>
-            <ul class="detail-info-list">
-              <li><strong>מחיר ללילה:</strong> {property.price} ₪</li>
-              <li><strong>סוג נכס:</strong> {property.type}</li>
-              <li><strong>מיקום:</strong> {property.location.city}, {property.location.street} {property.location.number}, קומה {property.location.floor}</li>
-              <li><strong>נפשות מקסימום:</strong> {property.occupancy}</li>
-              <li><strong>חדרי שינה:</strong> {property.bedrooms}</li>
-              <li><strong>מיטות:</strong> {property.beds}</li>
-            </ul>
-          </div>
-
-          <!-- מאפייני המתחם -->
-          <div class="detail-info-box">
-            <h3>מאפייני המתחם</h3>
-            <h4>כללי</h4>
-            <ul class="feature-list">
-              <li><strong>נפשות מקסימום:</strong> {property.occupancy}</li>
-              <li><strong>חדרי שינה:</strong> {property.bedrooms}</li>
-              <li><strong>מיטות:</strong> {property.beds}</li>
-              <li><strong>חדרי אמבטיה:</strong> {property.bathrooms}</li>
-              <li><strong>מטבח:</strong> {property.kitchen ? "✔️" : "❌"}</li>
-              <li><strong>מכונת כביסה:</strong> {property.washingmachine ? "✔️" : "❌"}</li>
-              <li><strong>WiFi:</strong> {property.wifi ? "✔️" : "❌"}</li>
-              <li><strong>טלוויזיה:</strong> {property.tv ? "✔️" : "❌"}</li>
-              <li><strong>תחבורה ציבורית בקרבת מקום:</strong> {property.publictransportnearby ? "✔️" : "❌"}</li>
-              <li><strong>חניה:</strong> {property.parking ? "✔️" : "❌"}</li>
-            </ul>
-          </div>
-
-          <!-- מתקנים בחוץ -->
-          <div class="detail-info-box">
-            <h3>מתקנים בחוץ</h3>
-            <ul class="feature-list">
-              <li><strong>בריכה פרטית ליחידה:</strong> {property.has_private_pool ? "✔️" : "❌"}</li>
-              <li><strong>בריכה במתחם:</strong> {property.has_pool ? "✔️" : "❌"}</li>
-              <li><strong>ג'קוזי ספא זרמים:</strong> {property.has_jacuzzi ? "✔️" : "❌"}</li>
-              <li><strong>מנגל:</strong> {property.has_grill ? "✔️" : "❌"}</li>
-            </ul>
-          </div>
-
-          <!-- מתאים ל -->
-          <div class="detail-info-box">
-            <h4>מתאים ל</h4>
-            <ul class="feature-list">
-              {Array.isArray(property.suitable_for) && property.suitable_for.map((group, i) => (
-                <li>{group}</li>
-              ))}
-            </ul>
-          </div>
-
-          <!-- בקרבת המקום -->
-          <div class="detail-info-box">
-            <h4>בקרבת המקום</h4>
-            <ul class="feature-list">
-              {Array.isArray(property.suitable_for) && property.suitable_for.map((group, i) => (
-                <li>{group}</li>
-              ))}
-            </ul>
-          </div>
-
-          <!-- פרטי יצירת קשר -->
-          <div class="detail-info-box">
-            <h3>פרטי יצירת קשר</h3>
-            <ul class="feature-list">
-              <li><strong>טלפון:</strong> {property.phone || "לא זמין"}</li>
-              <li><strong>WhatsApp:</strong> {property.whatsapp || "לא זמין"}</li>
-            </ul>
-          </div>
-
-          <!-- תנאים -->
-          <div class="detail-info-box">
-            <h3>תנאים</h3>
-            <ul class="feature-list">
-              <li><strong>שעת כניסה:</strong> {property.checkInTime || "לא צוין"}</li>
-              <li><strong>שעת יציאה:</strong> {property.checkOutTime || "לא צוין"}</li>
-              <li><strong>מינימום לילות שהייה:</strong> {property.minStayDays || 0}</li>
-            </ul>
-          </div>
-
-          <!-- טופס יצירת קשר/הזמנה -->
-          
-          </div>
         </>
       ) : (
-        <p class="detail-not-found">דירה זו לא קיימת.</p>
+        <p class="detail-not-found">{i18next.t("property.notFound")}</p>
       )}
     </main>
  <script type="module">
