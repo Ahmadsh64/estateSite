@@ -21,48 +21,71 @@
     <p id="loginMessage" style="color:red; margin-top:1rem;"></p>
   </main>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const supabase = createClient(
-      'https://exnsylhgwjvpphistxqz.supabase.co', 
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
-    );
+  const supabase = createClient(
+    'https://exnsylhgwjvpphistxqz.supabase.co', 
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
+  );
 
-    const form = document.getElementById('loginForm');
-    const msg = document.getElementById('loginMessage');
+  const form = document.getElementById('loginForm');
+  const msg = document.getElementById('loginMessage');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.textContent = "";
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = "";
 
-      const email = form.email.value.trim();
-      const password = form.password.value;
+    const email = form.email.value.trim();
+    const password = form.password.value;
 
-      if (!email || !password) {
-        msg.textContent = "❌ אנא מלא את כל השדות";
+    if (!email || !password) {
+      msg.textContent = "❌ אנא מלא את כל השדות";
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        console.error("Sign-in Error:", error.message); // הדפסת שגיאה
+        msg.textContent = "❌ שגיאה בהתחברות: " + error.message;
         return;
       }
 
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-        if (error || !data.session) {
-          msg.textContent = "❌ שגיאה בהתחברות: " + (error?.message || "Session לא נוצר");
-          return;
-        }
-
-        // שמירת session ב-sessionStorage
-        sessionStorage.setItem("sb-session", JSON.stringify(data.session));
-
-        // הפנייה לדשבורד
-        window.location.href = "/admin/dashboard";
-
-      } catch (err) {
-        console.error(err);
-        msg.textContent = "❌ שגיאה בשרת – נסה שוב";
+      if (!data.session) {
+        msg.textContent = "❌ Session לא נוצר";
+        return;
       }
-    });
-  </script>
+
+      // קבלת נתוני המשתמש לאחר ההתחברות
+      const { data: user, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        msg.textContent = "❌ שגיאה בהבאת נתוני המשתמש";
+        return;
+      }
+
+      console.log('User Data:', user); // הדפסת נתוני המשתמש
+
+      // בדוק אם התפקיד הוא "admin"
+      if (user.role == "admin") {
+        msg.textContent = "❌ אין לך הרשאות מנהל";
+        return;
+      }
+
+      // שמירת session ב-sessionStorage
+      sessionStorage.setItem("sb-session", JSON.stringify(data.session));
+
+      // הפנייה לדשבורד
+      window.location.href = "/admin/dashboard";
+
+    } catch (err) {
+      console.error("Server error:", err);
+      msg.textContent = "❌ שגיאה בשרת – נסה שוב";
+    }
+  });
+</script>
+
 </body>
 </html>

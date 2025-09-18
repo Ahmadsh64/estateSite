@@ -96,23 +96,48 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
           </div>
 
           <div class="detail-gallery-map">
-            <div class="detail-gallery">
-              <img id="detailMainImage" src={property.images[0]} alt={property.title} class="detail-main-image" />
-              <div class="detail-thumbs">
-                {property.images && Array.isArray(property.images) ? (
-                  property.images.map((img, i) => (
-                    <img
-                      src={img}
-                      alt={`תמונה ${i+1} של ${property.title}`}
-                      class="detail-thumb"
-                      id={`thumb-${i}`}
-                    />
-                  ))
-                ) : (
-                  <p>{i18next.t("property.noImages")}</p>
+            <div class="property-gallery">
+              <div class="main-image">
+                <img id="detailMainImage" src={images[0]} alt={property?.title} class="detail-main-image" />
+              </div>
+
+              <div class="thumbnail-gallery">
+                {images.slice(0, 5).map((img, i) => (
+                  <img
+                    src={img}
+                    alt={`תמונה ${i + 1} של ${property?.title}`}
+                    class="detail-thumb"
+                    data-index={i}
+                  />
+                ))}
+
+                {images.length > 5 && (
+                  <div class="more-images">+{images.length - 5}</div>
                 )}
               </div>
             </div>
+
+<!-- מודאל להצגת כל התמונות -->
+<div class="gallery-modal" id="galleryModal">
+  <div class="gallery-modal-content">
+    <span class="close">&times;</span>
+    <div class="full-gallery-container">
+      <button class="prev-btn">&#10094;</button>
+      <div class="full-gallery" id="fullGallery">
+        {images.map((img, i) => (
+          <img
+            src={img}
+            alt={`תמונה ${i + 1} של ${property?.title}`}
+            class="gallery-image"
+            data-index={i}
+          />
+        ))}
+      </div>
+      <button class="next-btn">&#10095;</button>
+    </div>
+  </div>
+</div>
+
             <div class="map-box">
               <div class="map-item">
                 <img src="/images/map.png" alt={i18next.t("property.map")} title={i18next.t("property.map")} />
@@ -239,74 +264,78 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
         <p class="detail-not-found">{i18next.t("property.notFound")}</p>
       )}
     </main>
- <script type="module">
-  document.addEventListener("DOMContentLoaded", function () {
-    // פונקציה להחלפת תמונה ראשית בלחיצה על תמונה קטנה
-    function changeImage(event) {
-      const newImageSrc = event.target.src;
-      const mainImage = document.getElementById("detailMainImage");
-      if (mainImage) { // וודא שהאלמנט קיים
-        mainImage.src = newImageSrc;
+    <script type="module">
+      let currentImageIndex = 0;
+
+      function changeImage(direction) {
+        const images = document.querySelectorAll('.full-gallery img');
+        currentImageIndex = (currentImageIndex + direction + images.length) % images.length;
+        const newScrollPosition = images[currentImageIndex].offsetLeft;
+        document.getElementById('fullGallery').scrollTo({
+          left: newScrollPosition,
+          behavior: 'smooth'
+        });
       }
-    }
 
-    // פונקציה להצגת התמונה בגודל מלא בלחיצה על התמונה הראשית
-    function openFullScreen() {
-      const mainImage = document.getElementById("detailMainImage");
-      const fullScreenModal = document.getElementById("fullScreenModal");
-      const fullScreenImage = document.getElementById("fullScreenImage");
-
-      if (mainImage && fullScreenModal && fullScreenImage) { // בדוק אם כל האלמנטים קיימים
-        fullScreenImage.src = mainImage.src;
-        fullScreenModal.style.display = "flex";
+      function openGallery() {
+        const fullScreenModal = document.getElementById("galleryModal");
+        if (fullScreenModal) {
+          fullScreenModal.style.display = "flex";
+        }
       }
-    }
 
-    // סגור את חלון התמונה הגדולה בלחיצה על ה-X
-    function closeFullScreen() {
-      const fullScreenModal = document.getElementById("fullScreenModal");
-      if (fullScreenModal) { // בדוק אם המודאל קיים
-        fullScreenModal.style.display = "none";
+      function closeGallery() {
+        const fullScreenModal = document.getElementById("galleryModal");
+        if (fullScreenModal) {
+          fullScreenModal.style.display = "none";
+        }
       }
-    }
 
-    // מאזינים לאירועים לתמונות מיני
-    const thumbs = document.querySelectorAll(".detail-thumb");
-    if (thumbs.length > 0) { // בדוק אם יש תמונות מיני
-      thumbs.forEach(thumb => {
-        thumb.addEventListener("click", changeImage);
+      document.addEventListener("DOMContentLoaded", function () {
+        function changeImageMain(event) {
+          const newImageSrc = event.target.src;
+          const mainImage = document.getElementById("detailMainImage");
+          if (mainImage) {
+            mainImage.src = newImageSrc;
+          }
+        }
+
+        const thumbs = document.querySelectorAll(".detail-thumb");
+        thumbs.forEach(thumb => {
+          thumb.addEventListener("click", changeImageMain);
+        });
+
+        const mainImage = document.getElementById("detailMainImage");
+        if (mainImage) {
+          mainImage.addEventListener("click", openGallery);
+        }
+
+        const moreImagesButton = document.querySelector(".more-images");
+        if (moreImagesButton) {
+          moreImagesButton.addEventListener("click", openGallery);
+        }
+
+        const prevButton = document.querySelector(".prev-btn");
+        const nextButton = document.querySelector(".next-btn");
+
+        if (prevButton) {
+          prevButton.addEventListener("click", function() {
+            changeImage(-1);
+          });
+        }
+
+        if (nextButton) {
+          nextButton.addEventListener("click", function() {
+            changeImage(1);
+          });
+        }
+
+        const closeButton = document.querySelector(".close");
+        if (closeButton) {
+          closeButton.addEventListener("click", closeGallery);
+        }
       });
-    }
-
-    // מאזין לאירועים לתמונה הראשית
-    const mainImage = document.getElementById("detailMainImage");
-    if (mainImage) { // אם התמונה הראשית קיימת
-      mainImage.addEventListener("click", openFullScreen);
-    }
-
-    // הוספת מאזין לכפתור סגירה של המודאל
-    const modalClose = document.getElementById("modalClose");
-    if (modalClose) { // אם כפתור הסגירה קיים
-      modalClose.addEventListener("click", closeFullScreen);
-    }
-
-    // הוספת מאזינים לכפתורים של יצירת קשר
-    const phoneButton = document.getElementById("phoneButton");
-    if (phoneButton) { // אם כפתור הטלפון קיים
-      phoneButton.addEventListener("click", function () {
-        window.location.href = `tel:${property.phone}`;
-      });
-    }
-
-    const whatsappButton = document.getElementById("whatsappButton");
-    if (whatsappButton) { // אם כפתור ה-WhatsApp קיים
-      whatsappButton.addEventListener("click", function () {
-        window.location.href = `https://wa.me/${property.whatsapp}`;
-      });
-    }
-  });
-</script>
-
+    </script>
   </body>
 </html>
 

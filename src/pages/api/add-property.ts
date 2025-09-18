@@ -1,3 +1,5 @@
+// pages/api/add-property.ts
+
 import { supabase } from "../../lib/supabaseClient";
 import { mapPropertyToDb } from "../../services/propertyMapper";
 import type { Property } from "../../types/property";
@@ -7,14 +9,20 @@ export async function POST({ request }: { request: Request }): Promise<Response>
     // --- אימות משתמש ---
     const authHeader = request.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ success: false, message: "Missing token" }), { status: 401 });
+      return new Response(JSON.stringify({ success: false, message: "Missing token" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
-      return new Response(JSON.stringify({ success: false, message: "Invalid or expired session" }), { status: 403 });
+      return new Response(JSON.stringify({ success: false, message: "Invalid or expired session" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // --- בדיקת role ---
@@ -25,7 +33,10 @@ export async function POST({ request }: { request: Request }): Promise<Response>
       .single();
 
     if (roleError || roleData?.role !== "admin") {
-      return new Response(JSON.stringify({ success: false, message: "Access denied, admin role required" }), { status: 403 });
+      return new Response(JSON.stringify({ success: false, message: "Access denied, admin role required" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // --- קבלת נתוני הטופס ---
@@ -59,68 +70,95 @@ export async function POST({ request }: { request: Request }): Promise<Response>
       images: [],
       is_active: true,
       created_at: new Date().toISOString(),
-      has_pool: formData.get("has_pool") === "on", // בריכה
-      has_private_pool: formData.get("has_private_pool") === "on", // בריכה פרטית
-      has_jacuzzi: formData.get("has_jacuzzi") === "on", // ג'קוזי
-      has_grill: formData.get("has_grill") === "on", // מנגל
-      suitable_for: formData.getAll("suitable_for[]") as string[], // מתאים ל
-      nearby: formData.getAll("nearby[]") as string[], // בקרבת המקום
-      rating: Number(formData.get("rating")) || 0, // דירוג
-      reviews_count: Number(formData.get("reviews_count")) || 0, // חוות דעת
-      phone: formData.get("phone") as string, // טלפון
-      whatsapp: formData.get("whatsapp") as string, // WhatsApp
+      has_pool: formData.get("has_pool") === "on",
+      has_private_pool: formData.get("has_private_pool") === "on",
+      has_jacuzzi: formData.get("has_jacuzzi") === "on",
+      has_grill: formData.get("has_grill") === "on",
+      suitable_for: formData.getAll("suitable_for[]") as string[],
+      nearby: formData.getAll("nearby[]") as string[],
+      rating: Number(formData.get("rating")) || 0,
+      reviews_count: Number(formData.get("reviews_count")) || 0,
+      phone: formData.get("phone") as string,
+      whatsapp: formData.get("whatsapp") as string,
     };
 
     // --- העלאת תמונות ---
     const images = formData.getAll("images") as File[];
     const imageUrls: string[] = [];
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
     for (const file of images) {
-      if (file && file.name) {
-        const ext = file.name.split(".").pop(); // הוצאת סיומת הקובץ
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
+      if (!file) continue;
 
-        const arrayBuffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(arrayBuffer);
+      // בדיקת גודל
+      if (file.size > MAX_FILE_SIZE) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: `File ${file.name} exceeds 5MB limit`,
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
 
-        try {
-          // העלאת התמונה לסטורג' ב-Supabase
-          const { error: uploadError } = await supabase.storage
-            .from("properties") // שם הבקט
-            .upload(fileName, bytes, { contentType: file.type });
+      // בדיקת MIME type
+      if (!allowedMimeTypes.includes(file.type)) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: `Invalid file type for ${file.name}. Only images are allowed.`,
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
 
-          if (uploadError) {
-            throw new Error(`Image upload failed: ${uploadError.message}`);
-          }
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
 
-          // קבלת כתובת ה-URL הציבורית של התמונה
-          const { data } = await supabase.storage.from("properties").getPublicUrl(fileName);
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
 
-          // אם לא הצלחנו לקבל את ה-URL, נזרוק שגיאה
-          if (!data?.publicUrl) {
-            throw new Error("Error fetching public URL: URL is empty");
-          }
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from("property-images")
+          .upload(fileName, bytes, { contentType: file.type });
 
-          imageUrls.push(data.publicUrl);
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            return new Response(JSON.stringify({ success: false, message: error.message }), { status: 500 });
-          } else {
-            return new Response(JSON.stringify({ success: false, message: "Unknown error" }), { status: 500 });
-          }
-        }
+        if (uploadError) throw new Error(uploadError.message);
+
+        const { data } = await supabase.storage.from("property-images").getPublicUrl(fileName);
+        if (!data?.publicUrl) throw new Error("Error fetching public URL");
+
+        imageUrls.push(data.publicUrl);
+      } catch (error: unknown) {
+        console.error("Upload error:", error);
+        return new Response(JSON.stringify({
+          success: false,
+          message: error instanceof Error ? error.message : "Unknown error",
+        }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
       }
     }
 
-    // עדכון התמונות של הנכס עם כתובת ה-URL
     property.images = imageUrls;
 
-    // --- שמירה בטבלה ---
+    // -- שמירה ב-database --
     const dbRow = mapPropertyToDb(property);
-    const { error: insertError } = await supabase.from("properties").insert([dbRow]);
+    console.log("Inserting data into database:", dbRow);
 
+    const { error: insertError } = await supabase.from("properties").insert([dbRow]);
     if (insertError) {
-      return new Response(JSON.stringify({ success: false, message: `Database insert failed: ${insertError.message}` }), { status: 500 });
+      console.error("Insert Error:", insertError);
+      return new Response(JSON.stringify({
+        success: false,
+        message: `Database insert failed: ${insertError.message}`,
+      }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     return new Response(JSON.stringify({ success: true, message: "Property added successfully" }), {
@@ -130,6 +168,9 @@ export async function POST({ request }: { request: Request }): Promise<Response>
 
   } catch (err) {
     console.error("Server error:", err);
-    return new Response(JSON.stringify({ success: false, message: "Server error" }), { status: 500 });
+    return new Response(JSON.stringify({ success: false, message: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
