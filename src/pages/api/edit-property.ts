@@ -73,7 +73,7 @@ export async function POST({ request }: { request: Request }): Promise<Response>
         const arrayBuffer = await file.arrayBuffer();
         const { error: uploadError } = await supabase.storage.from("properties").upload(fileName, new Uint8Array(arrayBuffer), { contentType: file.type });
         if (!uploadError) {
-          const { data } = supabase.storage.from("properties").getPublicUrl(fileName);
+          const { data } = await supabase.storage.from("properties").getPublicUrl(fileName);
           if (data?.publicUrl) newImages.push(data.publicUrl);
         } else {
           console.error("Upload failed:", uploadError.message);

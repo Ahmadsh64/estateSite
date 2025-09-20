@@ -684,11 +684,11 @@ body {
 }
 
 .prev-btn {
-  left: 10px;
+  right: 10px;
 }
 
 .next-btn {
-  right: 10px;
+  left: 10px;
 }
 
 .prev-btn:hover, .next-btn:hover {

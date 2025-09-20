@@ -3,6 +3,7 @@ import { mapPropertyToDb } from "../../services/propertyMapper";
 import type { Property } from "../../types/property";
 import express, { Request, Response } from 'express';
 import multer from 'multer';
+import crypto from 'crypto';
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage }).array('images'); // "images" הוא שם השדה בטופס
@@ -16,7 +17,7 @@ app.post('/api/add-property', (req: Request, res: Response) => {
     if (err) {
       return res.status(500).json({
         success: false,
-        message: `Error uploading files: ${err.message}`
+        message: `Error uploading files: ${err.message}`,
       });
     }
 

@@ -48,7 +48,7 @@
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        console.error("Sign-in Error:", error.message); // הדפסת שגיאה
+        console.error("Sign-in Error:", error.message);
         msg.textContent = "❌ שגיאה בהתחברות: " + error.message;
         return;
       }
@@ -68,8 +68,15 @@
 
       console.log('User Data:', user); // הדפסת נתוני המשתמש
 
-      // בדוק אם התפקיד הוא "admin"
-      if (user.role == "admin") {
+      // אם תפקיד המשתמש לא מוגדר כ "admin"
+      // יהיה צורך לבדוק זאת מתוך טבלת המשתמשים ב-Supabase אם הוספתם את התפקיד
+      const { data: userProfile, error: userProfileError } = await supabase
+        .from('users') // שמות טבלאות או עמודות יכולים להשתנות בהתאם להגדרות שלך
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (userProfileError || !userProfile || userProfile.role !== 'admin') {
         msg.textContent = "❌ אין לך הרשאות מנהל";
         return;
       }

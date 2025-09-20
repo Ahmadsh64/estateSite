@@ -1,185 +1,230 @@
 <html lang="he">
-<head>
-  <meta charset="UTF-8" />
-  <title>➕ הוספת דירה חדשה</title>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
-<body dir="rtl">
-<header class="admin-add-header">
-  <h1>➕ הוספת דירה חדשה</h1>
-  <nav class="admin-nav">
-    <a href="/admin/dashboard" class="admin-add-back">⬅️ חזרה לדשבורד</a>
-    <button id="logout-btn" class="admin-logout-btn">🚪 יציאה</button>
-  </nav>
-</header>
+  <head>
+    <meta charset="UTF-8" />
+    <title>➕ הוספת דירה חדשה</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body dir="rtl">
+    <header class="admin-add-header">
+      <h1>➕ הוספת דירה חדשה</h1>
+      <nav class="admin-nav">
+        <a href="/admin/dashboard" class="admin-add-back">⬅️ חזרה לדשבורד</a>
+        <button id="logout-btn" class="admin-logout-btn">🚪 יציאה</button>
+      </nav>
+    </header>
 
-<main class="admin-add-main">
-  <form id="admin-add-form" class="admin-add-form">
-    <!-- כותרת ומחיר -->
-    <label>כותרת:</label>
-    <input type="text" name="title" required />
+    <main class="admin-add-main">
+      <form id="admin-add-form" class="admin-add-form">
+        <!-- כותרת ומחיר -->
+        <label>כותרת:</label>
+        <input type="text" name="title" required />
 
-    <label>מחיר ללילה:</label>
-    <input type="number" name="price" required />
+        <label>מחיר ללילה:</label>
+        <input type="number" name="price" required />
 
-    <!-- מיקום -->
-    <fieldset>
-      <legend>📍 מיקום</legend>
-      <label>עיר:</label>
-      <input type="text" name="city" required />
-      <label>רחוב:</label>
-      <input type="text" name="street" />
-      <label>מספר:</label>
-      <input type="text" name="number" />
-      <label>קומה:</label>
-      <input type="text" name="floor" />
-    </fieldset>
+        <!-- מיקום -->
+        <fieldset>
+          <legend>📍 מיקום</legend>
+          <label>עיר:</label>
+          <input type="text" name="city" required />
+          <label>רחוב:</label>
+          <input type="text" name="street" />
+          <label>מספר:</label>
+          <input type="text" name="number" />
+          <label>קומה:</label>
+          <input type="text" name="floor" />
+        </fieldset>
 
-    <!-- תיאור ותמונות -->
-    <label>תיאור:</label>
-    <textarea name="description" required></textarea>
+        <!-- תיאור ותמונות -->
+        <label>תיאור:</label>
+        <textarea name="description" required></textarea>
 
-    <label>תמונות:</label>
-    <input type="file" name="images" accept="image/*" multiple />
+        <label>תמונות:</label>
+        <input type="file" name="images" accept="image/*" multiple />
 
-    <!-- פרטים נוספים -->
-    <fieldset>
-      <legend>🛏 פרטי הנכס</legend>
-      <label>מספר חדרי שינה:</label>
-      <input type="number" name="bedrooms" />
-      <label>מספר מיטות:</label>
-      <input type="number" name="beds" />
-      <label>מספר חדרי אמבטיה:</label>
-      <input type="number" name="bathrooms" />
-      <label>מקס' נופשים:</label>
-      <input type="number" name="occupancy" />
-      <label>סוג נכס:</label>
-      <input type="text" name="type" />
-    </fieldset>
+        <!-- פרטים נוספים -->
+        <fieldset>
+          <legend>🛏 פרטי הנכס</legend>
+          <label>מספר חדרי שינה:</label>
+          <input type="number" name="bedrooms" />
+          <label>מספר מיטות:</label>
+          <input type="number" name="beds" />
+          <label>מספר חדרי אמבטיה:</label>
+          <input type="number" name="bathrooms" />
+          <label>מקס' נופשים:</label>
+          <input type="number" name="occupancy" />
+          <label>סוג נכס:</label>
+          <input type="text" name="type" />
+        </fieldset>
 
-    <!-- מתקנים -->
-    <fieldset>
-      <legend>⚙️ מתקנים</legend>
-      <label><input type="checkbox" name="kitchen" /> מטבח</label>
-      <label><input type="checkbox" name="washingmachine" /> מכונת כביסה</label>
-      <label><input type="checkbox" name="wifi" /> Wi-Fi</label>
-      <label><input type="checkbox" name="tv" /> טלוויזיה</label>
-      <label><input type="checkbox" name="publictransportnearby" /> תחבורה ציבורית בסביבה</label>
-      <label><input type="checkbox" name="parking" /> חניה</label>
-      <label><input type="checkbox" name="has_pool" /> בריכה</label>
-      <label><input type="checkbox" name="has_private_pool" /> בריכה פרטית</label>
-      <label><input type="checkbox" name="has_jacuzzi" /> ג'קוזי</label>
-      <label><input type="checkbox" name="has_grill" /> מנגל</label>
-    </fieldset>
+        <!-- מתקנים -->
+        <fieldset>
+          <legend>⚙️ מתקנים</legend>
+          <label><input type="checkbox" name="kitchen" /> מטבח</label>
+          <label
+            ><input type="checkbox" name="washingmachine" /> מכונת כביסה</label
+          >
+          <label><input type="checkbox" name="wifi" /> Wi-Fi</label>
+          <label><input type="checkbox" name="tv" /> טלוויזיה</label>
+          <label
+            ><input type="checkbox" name="publictransportnearby" /> תחבורה ציבורית
+            בסביבה</label
+          >
+          <label><input type="checkbox" name="parking" /> חניה</label>
+          <label><input type="checkbox" name="has_pool" /> בריכה</label>
+          <label
+            ><input type="checkbox" name="has_private_pool" /> בריכה פרטית</label
+          >
+          <label><input type="checkbox" name="has_jacuzzi" /> ג'קוזי</label>
+          <label><input type="checkbox" name="has_grill" /> מנגל</label>
+        </fieldset>
 
-    <!-- פרטי יצירת קשר -->
-    <fieldset>
-      <legend>📞 יצירת קשר</legend>
-      <label>מספר טלפון:</label>
-      <input type="text" name="phone" />
-      <label>מספר WhatsApp:</label>
-      <input type="text" name="whatsapp" />
-    </fieldset>
+        <!-- פרטי יצירת קשר -->
+        <fieldset>
+          <legend>📞 יצירת קשר</legend>
+          <label>מספר טלפון:</label>
+          <input type="text" name="phone" />
+          <label>מספר WhatsApp:</label>
+          <input type="text" name="whatsapp" />
+        </fieldset>
 
-    <!-- תנאים -->
-    <fieldset>
-      <legend>⏰ תנאים</legend>
-      <label>שעת כניסה:</label>
-      <input type="time" name="checkInTime" />
-      <label>שעת יציאה:</label>
-      <input type="time" name="checkOutTime" />
-      <label>מינימום לילות שהייה:</label>
-      <input type="number" name="minstaydays" />
-    </fieldset>
+        <!-- תנאים -->
+        <fieldset>
+          <legend>⏰ תנאים</legend>
+          <label>שעת כניסה:</label>
+          <input type="time" name="checkInTime" />
+          <label>שעת יציאה:</label>
+          <input type="time" name="checkOutTime" />
+          <label>מינימום לילות שהייה:</label>
+          <input type="number" name="minstaydays" />
+        </fieldset>
 
-    <!-- קטגוריות -->
-    <fieldset>
-      <legend>🎯 מתאים ל</legend>
-      <label><input type="checkbox" name="suitable_for" value="משפחות" /> משפחות</label>
-      <label><input type="checkbox" name="suitable_for" value="דתיים" /> דתיים</label>
-      <label><input type="checkbox" name="suitable_for" value="קבוצות" /> קבוצות</label>
-      <label><input type="checkbox" name="suitable_for" value="זוגות" /> זוגות</label>
-    </fieldset>
+        <!-- קטגוריות -->
+        <fieldset>
+          <legend>🎯 מתאים ל</legend>
+          <label
+            ><input type="checkbox" name="suitable_for" value="משפחות" /> משפחות</label
+          >
+          <label
+            ><input type="checkbox" name="suitable_for" value="דתיים" /> דתיים</label
+          >
+          <label
+            ><input type="checkbox" name="suitable_for" value="קבוצות" /> קבוצות</label
+          >
+          <label
+            ><input type="checkbox" name="suitable_for" value="זוגות" /> זוגות</label
+          >
+        </fieldset>
 
-    <fieldset>
-      <legend>📍 בקרבת המקום</legend>
-      <label><input type="checkbox" name="nearby" value="בית כנסת" /> בית כנסת</label>
-      <label><input type="checkbox" name="nearby" value="מסעדות" /> מסעדות</label>
-      <label><input type="checkbox" name="nearby" value="מרכז קניות" /> מרכז קניות</label>
-      <label><input type="checkbox" name="nearby" value="תחבורה ציבורית" /> תחבורה ציבורית</label>
-    </fieldset>
+        <fieldset>
+          <legend>📍 בקרבת המקום</legend>
+          <label
+            ><input type="checkbox" name="nearby" value="בית כנסת" /> בית כנסת</label
+          >
+          <label
+            ><input type="checkbox" name="nearby" value="מסעדות" /> מסעדות</label
+          >
+          <label
+            ><input type="checkbox" name="nearby" value="מרכז קניות" /> מרכז קניות</label
+          >
+          <label
+            ><input type="checkbox" name="nearby" value="תחבורה ציבורית" /> תחבורה
+            ציבורית</label
+          >
+        </fieldset>
 
-    <button type="submit">💾 שמור</button>
-  </form>
+        <button type="submit">💾 שמור</button>
+      </form>
 
-  <p id="admin-add-message"></p>
-</main>
+      <p id="admin-add-message"></p>
+    </main>
 
-<script type="module">
-  const form = document.getElementById("admin-add-form");
-  const msg = document.getElementById("admin-add-message");
-  const logoutBtn = document.getElementById("logout-btn");
+    <script type="module">
+      const form = document.getElementById("admin-add-form");
+      const msg = document.getElementById("admin-add-message");
+      const logoutBtn = document.getElementById("logout-btn");
 
-  // כפתור יציאה
-  logoutBtn.addEventListener("click", () => {
-    sessionStorage.removeItem("sb-session");
-    window.location.href = "/admin/login";
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-
-    // דוגמה: איסוף כל ה-checkboxes מסוג suitableFor ו-nearby כמערכים
-    const suitableFor = Array.from(form.querySelectorAll('input[name="suitable_for"]:checked')).map(cb => cb.value);
-    const nearby = Array.from(form.querySelectorAll('input[name="nearby"]:checked')).map(cb => cb.value);
-
-    formData.append("suitable_for", JSON.stringify(suitableFor));
-    formData.append("nearby", JSON.stringify(nearby));
-
-    // קבלת הטוקן מה-sessionStorage
-    const session = sessionStorage.getItem("sb-session");
-    if (!session) {
-      msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
-      msg.style.color = "red";
-      setTimeout(() => {
+      // כפתור יציאה
+      logoutBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("sb-session");
         window.location.href = "/admin/login";
-      }, 3000);
-      return;
-    }
-
-    const token = JSON.parse(session).access_token;
-
-    try {
-      const res = await fetch("/api/add-property", {
-        method: "POST",
-        headers: { 
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
       });
 
-      const result = await res.json();
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
 
-      if (result.success) {
-        msg.textContent = "✅ הדירה נוספה בהצלחה!";
-        msg.style.color = "green";
-        form.reset();
-      } else {
-        msg.textContent = `❌ שגיאה: ${result.message}`;
-        msg.style.color = "red";
-        if (res.status === 403) {
+        // איסוף כל ה-checkboxes מסוג suitableFor ו-nearby כמערכים
+        const suitableFor = Array.from(
+          form.querySelectorAll('input[name="suitable_for"]:checked'),
+        ).map((cb) => cb.value);
+        const nearby = Array.from(
+          form.querySelectorAll('input[name="nearby"]:checked'),
+        ).map((cb) => cb.value);
+
+        formData.append("suitable_for", JSON.stringify(suitableFor));
+        formData.append("nearby", JSON.stringify(nearby));
+
+        // בדיקת MIME type של התמונות
+        const allowedMimeTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ];
+        const files = form.querySelector('input[type="file"]').files;
+
+        for (const file of files) {
+          if (!allowedMimeTypes.includes(file.type)) {
+            msg.textContent = `❌ סוג קובץ לא נתמך עבור ${file.name}. רק תמונות נתמכות.`;
+            msg.style.color = "red";
+            return;
+          }
+        }
+
+        // קבלת הטוקן מה-sessionStorage
+        const session = sessionStorage.getItem("sb-session");
+        if (!session) {
+          msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
+          msg.style.color = "red";
           setTimeout(() => {
             window.location.href = "/admin/login";
-          }, 9000);
+          }, 3000);
+          return;
         }
-      }
-    } catch (err) {
-      console.error(err);
-      msg.textContent = "❌ שגיאה בחיבור לשרת";
-      msg.style.color = "red";
-    }
-  });
-</script>
-</body>
+
+        const token = JSON.parse(session).access_token;
+
+        try {
+          const res = await fetch("/api/add-property", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+
+          const result = await res.json();
+
+          if (result.success) {
+            msg.textContent = "✅ הדירה נוספה בהצלחה!";
+            msg.style.color = "green";
+            form.reset();
+          } else {
+            msg.textContent = `❌ שגיאה: ${result.message}`;
+            msg.style.color = "red";
+            if (res.status === 403) {
+              setTimeout(() => {
+                window.location.href = "/admin/login";
+              }, 9000);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          msg.textContent = "❌ שגיאה בחיבור לשרת";
+          msg.style.color = "red";
+        }
+      });
+    </script>
+  </body>
 </html>
