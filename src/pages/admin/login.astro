@@ -1,22 +1,25 @@
+---
+import i18next from '../../i18n.js';
+---
 <html lang="he">
 <head>
   <meta charset="UTF-8"/>
-  <title>כניסת אדמין</title>
+  <title>{i18next.t("admin.login")}</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body dir="rtl">
   <main style="max-width:400px; margin:auto; padding:2rem; text-align:center;">
-    <h1>🔑 כניסת אדמין</h1>
+    <h1>🔑 {i18next.t("admin.login")}</h1>
     <form id="loginForm">
       <div style="margin:1rem 0;">
-        <label>אימייל:</label><br/>
+        <label>{i18next.t("admin.email")}</label><br/>
         <input type="email" name="email" required style="width:100%; padding:0.5rem;" />
       </div>
       <div style="margin:1rem 0;">
-        <label>סיסמה:</label><br/>
+        <label>{i18next.t("admin.password")}</label><br/>
         <input type="password" name="password" required style="width:100%; padding:0.5rem;" />
       </div>
-      <button type="submit" style="padding:0.5rem 1rem;">כניסה</button>
+      <button type="submit" style="padding:0.5rem 1rem;">{i18next.t("admin.loginButton")}</button>
     </form>
     <p id="loginMessage" style="color:red; margin-top:1rem;"></p>
   </main>

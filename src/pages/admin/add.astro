@@ -1,143 +1,123 @@
+---
+import i18next from '../../i18n.js';
+---
 <html lang="he">
   <head>
     <meta charset="UTF-8" />
-    <title>➕ הוספת דירה חדשה</title>
+    <title>➕ {i18next.t("admin.addNewProperty")}</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body dir="rtl">
     <header class="admin-add-header">
-      <h1>➕ הוספת דירה חדשה</h1>
+      <h1>➕ {i18next.t("admin.addNewProperty")}</h1>
       <nav class="admin-nav">
-        <a href="/admin/dashboard" class="admin-add-back">⬅️ חזרה לדשבורד</a>
-        <button id="logout-btn" class="admin-logout-btn">🚪 יציאה</button>
+        <a href="/admin/dashboard" class="admin-add-back">⬅️ {i18next.t("admin.backToDashboard")}</a>
+        <button id="logout-btn" class="admin-logout-btn">🚪 {i18next.t("admin.logout")}</button>
       </nav>
     </header>
 
     <main class="admin-add-main">
       <form id="admin-add-form" class="admin-add-form">
         <!-- כותרת ומחיר -->
-        <label>כותרת:</label>
+        <label>{i18next.t("admin.title")}</label>
         <input type="text" name="title" required />
 
-        <label>מחיר ללילה:</label>
+        <label>{i18next.t("admin.pricePerNight")}</label>
         <input type="number" name="price" required />
 
         <!-- מיקום -->
         <fieldset>
-          <legend>📍 מיקום</legend>
-          <label>עיר:</label>
+          <legend>📍 {i18next.t("admin.location")}</legend>
+          <label>{i18next.t("admin.city")}</label>
           <input type="text" name="city" required />
-          <label>רחוב:</label>
+          <label>{i18next.t("admin.street")}</label>
           <input type="text" name="street" />
-          <label>מספר:</label>
+          <label>{i18next.t("admin.number")}</label>
           <input type="text" name="number" />
-          <label>קומה:</label>
+          <label>{i18next.t("admin.floor")}</label>
           <input type="text" name="floor" />
         </fieldset>
 
         <!-- תיאור ותמונות -->
-        <label>תיאור:</label>
+        <label>{i18next.t("admin.description")}</label>
         <textarea name="description" required></textarea>
 
-        <label>תמונות:</label>
+        <label>{i18next.t("admin.images")}</label>
         <input type="file" name="images" accept="image/*" multiple />
 
         <!-- פרטים נוספים -->
         <fieldset>
-          <legend>🛏 פרטי הנכס</legend>
-          <label>מספר חדרי שינה:</label>
+          <legend>🛏 {i18next.t("admin.propertyDetails")}</legend>
+          <label>{i18next.t("admin.bedrooms")}</label>
           <input type="number" name="bedrooms" />
-          <label>מספר מיטות:</label>
+          <label>{i18next.t("admin.beds")}</label>
           <input type="number" name="beds" />
-          <label>מספר חדרי אמבטיה:</label>
+          <label>{i18next.t("admin.bathrooms")}</label>
           <input type="number" name="bathrooms" />
-          <label>מקס' נופשים:</label>
+          <label>{i18next.t("admin.maxOccupancy")}</label>
           <input type="number" name="occupancy" />
-          <label>סוג נכס:</label>
+          <label>{i18next.t("admin.propertyType")}</label>
           <input type="text" name="type" />
         </fieldset>
 
         <!-- מתקנים -->
         <fieldset>
-          <legend>⚙️ מתקנים</legend>
-          <label><input type="checkbox" name="kitchen" /> מטבח</label>
-          <label
-            ><input type="checkbox" name="washingmachine" /> מכונת כביסה</label
-          >
-          <label><input type="checkbox" name="wifi" /> Wi-Fi</label>
-          <label><input type="checkbox" name="tv" /> טלוויזיה</label>
-          <label
-            ><input type="checkbox" name="publictransportnearby" /> תחבורה ציבורית
-            בסביבה</label
-          >
-          <label><input type="checkbox" name="parking" /> חניה</label>
-          <label><input type="checkbox" name="has_pool" /> בריכה</label>
-          <label
-            ><input type="checkbox" name="has_private_pool" /> בריכה פרטית</label
-          >
-          <label><input type="checkbox" name="has_jacuzzi" /> ג'קוזי</label>
-          <label><input type="checkbox" name="has_grill" /> מנגל</label>
+          <legend>⚙️ {i18next.t("admin.amenities")}</legend>
+          <label><input type="checkbox" name="kitchen" /> {i18next.t("admin.kitchen")}</label>
+          <label><input type="checkbox" name="washingmachine" /> {i18next.t("admin.washingmachine")}</label>
+          <label><input type="checkbox" name="wifi" /> {i18next.t("admin.wifi")}</label>
+          <label><input type="checkbox" name="tv" /> {i18next.t("admin.tv")}</label>
+          <label><input type="checkbox" name="publictransportnearby" /> {i18next.t("admin.publictransportnearby")}</label>
+          <label><input type="checkbox" name="parking" /> {i18next.t("admin.parking")}</label>
+          <label><input type="checkbox" name="has_pool" /> {i18next.t("admin.pool")}</label>
+          <label><input type="checkbox" name="has_private_pool" /> {i18next.t("admin.privatePool")}</label>
+          <label><input type="checkbox" name="has_jacuzzi" /> {i18next.t("admin.jacuzzi")}</label>
+          <label><input type="checkbox" name="has_grill" /> {i18next.t("admin.grill")}</label>
         </fieldset>
 
         <!-- פרטי יצירת קשר -->
         <fieldset>
-          <legend>📞 יצירת קשר</legend>
-          <label>מספר טלפון:</label>
+          <legend>📞 {i18next.t("admin.contactInfo")}</legend>
+          <label>{i18next.t("admin.phone")}</label>
           <input type="text" name="phone" />
-          <label>מספר WhatsApp:</label>
+          <label>{i18next.t("admin.whatsapp")}</label>
           <input type="text" name="whatsapp" />
         </fieldset>
 
         <!-- תנאים -->
         <fieldset>
-          <legend>⏰ תנאים</legend>
-          <label>שעת כניסה:</label>
+          <legend>⏰ {i18next.t("admin.terms")}</legend>
+          <label>{i18next.t("admin.checkInTime")}</label>
           <input type="time" name="checkInTime" />
-          <label>שעת יציאה:</label>
+          <label>{i18next.t("admin.checkOutTime")}</label>
           <input type="time" name="checkOutTime" />
-          <label>מינימום לילות שהייה:</label>
+          <label>{i18next.t("admin.minstaydays")}</label>
           <input type="number" name="minstaydays" />
         </fieldset>
 
         <!-- קטגוריות -->
         <fieldset>
-          <legend>🎯 מתאים ל</legend>
-          <label
-            ><input type="checkbox" name="suitable_for" value="משפחות" /> משפחות</label
-          >
-          <label
-            ><input type="checkbox" name="suitable_for" value="דתיים" /> דתיים</label
-          >
-          <label
-            ><input type="checkbox" name="suitable_for" value="קבוצות" /> קבוצות</label
-          >
-          <label
-            ><input type="checkbox" name="suitable_for" value="זוגות" /> זוגות</label
-          >
+          <legend>🎯 {i18next.t("admin.suitableFor")}</legend>
+          <label><input type="checkbox" name="suitable_for" value="משפחות" /> {i18next.t("admin.families")}</label>
+          <label><input type="checkbox" name="suitable_for" value="דתיים" /> {i18next.t("admin.religious")}</label>
+          <label><input type="checkbox" name="suitable_for" value="קבוצות" /> {i18next.t("admin.groups")}</label>
+          <label><input type="checkbox" name="suitable_for" value="זוגות" /> {i18next.t("admin.couples")}</label>
         </fieldset>
 
         <fieldset>
-          <legend>📍 בקרבת המקום</legend>
-          <label
-            ><input type="checkbox" name="nearby" value="בית כנסת" /> בית כנסת</label
-          >
-          <label
-            ><input type="checkbox" name="nearby" value="מסעדות" /> מסעדות</label
-          >
-          <label
-            ><input type="checkbox" name="nearby" value="מרכז קניות" /> מרכז קניות</label
-          >
-          <label
-            ><input type="checkbox" name="nearby" value="תחבורה ציבורית" /> תחבורה
-            ציבורית</label
-          >
+          <legend>📍 {i18next.t("admin.nearby")}</legend>
+          <label><input type="checkbox" name="nearby" value="בית כנסת" /> {i18next.t("admin.synagogue")}</label>
+          <label><input type="checkbox" name="nearby" value="מסעדות" /> {i18next.t("admin.restaurants")}</label>
+          <label><input type="checkbox" name="nearby" value="מרכז קניות" /> {i18next.t("admin.shoppingCenter")}</label>
+          <label><input type="checkbox" name="nearby" value="תחבורה ציבורית" /> {i18next.t("admin.publicTransport")}</label>
         </fieldset>
 
-        <button type="submit">💾 שמור</button>
+        <button type="submit">💾 {i18next.t("admin.save")}</button>
       </form>
 
       <p id="admin-add-message"></p>
     </main>
+
 
     <script type="module">
       const form = document.getElementById("admin-add-form");

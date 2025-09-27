@@ -11,6 +11,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",
     "astro": "^5.13.5",
+    "dotenv": "^17.2.2",
     "file-type": "^21.0.0",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
@@ -20,6 +21,7 @@
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
     "@types/multer": "^2.0.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9"

@@ -34,6 +34,47 @@ header {
   z-index: 1000;
 }
 
+/* כפתורי קשר בסרגל העליון */
+.header-contact-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.header-contact-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-contact-btn.phone-btn {
+  background: #007bff;
+  color: white;
+}
+
+.header-contact-btn.phone-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.header-contact-btn.whatsapp-btn {
+  background: #25d366;
+  color: white;
+}
+
+.header-contact-btn.whatsapp-btn:hover {
+  background: #1da851;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
 /* צד ימין - לוגו */
 header .logo {
   display: flex;
@@ -1305,5 +1346,916 @@ footer {
   header nav a {
     font-size: 0.85rem;
     padding: 6px 12px;
+  }
+}
+
+/* =================== עיצוב חדש דומה לוויקנד - רוחב מלא =================== */
+
+/* קונטיינר ראשי ברוחב מלא */
+.detail-container-fullwidth {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* כותרת הנכס */
+.property-header-fullwidth {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 30px 40px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.property-title-section {
+  flex: 1;
+}
+
+.property-title-main {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.property-location-info {
+  margin-bottom: 8px;
+}
+
+.location-text {
+  font-size: 16px;
+  color: #666;
+}
+
+.floor-text {
+  font-size: 16px;
+  color: #666;
+}
+
+.property-rating-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-stars {
+  font-size: 16px;
+}
+
+.rating-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.reviews-count {
+  font-size: 14px;
+  color: #999;
+}
+
+.property-contact-buttons {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.contact-btn-primary,
+.contact-btn-whatsapp {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contact-btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.contact-btn-primary:hover {
+  background: #0056b3;
+}
+
+.contact-btn-whatsapp {
+  background: #25d366;
+  color: white;
+}
+
+.contact-btn-whatsapp:hover {
+  background: #1da851;
+}
+
+/* פריסה ראשית */
+.main-content-layout {
+  display: flex;
+  gap: 40px;
+  padding: 40px;
+  background: #f8f9fa;
+  min-height: calc(100vh - 200px);
+}
+
+/* גלריית תמונות */
+.gallery-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* פרטי הנכס מתחת לתמונות */
+.property-details-under-gallery {
+  margin-top: 20px;
+}
+
+.property-details-under-gallery .property-details-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.main-image-container-fullwidth {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.detail-main-image-fullwidth {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.detail-main-image-fullwidth:hover {
+  transform: scale(1.02);
+}
+
+.image-counter {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.thumbnail-gallery-fullwidth {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 5px 0;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.thumbnail-gallery-fullwidth::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumbnail-gallery-fullwidth::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thumbnail-gallery-fullwidth::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.detail-thumb-fullwidth {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.detail-thumb-fullwidth:hover {
+  border-color: #007bff;
+  transform: scale(1.05);
+}
+
+.detail-thumb-fullwidth.active {
+  border-color: #007bff;
+}
+
+.more-images-fullwidth {
+  width: 120px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.more-images-fullwidth:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* צד ימין - פרטים */
+.sidebar-section {
+  flex: 1;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* כרטיס פרטי הנכס */
+.property-details-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.details-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 15px 0;
+}
+
+.property-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* כרטיס מפה */
+.map-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.map-preview-fullwidth {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.map-preview-fullwidth:hover {
+  transform: scale(1.02);
+}
+
+.map-preview-img-fullwidth {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.map-overlay-text-fullwidth {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 15px 10px 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* כרטיס טופס יצירת קשר */
+.contact-form-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* כפתורי מפה */
+.map-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.map-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.map-action-btn:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+/* סקציות נוספות */
+.property-sections {
+  padding: 40px;
+  background: white;
+  margin-top: 20px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* תיאור המקום */
+.property-description-section {
+  margin-bottom: 40px;
+}
+
+.property-description-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  margin: 0;
+}
+
+/* מתקנים */
+.amenities-section {
+  margin-bottom: 40px;
+}
+
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.amenity-category {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.amenity-category-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 15px 0;
+}
+
+.amenity-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.amenity-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+  padding: 4px 0;
+}
+
+/* פרטי שהייה */
+.stay-details-section {
+  margin-bottom: 40px;
+}
+
+.stay-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stay-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stay-detail-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.stay-detail-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* פרטי יצירת קשר */
+.contact-details-section {
+  margin-bottom: 40px;
+}
+
+.contact-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.contact-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contact-detail-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.contact-detail-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.contact-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.contact-link:hover {
+  text-decoration: underline;
+}
+
+/* כפתורי קשר צפים */
+.floating-contact-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1500;
+}
+
+.floating-contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.floating-contact-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.floating-contact-btn:hover::before {
+  left: 100%;
+}
+
+.floating-contact-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
+.floating-btn-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.floating-btn-text {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.floating-phone-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+}
+
+.floating-phone-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  box-shadow: 0 12px 35px rgba(0, 123, 255, 0.4);
+}
+
+.floating-whatsapp-btn {
+  background: linear-gradient(135deg, #25d366, #1da851);
+  color: white;
+}
+
+.floating-whatsapp-btn:hover {
+  background: linear-gradient(135deg, #1da851, #17a049);
+  box-shadow: 0 12px 35px rgba(37, 211, 102, 0.4);
+}
+
+/* אנימציות */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.floating-contact-btn {
+  animation: float 3s ease-in-out infinite;
+}
+
+.floating-contact-btn:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.map-preview {
+  width: 200px;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.map-preview:hover {
+  transform: scale(1.05);
+}
+
+.map-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.map-overlay-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 15px 10px 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.map-icon {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+/* טופס יצירת קשר בצד */
+.contact-form-sidebar {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.contact-form-title {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.sidebar-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar-contact-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-contact-form label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.sidebar-contact-form input,
+.sidebar-contact-form select,
+.sidebar-contact-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: #fafafa;
+}
+
+.sidebar-contact-form input:focus,
+.sidebar-contact-form select:focus,
+.sidebar-contact-form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  background: white;
+}
+
+.sidebar-contact-form textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.checkbox-group {
+  margin: 10px 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.submit-btn-sidebar {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-btn-sidebar:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.submit-btn-sidebar:active {
+  transform: translateY(0);
+}
+
+/* מודאל למפה */
+.map-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(5px);
+}
+
+.map-modal-content {
+  position: relative;
+  margin: 2% auto;
+  width: 90%;
+  height: 90%;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.close-map {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  color: white;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 2001;
+  background: rgba(0, 0, 0, 0.5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.close-map:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* התאמות רספונסיביות לעיצוב החדש */
+@media (max-width: 1024px) {
+  .main-content-layout {
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+  }
+  
+  .sidebar-section {
+    max-width: none;
+  }
+  
+  .property-header-fullwidth {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .property-contact-buttons {
+    align-self: stretch;
+  }
+  
+  .contact-btn-primary,
+  .contact-btn-whatsapp {
+    flex: 1;
+  }
+  
+  .property-details-under-gallery {
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-image-container-fullwidth {
+    height: 300px;
+  }
+  
+  .detail-thumb-fullwidth {
+    width: 100px;
+    height: 70px;
+  }
+  
+  .more-images-fullwidth {
+    width: 100px;
+    height: 70px;
+  }
+  
+  .property-title-main {
+    font-size: 24px;
+  }
+  
+  .main-content-layout {
+    padding: 15px;
+  }
+  
+  .property-header-fullwidth {
+    padding: 15px;
+  }
+  
+  .map-modal-content {
+    width: 95%;
+    height: 80%;
+    margin: 5% auto;
+  }
+  
+  .property-sections {
+    padding: 20px;
+  }
+  
+  .amenities-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stay-details-grid,
+  .contact-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* התאמות לכפתורי קשר במובייל */
+  .header-contact-buttons {
+    gap: 8px;
+  }
+  
+  .header-contact-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+  
+  .floating-contact-buttons {
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .floating-contact-btn {
+    flex: 1;
+    min-width: auto;
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .floating-btn-text {
+    display: none;
+  }
+  
+  .floating-btn-icon {
+    font-size: 18px;
   }
 }

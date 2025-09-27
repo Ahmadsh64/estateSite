@@ -38,25 +38,34 @@ if (!error && data) {
 
 // מערך של כל התנאים לסינון
 const filters = [
-  { condition: selectedRooms, filter: (p: Property) => {
-    if (selectedRooms === "5+") {
-      return (p.bedrooms ?? 0) >= 5;
-    } else {
-      return (p.bedrooms ?? 0) === Number(selectedRooms);
-    }
-  }},
-  
-  { condition: selectedLocation, filter: (p: Property) => p.city === selectedLocation },
+  {
+    condition: selectedRooms,
+    filter: (p: Property) => {
+      if (selectedRooms === "5+") {
+        return (p.bedrooms ?? 0) >= 5;
+      } else {
+        return (p.bedrooms ?? 0) === Number(selectedRooms);
+      }
+    },
+  },
 
-  { condition: selectedAmenities.length > 0, filter: (p: Property) => {
-    return selectedAmenities.every((amenity) => {
-      if (amenity === "washingmachine" && !p.washingmachine) return false;
-      if (amenity === "WiFi" && !p.wifi) return false;
-      if (amenity === "parking" && !p.parking) return false;
-      if (amenity === "tv" && !p.tv) return false;
-      return true;
-    });
-  }},
+  {
+    condition: selectedLocation,
+    filter: (p: Property) => p.city === selectedLocation,
+  },
+
+  {
+    condition: selectedAmenities.length > 0,
+    filter: (p: Property) => {
+      return selectedAmenities.every((amenity) => {
+        if (amenity === "washingmachine" && !p.washingmachine) return false;
+        if (amenity === "WiFi" && !p.wifi) return false;
+        if (amenity === "parking" && !p.parking) return false;
+        if (amenity === "tv" && !p.tv) return false;
+        return true;
+      });
+    },
+  },
 ];
 
 // סינון הדירות לפי כל התנאים
@@ -65,8 +74,6 @@ filters.forEach(({ condition, filter }) => {
     properties = properties.filter(filter);
   }
 });
-
-
 ---
 
 <html lang="he">
@@ -77,23 +84,30 @@ filters.forEach(({ condition, filter }) => {
   </head>
   <body dir="rtl">
     <!-- Header -->
-<header>
-  <div class="logo">
-    <img src="/images/logo.png" alt={i18next.t("property.title")} />
-    <span>{i18next.t("property.title")}</span>
-  </div>
-  <nav>
-    <!-- כפתורים לסוגי נכסים -->
-    <a href="/" class="filter-btn">{i18next.t("search.apartments")}</a>
-    <a href="/?type=בית" class="filter-btn">{i18next.t("search.houses")}</a>
-    <a href="/?type=צימר" class="filter-btn">{i18next.t("search.cabins")}</a>
-    <a href="/?type=וילה" class="filter-btn">{i18next.t("search.villas")}</a>
-    <a href="/?type=מלון" class="filter-btn">{i18next.t("search.hotels")}</a>
-    <a href="/?type=אטרקציה" class="filter-btn">{i18next.t("search.attractions")}</a>
-    <a href="/?type=קמפינג" class="filter-btn">{i18next.t("search.camping")}</a>
-  </nav>
-  <a href="/admin/login" class="admin-btn">{i18next.t("admin.login")}</a>
-</header>
+    <header>
+      <div class="logo">
+        <img src="/images/logo.png" alt={i18next.t("property.title")} />
+        <span>{i18next.t("property.title")}</span>
+      </div>
+      <nav>
+        <!-- כפתורים לסוגי נכסים -->
+        <a href="/" class="filter-btn">{i18next.t("search.apartments")}</a>
+        <a href="/?type=בית" class="filter-btn">{i18next.t("search.houses")}</a>
+        <a href="/?type=צימר" class="filter-btn">{i18next.t("search.cabins")}</a
+        >
+        <a href="/?type=וילה" class="filter-btn">{i18next.t("search.villas")}</a
+        >
+        <a href="/?type=מלון" class="filter-btn">{i18next.t("search.hotels")}</a
+        >
+        <a href="/?type=אטרקציה" class="filter-btn"
+          >{i18next.t("search.attractions")}</a
+        >
+        <a href="/?type=קמפינג" class="filter-btn"
+          >{i18next.t("search.camping")}</a
+        >
+      </nav>
+      <a href="/admin/login" class="admin-btn">{i18next.t("admin.login")}</a>
+    </header>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -114,14 +128,6 @@ filters.forEach(({ condition, filter }) => {
                 ))
               }
             </select>
-          </div>
-
-          <!-- Filter for Check-in and Check-out -->
-          <div class="filter-group">
-            <label for="checkIn">{i18next.t("search.checkintime")}</label>
-            <input type="date" name="checkIn" id="checkIn" />
-            <label for="checkOut">{i18next.t("search.checkouttime")}</label>
-            <input type="date" name="checkouttime" id="checkouttime" />
           </div>
 
           <!-- Filter for Rooms -->
@@ -154,10 +160,16 @@ filters.forEach(({ condition, filter }) => {
           <!-- Filter for Price Range -->
           <div class="filter-group">
             <label for="priceRange">{i18next.t("search.price")}</label>
-            <input type="range" name="price" id="priceRange" min="0" max="20000" step="100" />
-            <div id="price-range-value">0 - 20,000 ₪</div>
+            <input
+              type="range"
+              name="price"
+              id="priceRange"
+              min="0"
+              max="40000"
+              step="10"
+            />
+            <div id="price-range-value">0 - 40000 ₪</div>
           </div>
-
           <!-- Filter for Amenities -->
           <div class="filter-group">
             <label>{i18next.t("search.amenities")}</label>
@@ -166,7 +178,11 @@ filters.forEach(({ condition, filter }) => {
                 <input type="checkbox" name="amenities" value="wifi" /> WiFi
               </label>
               <label>
-                <input type="checkbox" name="amenities" value="washingmachine" /> מכונת כביסה
+                <input
+                  type="checkbox"
+                  name="amenities"
+                  value="washingmachine"
+                /> מכונת כביסה
               </label>
               <label>
                 <input type="checkbox" name="amenities" value="parking" /> חניה
@@ -177,125 +193,167 @@ filters.forEach(({ condition, filter }) => {
             </div>
           </div>
 
-          <button type="submit" class="search-btn">{i18next.t("search.searchButton")}</button>
+          <button type="submit" class="search-btn"
+            >{i18next.t("search.searchButton")}</button
+          >
         </form>
       </div>
     </section>
 
     <!-- Property Listings -->
-<main>
-  <ul class="home-property-list">
-    {
-      properties.map((p: Property) => (
-        <li class="home-property-item" data-property={JSON.stringify(p)}>
-          <a href={`/${p.id}`} class="home-property-link">
-            <div class="home-property-images">
-              <img
-                id={`main-image-${p.id}`}
-                loading="lazy"
-                src={p.images[0]}
-                alt={p.title}
-                class="property-main-image"
-              />
-            </div>
+    <main>
+      <ul class="home-property-list">
+        {
+          properties.map((p: Property) => (
+            <li class="home-property-item" data-property={JSON.stringify(p)}>
+              <a href={`/${p.id}`} class="home-property-link">
+                <div class="home-property-images">
+                  <img
+                    id={`main-image-${p.id}`}
+                    loading="lazy"
+                    src={p.images[0]}
+                    alt={p.title}
+                    class="property-main-image"
+                  />
+                </div>
 
-            <div class="property-details">
-              <h2 class="home-property-title">{p.title}</h2>
-              <p class="home-property-price">
-                {i18next.t("property.price")}: {p.price.toLocaleString("he-IL")}
-              </p>
-              
-              <div class="home-property-info">
-                <p class="home-property-location">
-                  {p.location?.city || ""} {p.location?.street || ""} {p.location?.number || ""}
-                  {p.location?.floor ? `, קומה ${p.location.floor}` : ""}
-                </p>
+                <div class="property-details">
+                  <h2 class="home-property-title">{p.title}</h2>
+                  <p class="home-property-price">
+                    {i18next.t("property.price")}:{" "}
+                    {p.price.toLocaleString("he-IL")}
+                  </p>
 
-                <p class="home-property-features">
-                  {[{ label: "חדרים", value: p.bedrooms },
-                    { label: "מיטות", value: p.beds },
-                    { label: "חדרי אמבטיה", value: p.bathrooms },
-                    { label: "נפשות מקסימום", value: p.occupancy },
-                  ].map((feature, i) => (
-                    <span class="property-feature">
-                      {feature.label}: {feature.value} {i < 8 ? "| " : ""}
-                    </span>
-                  ))}
-                </p>
-              </div>
-              
-              <hr class="property-divider" />
+                  <div class="home-property-info">
+                    <p class="home-property-location">
+                      {p.location?.city || ""} {p.location?.street || ""}{" "}
+                      {p.location?.number || ""}
+                      {p.location?.floor ? `, קומה ${p.location.floor}` : ""}
+                    </p>
 
-              <div class="home-property-contact">
-                <p class="home-property-whatsapp">
-                  {p.whatsapp ? `📞 ${p.whatsapp}` : "אין פרטי קשר"}
-                </p>
-              </div>
-            </div>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</main>
+                    <p class="home-property-features">
+                      {[
+                        { label: "חדרים", value: p.bedrooms },
+                        { label: "מיטות", value: p.beds },
+                        { label: "חדרי אמבטיה", value: p.bathrooms },
+                        { label: "נפשות מקסימום", value: p.occupancy },
+                      ].map((feature, i) => (
+                        <span class="property-feature">
+                          {feature.label}: {feature.value} {i < 8 ? "| " : ""}
+                        </span>
+                      ))}
+                    </p>
+                  </div>
 
-<script type="module">
-  // שליפה של selectedAmenities מה-URL
-  const selectedAmenities = new URLSearchParams(window.location.search).getAll("amenities");
-  const selectedRooms = new URLSearchParams(window.location.search).get("rooms");
-  const selectedLocation = new URLSearchParams(window.location.search).get("location");
-  const selectedPriceRange = new URLSearchParams(window.location.search).get("price");
-  const selectedType = new URLSearchParams(window.location.search).get("type");
+                  <hr class="property-divider" />
 
-  const propertyItems = document.querySelectorAll(".home-property-item");
-
-  // קבלת אלמנט הסרגל והאלמנט של הצגת המחיר
-  const priceRange = document.getElementById("priceRange");
-  const priceValueDisplay = document.getElementById("price-range-value");
-
-  // פונקציה לעדכון המחיר
-  priceRange.addEventListener("input", function() {
-    const minPrice = priceRange.min;
-    const maxPrice = priceRange.max;
-    const value = priceRange.value;
-
-    // עדכון טקסט הצגת המחיר
-    priceValueDisplay.textContent = `${value} - ${maxPrice} ₪`;
-  });
-
-  propertyItems.forEach((item) => {
-    if (item instanceof HTMLElement) {
-      const p = JSON.parse(item.dataset.property);
-      let isMatch = true;
-
-      // מערך של כל התנאים לסינון
-      const filters = [
-        { condition: selectedType && p.type !== selectedType, field: "type" },
-        { condition: selectedRooms && selectedRooms !== "5+" && p.bedrooms !== Number(selectedRooms), field: "rooms" },
-        { condition: selectedLocation && p.city !== selectedLocation, field: "location" },
-        { condition: selectedPriceRange && p.price > Number(selectedPriceRange), field: "price" },
-        ...selectedAmenities.map((amenity) => ({
-          condition: (amenity === "wifi" && !p.wifi) ||
-                     (amenity === "washingmachine" && !p.washingmachine) ||
-                     (amenity === "parking" && !p.parking) ||
-                     (amenity === "tv" && !p.tv),
-          field: `amenity: ${amenity}`
-        }))
-      ];
-
-      // לולאת סינון אחת
-      filters.forEach((filter) => {
-        if (filter.condition) {
-          isMatch = false;
+                  <div class="home-property-contact">
+                    <p class="home-property-whatsapp">
+                      {p.whatsapp ? `📞 ${p.whatsapp}` : "אין פרטי קשר"}
+                    </p>
+                  </div>
+                </div>
+              </a>
+            </li>
+          ))
         }
+      </ul>
+    </main>
+
+    <script type="module">
+      // שליפה של selectedAmenities מה-URL
+      const selectedAmenities = new URLSearchParams(
+        window.location.search,
+      ).getAll("amenities");
+      const selectedRooms = new URLSearchParams(window.location.search).get(
+        "rooms",
+      );
+      const selectedLocation = new URLSearchParams(window.location.search).get(
+        "location",
+      );
+      const selectedPriceRange = new URLSearchParams(
+        window.location.search,
+      ).get("price");
+      const selectedType = new URLSearchParams(window.location.search).get(
+        "type",
+      );
+
+      const propertyItems = document.querySelectorAll(".home-property-item");
+
+      // קבלת אלמנט הסרגל והאלמנט של הצגת המחיר
+      const priceRange = document.getElementById("priceRange");
+      const priceValueDisplay = document.getElementById("price-range-value");
+
+      // פונקציה לעדכון טווח המחיר
+      priceRange.addEventListener("input", function () {
+        const minPrice = priceRange.min;
+        const maxPrice = priceRange.max;
+        const value = priceRange.value;
+
+        // עדכון טקסט הצגת המחיר
+        priceValueDisplay.textContent = `${minPrice} - ${value} ₪`;
+
+        // שמירת המחיר ב-localStorage
+        sessionStorage.setItem("selectedPrice", value);
       });
 
-      if (!isMatch) {
-        item.style.display = "none";
+      // אתחול המחיר מהמקומי סטרוג' אם קיים
+      const savedPrice = localStorage.getItem("selectedPrice");
+      if (savedPrice) {
+        priceRange.value = savedPrice;
+        priceValueDisplay.textContent = `0 - ${savedPrice} ₪`; // עדכון הצגת המחיר
       }
-    }
-  });
-</script>
 
+      // הפעלת סינון לפי תנאים
+      propertyItems.forEach((item) => {
+        if (item instanceof HTMLElement) {
+          const p = JSON.parse(item.dataset.property);
+          let isMatch = true;
+
+          // מערך של כל התנאים לסינון
+          const filters = [
+            {
+              condition: selectedType && p.type !== selectedType,
+              field: "type",
+            },
+            {
+              condition:
+                selectedRooms &&
+                selectedRooms !== "5+" &&
+                p.bedrooms !== Number(selectedRooms),
+              field: "rooms",
+            },
+            {
+              condition: selectedLocation && p.city !== selectedLocation,
+              field: "location",
+            },
+            {
+              condition:
+                selectedPriceRange && p.price > Number(selectedPriceRange),
+              field: "price",
+            },
+            ...selectedAmenities.map((amenity) => ({
+              condition:
+                (amenity === "wifi" && !p.wifi) ||
+                (amenity === "washingmachine" && !p.washingmachine) ||
+                (amenity === "parking" && !p.parking) ||
+                (amenity === "tv" && !p.tv),
+              field: `amenity: ${amenity}`,
+            })),
+          ];
+
+          // לולאת סינון אחת
+          filters.forEach((filter) => {
+            if (filter.condition) {
+              isMatch = false;
+            }
+          });
+
+          if (!isMatch) {
+            item.style.display = "none";
+          }
+        }
+      });
+    </script>
   </body>
 </html>

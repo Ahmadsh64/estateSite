@@ -1,6 +1,7 @@
 ---
 import { supabase } from "../../lib/supabaseClient";
 import type { Property } from "../../types/property";
+import i18next from "../../i18n";
 
 let properties: Property[] = [];
 
@@ -13,7 +14,7 @@ const { data, error } = await supabase
 if (error) {
   console.error("שגיאה בשליפת הדירות:", error.message);
   const errorMessage = document.createElement("div");
-  errorMessage.textContent = "❌ שגיאה בהצגת דירות. אנא נסה שוב.";
+  errorMessage.textContent = i18next.t("admin.errorFetchingProperties");
   errorMessage.style.color = "red";
   document.body.appendChild(errorMessage);
 } else if (data) {
@@ -52,21 +53,21 @@ if (error) {
 <html lang="he">
   <head>
     <meta charset="UTF-8" />
-    <title>ניהול דירות - מנהל</title>
+    <title>{i18next.t("admin.propertyManagement")}</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body dir="rtl">
     <header class="admin-header">
-      <h1 class="admin-title">ניהול דירות</h1>
+      <h1 class="admin-title">{i18next.t("admin.propertyManagement")}</h1>
       <nav class="admin-nav">
-        <a href="/admin/add" class="admin-add-btn">➕ הוספת דירה חדשה</a>
-        <a href="/" class="admin-home-btn">🏠 חזרה לדף הראשי</a>
-        <button id="logout-btn" class="admin-logout-btn">🚪 יציאה</button>
+        <a href="/admin/add" class="admin-add-btn">➕ {i18next.t("admin.addNewProperty")}</a>
+        <a href="/" class="admin-home-btn">🏠 {i18next.t("admin.backToHome")}</a>
+        <button id="logout-btn" class="admin-logout-btn">🚪 {i18next.t("admin.logout")}</button>
       </nav>
     </header>
 
     <main class="admin-main">
-      <div id="loading-spinner" style="display:none;">טעינה...</div>
+      <div id="loading-spinner" style="display:none;">{i18next.t("admin.loading")}</div>
 
       {properties.map((p: Property) => (
         <div
@@ -90,12 +91,12 @@ if (error) {
                 {p.location.city}, {p.location.street} {p.location.number}
               </p>
               <p class="admin-property-status">
-                סטטוס: {p.is_active ? "פעיל" : "מוסתר"}
+                {i18next.t("admin.status")}: {p.is_active ? i18next.t("admin.active") : i18next.t("admin.hidden")}
               </p>
             </div>
             <div class="admin-property-actions">
               <a href={`/admin/edit/${p.id}`} class="admin-edit-btn">
-                ✏️ עריכה
+                ✏️ {i18next.t("admin.edit")}
               </a>
               {p.is_active ? (
                 <button
@@ -104,7 +105,7 @@ if (error) {
                   data-id={p.id}
                   data-activate="false"
                 >
-                  🗑️ הסתרה
+                  🗑️ {i18next.t("admin.hide")}
                 </button>
               ) : (
                 <button
@@ -113,7 +114,7 @@ if (error) {
                   data-id={p.id}
                   data-activate="true"
                 >
-                  ♻️ שחזור
+                  ♻️ {i18next.t("admin.restore")}
                 </button>
               )}
             </div>
@@ -153,7 +154,7 @@ if (error) {
 
           if (result.success) {
             alert(
-              activate ? "✅ הדירה שוחזרה בהצלחה" : "✅ הדירה הוסתרה בהצלחה",
+              activate ? i18next.t("admin.propertyRestored") : i18next.t("admin.propertyHidden"),
             );
 
             const propertyCard = document.querySelector(
@@ -168,7 +169,7 @@ if (error) {
               );
 
               if (statusText)
-                statusText.innerText = `סטטוס: ${activate ? "פעיל" : "מוסתר"}`;
+                statusText.innerText = `${i18next.t("admin.status")}: ${activate ? i18next.t("admin.active") : i18next.t("admin.hidden")}`;
 
               if (statusButton) {
                 statusButton.setAttribute(
@@ -178,11 +179,11 @@ if (error) {
                 if (activate) {
                   statusButton.classList.remove("admin-restore-btn");
                   statusButton.classList.add("admin-delete-btn");
-                  statusButton.innerText = "🗑️ הסתרה";
+                  statusButton.innerText = "🗑️ {i18next.t('admin.hide')}";
                 } else {
                   statusButton.classList.remove("admin-delete-btn");
                   statusButton.classList.add("admin-restore-btn");
-                  statusButton.innerText = "♻️ שחזור";
+                  statusButton.innerText = "♻️ {i18next.t('admin.restore')}";
                 }
               }
             }
@@ -216,3 +217,4 @@ if (error) {
     </script>
   </body>
 </html>
+
