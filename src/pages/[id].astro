@@ -2,6 +2,14 @@
 import i18next from "../i18n";
 import { supabase } from "../lib/supabaseClient";
 import type { Property } from "../types/property";  // ייבוא טיפוס Property
+import { mapDbToProperty } from "../services/propertyMapper";  // ייבוא פונקציית המרה
+
+// פונקציה עזר להוספת קידומת מדינה
+function formatPhoneNumber(phone: string | undefined): string {
+  if (!phone) return '';
+  if (phone.startsWith('+')) return phone;
+  return '+972' + phone.replace(/^0/, '');
+}
 
 const { params } = Astro;
 const id = params.id;
@@ -16,49 +24,11 @@ const { data, error } = await supabase
   .single();
 
 if (error) {
-  console.error("שגיאה בשליפת הדירה:", error.message);
+  console.error(i18next.t("property.errorLoadingProperty"), error.message);
 } 
 if (data) {
-  // המרת הנתונים לטיפוס Property
-  property = {
-    id: data.id,
-    title: data.title,
-    price: data.price,
-    location: {
-      city: data.city || "",
-      street: data.street || "",
-      number: data.number || "",
-      floor: data.floor || "",
-    },
-    description: data.description || "",
-    images: data.images || [],
-    occupancy: data.occupancy,
-    bedrooms: data.bedrooms,
-    beds: data.beds,
-    bathrooms: data.bathrooms,
-    kitchen: data.kitchen, 
-    washingmachine: data.washingmachine,
-    wifi: data.wifi,
-    tv: data.tv,
-    publictransportnearby: data.publictransportnearby,
-    parking: data.parking,
-    checkintime: data.checkintime,
-    checkouttime: data.checkouttime,
-    minStayDays: data.minStayDays,
-    type: data.type,
-    is_active: data.is_active, // הוספת השדה החסר
-    created_at: data.created_at,
-    has_pool: data.has_pool,            // בריכה
-    has_private_pool: data.has_private_pool,    // בריכה פרטית
-    has_jacuzzi: data.has_jacuzzi,          // ג'קוזי
-    has_grill: data.has_grill,            // מנגל
-    suitable_for: data.suitable_for,        // מתאים ל: משפחות, דתיים, קבוצות
-    nearby: data.nearby,            // בקרבת המקום: בית כנסת, מסעדות, תחבורה ציבורית
-    rating: data.rating,               // דירוג
-    reviews_count: data.reviews_count,        // מספר חוות דעת
-    phone: data.phone,                // מספר טלפון
-    whatsapp: data.whatsapp,             // מספר WhatsApp
-  };
+  // המרת הנתונים לטיפוס Property באמצעות הפונקציה
+  property = mapDbToProperty(data);
 }
 
 const images = property ? (Array.isArray(property.images) ? property.images : [property.images]) : [];
@@ -93,12 +63,12 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
               </div>
             </div>
             <div class="property-contact-buttons">
-              <button class="contact-btn-primary" onclick={`window.location.href='tel:${property.phone}'`}>
+              <button class="contact-btn-primary" onclick={`window.location.href='tel:${formatPhoneNumber(property.phone)}'`}>
                 📞 {i18next.t("property.call")}
-</button>
-              <button class="contact-btn-whatsapp" onclick={`window.location.href='https://wa.me/${property.whatsapp}?text=${encodeURIComponent('שלום, אני מעוניין לשאול על הדירה: ' + property.title)}'`}>
-                💬 {i18next.t("property.whatsapp")}
               </button>
+              <a href={`https://wa.me/${formatPhoneNumber(property.whatsapp)}?text=${encodeURIComponent(i18next.t("property.whatsappMessage") + ' ' + property.title)}`} class="contact-btn-whatsapp" target="_blank" rel="noopener noreferrer">
+                💬 {i18next.t("property.whatsapp")}
+              </a>
             </div>
           </div>
 
@@ -127,137 +97,135 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
                 )}
               </div>
 
-              <!-- פרטי הנכס מתחת לתמונות -->
-              <div class="property-details-under-gallery">
-                <div class="property-details-card">
-                  <h3 class="details-title">{i18next.t("property.details")}</h3>
-                  <div class="property-summary">
-                    <div class="summary-item">
-                      <span class="summary-label">{i18next.t("property.pricePerNight")}:</span>
-                      <span class="summary-value">{property.price.toLocaleString("he-IL")} ₪</span>
+                <!-- פרטי הנכס מתחת לתמונות -->
+                <div class="property-details-under-gallery">
+                  <div class="property-details-card">
+                    <h3 class="details-title">{i18next.t("property.details")}</h3>
+                    <div class="property-summary">
+                      <div class="summary-item">
+                        <span class="summary-label">{i18next.t("property.pricePerNight")}:</span>
+                        <span class="summary-value">{property.price.toLocaleString("he-IL")} ₪</span>
+                      </div>
+                      <div class="summary-item">
+                        <span class="summary-label">{i18next.t("property.bedrooms")}:</span>
+                        <span class="summary-value">{property.bedrooms}</span>
+                      </div>
+                      <div class="summary-item">
+                        <span class="summary-label">{i18next.t("property.bathrooms")}:</span>
+                        <span class="summary-value">{property.bathrooms}</span>
+                      </div>
+                      <div class="summary-item">
+                        <span class="summary-label">{i18next.t("property.maxGuests")}:</span>
+                        <span class="summary-value">{property.occupancy}</span>
+                      </div>
                     </div>
-                    <div class="summary-item">
-                      <span class="summary-label">{i18next.t("property.bedrooms")}:</span>
-                      <span class="summary-value">{property.bedrooms}</span>
-                    </div>
-                    <div class="summary-item">
-                      <span class="summary-label">{i18next.t("property.bathrooms")}:</span>
-                      <span class="summary-value">{property.bathrooms}</span>
-                    </div>
-                    <div class="summary-item">
-                      <span class="summary-label">{i18next.t("property.maxGuests")}:</span>
-                      <span class="summary-value">{property.occupancy}</span>
+                  </div>
+
+                  <!-- תיאור מפורט -->
+                  <div class="property-description-section">
+                    <h2 class="section-title">{i18next.t("property.aboutPlace")}</h2>
+                    <div class="description-content">
+                      <p class="property-description-text">{property.description}</p>
                     </div>
                   </div>
-                </div>
-              </div>
 
-<!-- סקציות נוספות כמו בוויקנד -->
-          <div class="property-sections">
-            <!-- תיאור מפורט -->
-            <div class="property-description-section">
-              <h2 class="section-title">אודות המקום</h2>
-              <div class="description-content">
-                <p class="property-description-text">{property.description}</p>
-              </div>
-            </div>
+                  <!-- מתקנים ופיצ'רים -->
+                  <div class="amenities-section">
+                    <h2 class="section-title">{i18next.t("property.amenities")}</h2>
+                    <div class="amenities-grid">
+                      <div class="amenity-category">
+                        <h3 class="amenity-category-title">{i18next.t("property.generalFacilities")}</h3>
+                        <div class="amenity-items">
+                          {property.kitchen && <div class="amenity-item">🍳 {i18next.t("property.kitchen")}</div>}
+                          {property.washingmachine && <div class="amenity-item">🧺 {i18next.t("property.washingMachine")}</div>}
+                          {property.wifi && <div class="amenity-item">📶 WiFi</div>}
+                          {property.tv && <div class="amenity-item">📺 {i18next.t("property.tv")}</div>}
+                          {property.parking && <div class="amenity-item">🅿️ {i18next.t("property.parking")}</div>}
+                          {property.publictransportnearby && <div class="amenity-item">🚌 {i18next.t("property.publicTransport")}</div>}
+                        </div>
+                      </div>
 
-            <!-- מתקנים ופיצ'רים -->
-            <div class="amenities-section">
-              <h2 class="section-title">מה יש במקום</h2>
-              <div class="amenities-grid">
-                <div class="amenity-category">
-                  <h3 class="amenity-category-title">מתקנים כלליים</h3>
-                  <div class="amenity-items">
-                    {property.kitchen && <div class="amenity-item">🍳 מטבח</div>}
-                    {property.washingmachine && <div class="amenity-item">🧺 מכונת כביסה</div>}
-                    {property.wifi && <div class="amenity-item">📶 WiFi</div>}
-                    {property.tv && <div class="amenity-item">📺 טלוויזיה</div>}
-                    {property.parking && <div class="amenity-item">🅿️ חניה</div>}
-                    {property.publictransportnearby && <div class="amenity-item">🚌 תחבורה ציבורית</div>}
+                      <div class="amenity-category">
+                        <h3 class="amenity-category-title">{i18next.t("property.outdoorFacilities")}</h3>
+                        <div class="amenity-items">
+                          {property.has_pool && <div class="amenity-item">🏊 {i18next.t("property.pool")}</div>}
+                          {property.has_private_pool && <div class="amenity-item">🏊‍♀️ {i18next.t("property.privatePool")}</div>}
+                          {property.has_jacuzzi && <div class="amenity-item">🛁 {i18next.t("property.jacuzzi")}</div>}
+                          {property.has_grill && <div class="amenity-item">🔥 {i18next.t("property.grill")}</div>}
+                        </div>
+                      </div>
+
+                      <div class="amenity-category">
+                        <h3 class="amenity-category-title">{i18next.t("property.suitableFor")}</h3>
+                        <div class="amenity-items">
+                          {Array.isArray(property.suitable_for) && property.suitable_for.map((group) => (
+                            <div class="amenity-item">👥 {group}</div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div class="amenity-category">
+                        <h3 class="amenity-category-title">{i18next.t("property.nearby")}</h3>
+                        <div class="amenity-items">
+                          {Array.isArray(property.nearby) && property.nearby.map((place) => (
+                            <div class="amenity-item">📍 {place}</div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- פרטי שהייה -->
+                  <div class="stay-details-section">
+                    <h2 class="section-title">{i18next.t("property.stayDetails")}</h2>
+                    <div class="stay-details-grid">
+                      <div class="stay-detail-item">
+                        <span class="stay-detail-label">{i18next.t("property.checkInTime")}:</span>
+                        <span class="stay-detail-value">{property.checkintime || i18next.t("common.notSpecified")}</span>
+                      </div>
+                      <div class="stay-detail-item">
+                        <span class="stay-detail-label">{i18next.t("property.checkOutTime")}:</span>
+                        <span class="stay-detail-value">{property.checkouttime || i18next.t("common.notSpecified")}</span>
+                      </div>
+                      <div class="stay-detail-item">
+                        <span class="stay-detail-label">{i18next.t("property.minimumNights")}:</span>
+                        <span class="stay-detail-value">{property.minStayDays || 1} {i18next.t("property.nights")}</span>
+                      </div>
+                      <div class="stay-detail-item">
+                        <span class="stay-detail-label">{i18next.t("property.maximumGuests")}:</span>
+                        <span class="stay-detail-value">{property.occupancy} {i18next.t("property.people")}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- פרטי יצירת קשר -->
+                  <div class="contact-details-section">
+                    <h2 class="section-title">{i18next.t("property.contactDetails")}</h2>
+                    <div class="contact-details-grid">
+                      <div class="contact-detail-item">
+                        <span class="contact-detail-label">{i18next.t("property.phone")}:</span>
+                        <span class="contact-detail-value">
+                          {property.phone ? (
+                            <a href={`tel:${formatPhoneNumber(property.phone)}`} class="contact-link">{property.phone}</a>
+                          ) : (
+                            i18next.t("common.notAvailable")
+                          )}
+                        </span>
+                      </div>
+                      <div class="contact-detail-item">
+                        <span class="contact-detail-label">WhatsApp:</span>
+                        <span class="contact-detail-value">
+                          {property.whatsapp ? (
+                            <a href={`https://wa.me/${formatPhoneNumber(property.whatsapp)}`} class="contact-link" target="_blank">{property.whatsapp}</a>
+                          ) : (
+                            i18next.t("common.notAvailable")
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="amenity-category">
-                  <h3 class="amenity-category-title">מתקנים חיצוניים</h3>
-                  <div class="amenity-items">
-                    {property.has_pool && <div class="amenity-item">🏊 בריכה</div>}
-                    {property.has_private_pool && <div class="amenity-item">🏊‍♀️ בריכה פרטית</div>}
-                    {property.has_jacuzzi && <div class="amenity-item">🛁 ג'קוזי</div>}
-                    {property.has_grill && <div class="amenity-item">🔥 מנגל</div>}
-                  </div>
-                </div>
-
-                <div class="amenity-category">
-                  <h3 class="amenity-category-title">מתאים ל</h3>
-                  <div class="amenity-items">
-                    {Array.isArray(property.suitable_for) && property.suitable_for.map((group) => (
-                      <div class="amenity-item">👥 {group}</div>
-                    ))}
-                  </div>
-                </div>
-
-                <div class="amenity-category">
-                  <h3 class="amenity-category-title">בקרבת מקום</h3>
-                  <div class="amenity-items">
-                    {Array.isArray(property.nearby) && property.nearby.map((place) => (
-                      <div class="amenity-item">📍 {place}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- פרטי שהייה -->
-            <div class="stay-details-section">
-              <h2 class="section-title">פרטי שהייה</h2>
-              <div class="stay-details-grid">
-                <div class="stay-detail-item">
-                  <span class="stay-detail-label">שעת כניסה:</span>
-                  <span class="stay-detail-value">{property.checkintime || "לא צוין"}</span>
-                </div>
-                <div class="stay-detail-item">
-                  <span class="stay-detail-label">שעת יציאה:</span>
-                  <span class="stay-detail-value">{property.checkouttime || "לא צוין"}</span>
-                </div>
-                <div class="stay-detail-item">
-                  <span class="stay-detail-label">מינימום לילות:</span>
-                  <span class="stay-detail-value">{property.minStayDays || 1} לילות</span>
-                </div>
-                <div class="stay-detail-item">
-                  <span class="stay-detail-label">מקסימום נופשים:</span>
-                  <span class="stay-detail-value">{property.occupancy} אנשים</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- פרטי יצירת קשר -->
-            <div class="contact-details-section">
-              <h2 class="section-title">פרטי יצירת קשר</h2>
-              <div class="contact-details-grid">
-                <div class="contact-detail-item">
-                  <span class="contact-detail-label">טלפון:</span>
-                  <span class="contact-detail-value">
-                    {property.phone ? (
-                      <a href={`tel:${property.phone}`} class="contact-link">{property.phone}</a>
-                    ) : (
-                      "לא זמין"
-                    )}
-                  </span>
-                </div>
-                <div class="contact-detail-item">
-                  <span class="contact-detail-label">WhatsApp:</span>
-                  <span class="contact-detail-value">
-                    {property.whatsapp ? (
-                      <a href={`https://wa.me/${property.whatsapp}`} class="contact-link" target="_blank">{property.whatsapp}</a>
-                    ) : (
-                      "לא זמין"
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
 
 
             </div>
@@ -281,17 +249,17 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
                 <form id="sidebarContactForm" class="sidebar-contact-form">
                   <div class="form-group">
                     <label for="full-name-sidebar">שם מלא</label>
-                    <input type="text" id="full-name-sidebar" name="full-name" placeholder="הכנס את שמך המלא" required>
+                    <input type="text" id="full-name-sidebar" name="full-name" placeholder={i18next.t("property.enterFullName")} required>
                   </div>
 
                   <div class="form-group">
                     <label for="email-sidebar">כתובת דואר אלקטרוני</label>
-                    <input type="email" id="email-sidebar" name="email" placeholder="הכנס את כתובת הדואר האלקטרוני שלך" required>
+                    <input type="email" id="email-sidebar" name="email" placeholder={i18next.t("property.enterEmail")} required>
                   </div>
 
                   <div class="form-group">
                     <label for="phone-sidebar">מספר טלפון</label>
-                    <input type="tel" id="phone-sidebar" name="phone" placeholder="הכנס את מספר הטלפון שלך" required>
+                    <input type="tel" id="phone-sidebar" name="phone" placeholder={i18next.t("property.enterPhone")} required>
                   </div>
 
                   <div class="form-group">
@@ -320,7 +288,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
 
                   <div class="form-group">
                     <label for="special-requests-sidebar">בקשות מיוחדות</label>
-                    <textarea id="special-requests-sidebar" name="special-requests" placeholder="מוזמנים להוסיף בקשה למקום האירוח" rows="3"></textarea>
+                    <textarea id="special-requests-sidebar" name="special-requests" placeholder={i18next.t("property.specialRequestsPlaceholder")} rows="3"></textarea>
                   </div>
 
                   <div class="form-group checkbox-group">
@@ -341,14 +309,14 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
 
           <!-- כפתורי קשר צפים -->
           <div class="floating-contact-buttons">
-            <button class="floating-contact-btn floating-phone-btn" onclick={`window.location.href='tel:${property.phone}'`}>
+            <button class="floating-contact-btn floating-phone-btn" onclick={`window.location.href='tel:${formatPhoneNumber(property.phone)}'`}>
               <span class="floating-btn-icon">📞</span>
               <span class="floating-btn-text">{i18next.t("property.call")}</span>
             </button>
-            <button class="floating-contact-btn floating-whatsapp-btn" onclick={`window.location.href='https://wa.me/${property.whatsapp}?text=${encodeURIComponent('שלום, אני מעוניין לשאול על הדירה: ' + property.title)}'`}>
+            <a href={`https://wa.me/${formatPhoneNumber(property.whatsapp)}?text=${encodeURIComponent(i18next.t("property.whatsappMessage") + ' ' + property.title)}`} class="floating-contact-btn floating-whatsapp-btn" target="_blank" rel="noopener noreferrer">
               <span class="floating-btn-icon">💬</span>
               <span class="floating-btn-text">{i18next.t("property.whatsapp")}</span>
-            </button>
+            </a>
           </div>
 
 <!-- מודאל להצגת כל התמונות -->
@@ -378,7 +346,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
     <span class="close-map">&times;</span>
     <div class="map-container">
       <iframe 
-        src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${property.location.city}+${property.location.street}+${property.location.number}`}
+        src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(`${property.location.street} ${property.location.number}, ${property.location.city}`)}`}
         width="100%" 
         height="100%" 
         style="border:0;" 
@@ -444,7 +412,20 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
         const city = "{property.location.city}";
         const street = "{property.location.street}";
         const number = "{property.location.number}";
-        const address = `${city}+${street}`;
+        const floor = "{property.location.floor}";
+        
+        // בניית כתובת מלאה
+        let address = "";
+        if (street) address += street;
+        if (number) address += ` ${number}`;
+        if (floor) address += `, ${floor}`;
+        if (city) address += `, ${city}`;
+        
+        // אם אין כתובת, נשתמש רק בעיר
+        if (!address.trim()) {
+          address = city || i18next.t("property.israel");
+        }
+        
         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
         window.open(mapsUrl, '_blank');
       }
@@ -578,15 +559,15 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
             
             try {
               // כאן תוכל להוסיף שליחה לשרת
-              console.log("טופס נשלח:", data);
+              console.log(i18next.t("property.formSubmitted"), data);
               
               // הודעת הצלחה
-              alert("תודה! פנייתך נשלחה בהצלחה. נחזור אליך בהקדם.");
+              alert(i18next.t("property.thankYou"));
               sidebarContactForm.reset();
               
             } catch (error) {
-              console.error("שגיאה בשליחת הטופס:", error);
-              alert("אירעה שגיאה בשליחת הפנייה. אנא נסה שוב.");
+              console.error(i18next.t("property.errorSendingForm"), error);
+              alert(i18next.t("property.errorSendingRequest"));
             }
           });
         }

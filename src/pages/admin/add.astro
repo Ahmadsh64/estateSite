@@ -1,128 +1,320 @@
 ---
+import { supabase } from "../../lib/supabaseClient";
 import i18next from '../../i18n.js';
+
+// בדיקת הרשאות תתבצע בצד הלקוח
 ---
 <html lang="he">
   <head>
     <meta charset="UTF-8" />
     <title>➕ {i18next.t("admin.addNewProperty")}</title>
     <link rel="stylesheet" href="/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body dir="rtl">
-    <header class="admin-add-header">
-      <h1>➕ {i18next.t("admin.addNewProperty")}</h1>
-      <nav class="admin-nav">
-        <a href="/admin/dashboard" class="admin-add-back">⬅️ {i18next.t("admin.backToDashboard")}</a>
-        <button id="logout-btn" class="admin-logout-btn">🚪 {i18next.t("admin.logout")}</button>
-      </nav>
+    <header class="admin-header">
+      <div class="admin-header-content">
+        <h1 class="admin-title">
+          <span class="admin-icon">➕</span>
+          {i18next.t("admin.addNewProperty")}
+        </h1>
+        <nav class="admin-nav">
+          <a href="/admin/dashboard" class="admin-nav-btn back-btn">
+            <span class="btn-icon">⬅️</span>
+            {i18next.t("admin.backToDashboard")}
+          </a>
+          <button id="logout-btn" class="admin-nav-btn logout-btn">
+            <span class="btn-icon">🚪</span>
+            {i18next.t("admin.logout")}
+          </button>
+        </nav>
+      </div>
     </header>
 
-    <main class="admin-add-main">
-      <form id="admin-add-form" class="admin-add-form">
-        <!-- כותרת ומחיר -->
-        <label>{i18next.t("admin.title")}</label>
-        <input type="text" name="title" required />
+    <main class="admin-main">
+      <div class="admin-container">
+        <form id="admin-add-form" class="admin-form">
+          <!-- כותרת ומחיר -->
+          <div class="form-section">
+            <h2 class="section-title">📝 {i18next.t("admin.basicInfo")}</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="title">{i18next.t("admin.title")} *</label>
+                <input type="text" id="title" name="title" class="form-input" required placeholder={i18next.t("admin.enterTitle")} />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="price">{i18next.t("admin.pricePerNight")} *</label>
+                <input type="number" id="price" name="price" class="form-input" required placeholder="0" min="0" />
+                <span class="currency">₪</span>
+              </div>
+            </div>
+          </div>
 
-        <label>{i18next.t("admin.pricePerNight")}</label>
-        <input type="number" name="price" required />
+          <!-- מיקום -->
+          <div class="form-section">
+            <h2 class="section-title">📍 {i18next.t("admin.location")}</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="city">{i18next.t("admin.city")} *</label>
+                <input type="text" id="city" name="city" class="form-input" required placeholder={i18next.t("property.enterCity")} />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="street">{i18next.t("admin.street")}</label>
+                <input type="text" id="street" name="street" class="form-input" placeholder={i18next.t("property.enterStreet")} />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="number">{i18next.t("admin.number")}</label>
+                <input type="text" id="number" name="number" class="form-input" placeholder={i18next.t("property.enterNumber")} />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="floor">{i18next.t("admin.floor")}</label>
+                <input type="text" id="floor" name="floor" class="form-input" placeholder={i18next.t("property.enterFloor")} />
+              </div>
+            </div>
+          </div>
 
-        <!-- מיקום -->
-        <fieldset>
-          <legend>📍 {i18next.t("admin.location")}</legend>
-          <label>{i18next.t("admin.city")}</label>
-          <input type="text" name="city" required />
-          <label>{i18next.t("admin.street")}</label>
-          <input type="text" name="street" />
-          <label>{i18next.t("admin.number")}</label>
-          <input type="text" name="number" />
-          <label>{i18next.t("admin.floor")}</label>
-          <input type="text" name="floor" />
-        </fieldset>
+          <!-- תיאור ותמונות -->
+          <div class="form-section">
+            <h2 class="section-title">📄 {i18next.t("admin.description")}</h2>
+            <div class="form-group">
+              <label class="form-label" for="description">{i18next.t("admin.description")} *</label>
+              <textarea id="description" name="description" class="form-textarea" required placeholder={i18next.t("property.enterDescription")}></textarea>
+            </div>
+          </div>
 
-        <!-- תיאור ותמונות -->
-        <label>{i18next.t("admin.description")}</label>
-        <textarea name="description" required></textarea>
+          <div class="form-section">
+            <h2 class="section-title">🖼️ {i18next.t("admin.images")}</h2>
+            <div class="form-group">
+              <label class="form-label" for="images">{i18next.t("admin.images")} *</label>
+              <div class="file-upload-container">
+                <input type="file" id="images" name="images" accept="image/*" multiple class="file-input" />
+                <label for="images" class="file-upload-label">
+                  <span class="file-upload-icon">📁</span>
+                  <span class="file-upload-text">בחר תמונות</span>
+                </label>
+                <div class="file-preview" id="file-preview"></div>
+              </div>
+            </div>
+          </div>
 
-        <label>{i18next.t("admin.images")}</label>
-        <input type="file" name="images" accept="image/*" multiple />
+          <!-- פרטים נוספים -->
+          <div class="form-section">
+            <h2 class="section-title">🛏️ {i18next.t("admin.propertyDetails")}</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="bedrooms">{i18next.t("admin.bedrooms")}</label>
+                <input type="number" id="bedrooms" name="bedrooms" class="form-input" min="0" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="beds">{i18next.t("admin.beds")}</label>
+                <input type="number" id="beds" name="beds" class="form-input" min="0" placeholder="0" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="bathrooms">{i18next.t("admin.bathrooms")}</label>
+                <input type="number" id="bathrooms" name="bathrooms" class="form-input" min="0" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="occupancy">{i18next.t("admin.maxOccupancy")}</label>
+                <input type="number" id="occupancy" name="occupancy" class="form-input" min="1" placeholder="1" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="type">{i18next.t("admin.propertyType")}</label>
+              <select id="type" name="type" class="form-select">
+                <option value="">{i18next.t("property.selectPropertyType")}</option>
+                <option value={i18next.t("property.apartment")}>{i18next.t("property.apartment")}</option>
+                <option value={i18next.t("property.house")}>{i18next.t("property.house")}</option>
+                <option value={i18next.t("property.villa")}>{i18next.t("property.villa")}</option>
+                <option value={i18next.t("property.cabin")}>{i18next.t("property.cabin")}</option>
+                <option value={i18next.t("property.hotel")}>{i18next.t("property.hotel")}</option>
+              </select>
+            </div>
+          </div>
 
-        <!-- פרטים נוספים -->
-        <fieldset>
-          <legend>🛏 {i18next.t("admin.propertyDetails")}</legend>
-          <label>{i18next.t("admin.bedrooms")}</label>
-          <input type="number" name="bedrooms" />
-          <label>{i18next.t("admin.beds")}</label>
-          <input type="number" name="beds" />
-          <label>{i18next.t("admin.bathrooms")}</label>
-          <input type="number" name="bathrooms" />
-          <label>{i18next.t("admin.maxOccupancy")}</label>
-          <input type="number" name="occupancy" />
-          <label>{i18next.t("admin.propertyType")}</label>
-          <input type="text" name="type" />
-        </fieldset>
+          <!-- מתקנים -->
+          <div class="form-section">
+            <h2 class="section-title">⚙️ {i18next.t("admin.amenities")}</h2>
+            <div class="amenities-grid">
+              <div class="amenity-category">
+                <h3 class="amenity-category-title">מתקנים כלליים</h3>
+                <div class="checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="kitchen" class="checkbox-input" />
+                    <span class="checkbox-text">🍳 {i18next.t("admin.kitchen")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="washingmachine" class="checkbox-input" />
+                    <span class="checkbox-text">🧺 {i18next.t("admin.washingmachine")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="wifi" class="checkbox-input" />
+                    <span class="checkbox-text">📶 {i18next.t("admin.wifi")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="tv" class="checkbox-input" />
+                    <span class="checkbox-text">📺 {i18next.t("admin.tv")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="parking" class="checkbox-input" />
+                    <span class="checkbox-text">🅿️ {i18next.t("admin.parking")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="publictransportnearby" class="checkbox-input" />
+                    <span class="checkbox-text">🚌 {i18next.t("admin.publictransportnearby")}</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="amenity-category">
+                <h3 class="amenity-category-title">מתקנים חיצוניים</h3>
+                <div class="checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="has_pool" class="checkbox-input" />
+                    <span class="checkbox-text">🏊 {i18next.t("admin.pool")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="has_private_pool" class="checkbox-input" />
+                    <span class="checkbox-text">🏊‍♀️ {i18next.t("admin.privatePool")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="has_jacuzzi" class="checkbox-input" />
+                    <span class="checkbox-text">🛁 {i18next.t("admin.jacuzzi")}</span>
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="has_grill" class="checkbox-input" />
+                    <span class="checkbox-text">🔥 {i18next.t("admin.grill")}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <!-- מתקנים -->
-        <fieldset>
-          <legend>⚙️ {i18next.t("admin.amenities")}</legend>
-          <label><input type="checkbox" name="kitchen" /> {i18next.t("admin.kitchen")}</label>
-          <label><input type="checkbox" name="washingmachine" /> {i18next.t("admin.washingmachine")}</label>
-          <label><input type="checkbox" name="wifi" /> {i18next.t("admin.wifi")}</label>
-          <label><input type="checkbox" name="tv" /> {i18next.t("admin.tv")}</label>
-          <label><input type="checkbox" name="publictransportnearby" /> {i18next.t("admin.publictransportnearby")}</label>
-          <label><input type="checkbox" name="parking" /> {i18next.t("admin.parking")}</label>
-          <label><input type="checkbox" name="has_pool" /> {i18next.t("admin.pool")}</label>
-          <label><input type="checkbox" name="has_private_pool" /> {i18next.t("admin.privatePool")}</label>
-          <label><input type="checkbox" name="has_jacuzzi" /> {i18next.t("admin.jacuzzi")}</label>
-          <label><input type="checkbox" name="has_grill" /> {i18next.t("admin.grill")}</label>
-        </fieldset>
+          <!-- פרטי יצירת קשר -->
+          <div class="form-section">
+            <h2 class="section-title">📞 {i18next.t("admin.contactInfo")}</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="phone">{i18next.t("admin.phone")}</label>
+                <input type="tel" id="phone" name="phone" class="form-input" placeholder="050-1234567" pattern="0[0-9]{8,9}" title={i18next.t("property.phoneValidation")} />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="whatsapp">{i18next.t("admin.whatsapp")}</label>
+                <input type="tel" id="whatsapp" name="whatsapp" class="form-input" placeholder="050-1234567" pattern="0[0-9]{8,9}" title={i18next.t("property.whatsappValidation")} />
+              </div>
+            </div>
+          </div>
 
-        <!-- פרטי יצירת קשר -->
-        <fieldset>
-          <legend>📞 {i18next.t("admin.contactInfo")}</legend>
-          <label>{i18next.t("admin.phone")}</label>
-          <input type="text" name="phone" />
-          <label>{i18next.t("admin.whatsapp")}</label>
-          <input type="text" name="whatsapp" />
-        </fieldset>
+          <!-- תנאים -->
+          <div class="form-section">
+            <h2 class="section-title">⏰ {i18next.t("admin.terms")}</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="checkInTime">{i18next.t("admin.checkInTime")}</label>
+                <input type="time" id="checkInTime" name="checkInTime" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="checkOutTime">{i18next.t("admin.checkOutTime")}</label>
+                <input type="time" id="checkOutTime" name="checkOutTime" class="form-input" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="minstaydays">{i18next.t("admin.minstaydays")}</label>
+              <input type="number" id="minstaydays" name="minstaydays" class="form-input" min="1" placeholder="1" />
+            </div>
+          </div>
 
-        <!-- תנאים -->
-        <fieldset>
-          <legend>⏰ {i18next.t("admin.terms")}</legend>
-          <label>{i18next.t("admin.checkInTime")}</label>
-          <input type="time" name="checkInTime" />
-          <label>{i18next.t("admin.checkOutTime")}</label>
-          <input type="time" name="checkOutTime" />
-          <label>{i18next.t("admin.minstaydays")}</label>
-          <input type="number" name="minstaydays" />
-        </fieldset>
+          <!-- קטגוריות -->
+          <div class="form-section">
+            <h2 class="section-title">🎯 {i18next.t("admin.suitableFor")}</h2>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="suitable_for" value={i18next.t("admin.families")} class="checkbox-input" />
+                <span class="checkbox-text">👨‍👩‍👧‍👦 {i18next.t("admin.families")}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="suitable_for" value={i18next.t("admin.religious")} class="checkbox-input" />
+                <span class="checkbox-text">🕍 {i18next.t("admin.religious")}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="suitable_for" value={i18next.t("admin.groups")} class="checkbox-input" />
+                <span class="checkbox-text">👥 {i18next.t("admin.groups")}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="suitable_for" value={i18next.t("admin.couples")} class="checkbox-input" />
+                <span class="checkbox-text">💑 {i18next.t("admin.couples")}</span>
+              </label>
+            </div>
+          </div>
 
-        <!-- קטגוריות -->
-        <fieldset>
-          <legend>🎯 {i18next.t("admin.suitableFor")}</legend>
-          <label><input type="checkbox" name="suitable_for" value="משפחות" /> {i18next.t("admin.families")}</label>
-          <label><input type="checkbox" name="suitable_for" value="דתיים" /> {i18next.t("admin.religious")}</label>
-          <label><input type="checkbox" name="suitable_for" value="קבוצות" /> {i18next.t("admin.groups")}</label>
-          <label><input type="checkbox" name="suitable_for" value="זוגות" /> {i18next.t("admin.couples")}</label>
-        </fieldset>
+          <div class="form-section">
+            <h2 class="section-title">📍 {i18next.t("admin.nearby")}</h2>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="nearby" value={i18next.t("admin.synagogue")} class="checkbox-input" />
+                <span class="checkbox-text">🕍 {i18next.t("admin.synagogue")}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="nearby" value={i18next.t("admin.restaurants")} class="checkbox-input" />
+                <span class="checkbox-text">🍽️ {i18next.t("admin.restaurants")}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="nearby" value={i18next.t("admin.shoppingCenter")} class="checkbox-input" />
+                <span class="checkbox-text">🛍️ {i18next.t("admin.shoppingCenter")}</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="nearby" value={i18next.t("admin.publicTransport")} class="checkbox-input" />
+                <span class="checkbox-text">🚌 {i18next.t("admin.publicTransport")}</span>
+              </label>
+            </div>
+          </div>
 
-        <fieldset>
-          <legend>📍 {i18next.t("admin.nearby")}</legend>
-          <label><input type="checkbox" name="nearby" value="בית כנסת" /> {i18next.t("admin.synagogue")}</label>
-          <label><input type="checkbox" name="nearby" value="מסעדות" /> {i18next.t("admin.restaurants")}</label>
-          <label><input type="checkbox" name="nearby" value="מרכז קניות" /> {i18next.t("admin.shoppingCenter")}</label>
-          <label><input type="checkbox" name="nearby" value="תחבורה ציבורית" /> {i18next.t("admin.publicTransport")}</label>
-        </fieldset>
+          <div class="form-actions">
+            <button type="submit" class="submit-btn">
+              <span class="btn-icon">💾</span>
+              {i18next.t("admin.save")}
+            </button>
+            <button type="reset" class="reset-btn">
+              <span class="btn-icon">🔄</span>
+              איפוס טופס
+            </button>
+          </div>
+        </form>
 
-        <button type="submit">💾 {i18next.t("admin.save")}</button>
-      </form>
-
-      <p id="admin-add-message"></p>
+        <div id="admin-add-message" class="message-container"></div>
+      </div>
     </main>
 
 
     <script type="module">
+      // בדיקת הרשאות מנהל
+      const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
+      if (!session.access_token) {
+        alert(i18next.t("admin.noPermission"));
+        window.location.href = "/admin/login";
+      }
+
+      // תרגומים זמניים לצד הלקוח
+      const translations = {
+        noPermission: "❌ אין הרשאה – אנא התחבר מחדש",
+        connectionError: "❌ שגיאה בחיבור לשרת",
+        successPropertyAdded: "✅ הדירה נוספה בהצלחה!",
+        errorFileType: "❌ סוג קובץ לא נתמך עבור",
+        onlyImagesSupported: "רק תמונות נתמכות",
+        error: "❌ שגיאה:",
+        fillAllFields: "אנא מלא את כל השדות הנדרשים",
+        invalidPhone: "מספר טלפון לא תקין",
+        invalidWhatsApp: "מספר WhatsApp לא תקין"
+      };
+
       const form = document.getElementById("admin-add-form");
       const msg = document.getElementById("admin-add-message");
       const logoutBtn = document.getElementById("logout-btn");
+      const fileInput = document.getElementById("images");
+      const filePreview = document.getElementById("file-preview");
 
       // כפתור יציאה
       logoutBtn.addEventListener("click", () => {
@@ -130,8 +322,108 @@ import i18next from '../../i18n.js';
         window.location.href = "/admin/login";
       });
 
+      // תצוגת תמונות מקדימה
+      fileInput.addEventListener("change", (e) => {
+        const files = Array.from(e.target.files);
+        filePreview.innerHTML = "";
+        
+        files.forEach((file, index) => {
+          if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const preview = document.createElement("div");
+              preview.className = "file-preview-item";
+              preview.innerHTML = `
+                <img src="${e.target.result}" alt="תצוגה מקדימה ${index + 1}" />
+                <span class="file-name">${file.name}</span>
+                <button type="button" class="remove-file" data-index="${index}">×</button>
+              `;
+              filePreview.appendChild(preview);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+
+      // הסרת תמונה מתצוגה מקדימה
+      filePreview.addEventListener("click", (e) => {
+        if (e.target.classList.contains("remove-file")) {
+          const index = parseInt(e.target.dataset.index);
+          const dt = new DataTransfer();
+          const files = Array.from(fileInput.files);
+          files.splice(index, 1);
+          files.forEach(file => dt.items.add(file));
+          fileInput.files = dt.files;
+          e.target.closest(".file-preview-item").remove();
+        }
+      });
+
+      // איפוס טופס
+      document.querySelector(".reset-btn").addEventListener("click", () => {
+        form.reset();
+        filePreview.innerHTML = "";
+        msg.textContent = "";
+        msg.className = "message-container";
+      });
+
+      // בדיקת תקינות טלפון
+      function validatePhone(phone) {
+        const phoneRegex = /^0[0-9]{8,9}$/;
+        return phoneRegex.test(phone.replace(/-/g, ""));
+      }
+
+      // הצגת הודעת שגיאה
+      function showError(message) {
+        msg.textContent = message;
+        msg.className = "message-container error";
+      }
+
+      // הצגת הודעת הצלחה
+      function showSuccess(message) {
+        msg.textContent = message;
+        msg.className = "message-container success";
+      }
+
+      // הצגת הודעת טעינה
+      function showLoading(message) {
+        msg.textContent = message;
+        msg.className = "message-container loading";
+      }
+
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        
+        // בדיקת שדות חובה
+        const requiredFields = ["title", "price", "city", "description"];
+        for (const field of requiredFields) {
+          if (!form[field].value.trim()) {
+            showError(translations.fillAllFields);
+            form[field].focus();
+            return;
+          }
+        }
+
+        // בדיקת תמונות
+        if (fileInput.files.length === 0) {
+          showError("אנא בחר לפחות תמונה אחת");
+          return;
+        }
+
+        // בדיקת תקינות טלפון
+        if (form.phone.value && !validatePhone(form.phone.value)) {
+          showError(translations.invalidPhone);
+          form.phone.focus();
+          return;
+        }
+
+        if (form.whatsapp.value && !validatePhone(form.whatsapp.value)) {
+          showError(translations.invalidWhatsApp);
+          form.whatsapp.focus();
+          return;
+        }
+
+        showLoading("שולח נתונים...");
+
         const formData = new FormData(form);
 
         // איסוף כל ה-checkboxes מסוג suitableFor ו-nearby כמערכים
@@ -152,12 +444,11 @@ import i18next from '../../i18n.js';
           "image/gif",
           "image/webp",
         ];
-        const files = form.querySelector('input[type="file"]').files;
+        const files = Array.from(fileInput.files);
 
         for (const file of files) {
           if (!allowedMimeTypes.includes(file.type)) {
-            msg.textContent = `❌ סוג קובץ לא נתמך עבור ${file.name}. רק תמונות נתמכות.`;
-            msg.style.color = "red";
+            showError(`${translations.errorFileType} ${file.name}. ${translations.onlyImagesSupported}`);
             return;
           }
         }
@@ -165,8 +456,7 @@ import i18next from '../../i18n.js';
         // קבלת הטוקן מה-sessionStorage
         const session = sessionStorage.getItem("sb-session");
         if (!session) {
-          msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
-          msg.style.color = "red";
+          showError(translations.noPermission);
           setTimeout(() => {
             window.location.href = "/admin/login";
           }, 3000);
@@ -187,22 +477,22 @@ import i18next from '../../i18n.js';
           const result = await res.json();
 
           if (result.success) {
-            msg.textContent = "✅ הדירה נוספה בהצלחה!";
-            msg.style.color = "green";
+            showSuccess(translations.successPropertyAdded);
             form.reset();
+            filePreview.innerHTML = "";
+            // גלילה למעלה
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
-            msg.textContent = `❌ שגיאה: ${result.message}`;
-            msg.style.color = "red";
+            showError(`${translations.error} ${result.message}`);
             if (res.status === 403) {
               setTimeout(() => {
                 window.location.href = "/admin/login";
-              }, 9000);
+              }, 3000);
             }
           }
         } catch (err) {
           console.error(err);
-          msg.textContent = "❌ שגיאה בחיבור לשרת";
-          msg.style.color = "red";
+          showError(translations.connectionError);
         }
       });
     </script>

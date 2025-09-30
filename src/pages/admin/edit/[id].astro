@@ -1,8 +1,10 @@
 ---
 import { supabase } from "../../../lib/supabaseClient";
 import type { Property } from "../../../types/property";
-
 import i18next from "../../../i18n.js";
+
+// בדיקת הרשאות תתבצע בצד הלקוח
+
 const { params } = Astro;
 const id: string = params.id as string;
 
@@ -61,6 +63,9 @@ const location = property.location || {};
 
       <!-- תמונות קיימות -->
       <label>{i18next.t("admin.existingImages")}</label>
+      <p style="color: #666; font-size: 14px; margin: 5px 0 10px 0;">
+        לחץ על × כדי להסיר תמונות קיימות
+      </p>
       <div id="existingImages">
         {property.images.map((img, i) => (
           <div class="edit-property-image-wrapper" data-index={i}>
@@ -72,6 +77,9 @@ const location = property.location || {};
 
       <!-- העלאת תמונות חדשות -->
       <label>{i18next.t("admin.addNewImages")}</label>
+      <p style="color: #666; font-size: 14px; margin: 5px 0 10px 0;">
+        בחר תמונות חדשות להוספה (ניתן להסיר לפני השמירה)
+      </p>
       <input type="file" id="imageInput" multiple accept="image/*" />
       <div id="previewContainer"></div>
 
@@ -101,9 +109,9 @@ const location = property.location || {};
 
       <!-- פרטי יצירת קשר -->
       <label>{i18next.t("admin.phone")}</label>
-      <input type="text" name="phone" value={property.phone || ""} />
+      <input type="tel" name="phone" value={property.phone || ""} pattern="0[0-9]{8,9}" title={i18next.t("property.phoneValidation")} />
       <label>{i18next.t("admin.whatsapp")}</label>
-      <input type="text" name="whatsapp" value={property.whatsapp || ""} />
+      <input type="tel" name="whatsapp" value={property.whatsapp || ""} pattern="0[0-9]{8,9}" title={i18next.t("property.whatsappValidation")} />
 
       <!-- תנאים -->
       <label>{i18next.t("admin.checkInTime")}</label>
@@ -116,18 +124,18 @@ const location = property.location || {};
       <!-- קטגוריות -->
       <fieldset>
         <legend>🎯 {i18next.t("admin.suitableFor")}</legend>
-        <label><input type="checkbox" name="suitable_for" value="משפחות" checked={property.suitable_for?.includes('משפחות') || false} /> {i18next.t("admin.families")}</label>
-        <label><input type="checkbox" name="suitable_for" value="דתיים" checked={property.suitable_for?.includes('דתיים') || false} /> {i18next.t("admin.religious")}</label>
-        <label><input type="checkbox" name="suitable_for" value="קבוצות" checked={property.suitable_for?.includes('קבוצות') || false} /> {i18next.t("admin.groups")}</label>
-        <label><input type="checkbox" name="suitable_for" value="זוגות" checked={property.suitable_for?.includes('זוגות') || false} /> {i18next.t("admin.couples")}</label>
+        <label><input type="checkbox" name="suitable_for" value={i18next.t("admin.families")} checked={property.suitable_for?.includes(i18next.t("admin.families")) || false} /> {i18next.t("admin.families")}</label>
+        <label><input type="checkbox" name="suitable_for" value={i18next.t("admin.religious")} checked={property.suitable_for?.includes(i18next.t("admin.religious")) || false} /> {i18next.t("admin.religious")}</label>
+        <label><input type="checkbox" name="suitable_for" value={i18next.t("admin.groups")} checked={property.suitable_for?.includes(i18next.t("admin.groups")) || false} /> {i18next.t("admin.groups")}</label>
+        <label><input type="checkbox" name="suitable_for" value={i18next.t("admin.couples")} checked={property.suitable_for?.includes(i18next.t("admin.couples")) || false} /> {i18next.t("admin.couples")}</label>
       </fieldset>
 
       <fieldset>
         <legend>📍 {i18next.t("admin.nearby")}</legend>
-        <label><input type="checkbox" name="nearby" value="בית כנסת" checked={property.nearby?.includes('בית כנסת') || false} /> {i18next.t("admin.synagogue")}</label>
-        <label><input type="checkbox" name="nearby" value="מסעדות" checked={property.nearby?.includes('מסעדות') || false} /> {i18next.t("admin.restaurants")}</label>
-        <label><input type="checkbox" name="nearby" value="מרכז קניות" checked={property.nearby?.includes('מרכז קניות') || false} /> {i18next.t("admin.shoppingCenter")}</label>
-        <label><input type="checkbox" name="nearby" value="תחבורה ציבורית" checked={property.nearby?.includes('תחבורה ציבורית') || false} /> {i18next.t("admin.publicTransport")}</label>
+        <label><input type="checkbox" name="nearby" value={i18next.t("admin.synagogue")} checked={property.nearby?.includes(i18next.t("admin.synagogue")) || false} /> {i18next.t("admin.synagogue")}</label>
+        <label><input type="checkbox" name="nearby" value={i18next.t("admin.restaurants")} checked={property.nearby?.includes(i18next.t("admin.restaurants")) || false} /> {i18next.t("admin.restaurants")}</label>
+        <label><input type="checkbox" name="nearby" value={i18next.t("admin.shoppingCenter")} checked={property.nearby?.includes(i18next.t("admin.shoppingCenter")) || false} /> {i18next.t("admin.shoppingCenter")}</label>
+        <label><input type="checkbox" name="nearby" value={i18next.t("admin.publicTransport")} checked={property.nearby?.includes(i18next.t("admin.publicTransport")) || false} /> {i18next.t("admin.publicTransport")}</label>
       </fieldset>
 
       <button type="submit">{i18next.t("admin.saveChanges")}</button>
@@ -137,6 +145,23 @@ const location = property.location || {};
   </main>
 
   <script type="module">
+    // בדיקת הרשאות מנהל
+    const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
+    if (!session.access_token) {
+      alert(i18next.t("admin.noPermission"));
+      window.location.href = "/admin/login";
+    }
+
+    // תרגומים זמניים לצד הלקוח
+    const translations = {
+      noPermission: "❌ אין הרשאה – אנא התחבר מחדש",
+      propertyUpdated: "✅ הדירה עודכנה בהצלחה!",
+      connectionError: "❌ שגיאה בחיבור לשרת",
+      fillAllFields: "אנא מלא את כל השדות",
+      invalidPhone: "מספר טלפון לא תקין",
+      invalidWhatsApp: "מספר WhatsApp לא תקין"
+    };
+
     const form = document.getElementById("editForm");
     const msg = document.getElementById("message");
     const imageInput = document.getElementById("imageInput");
@@ -153,6 +178,14 @@ const location = property.location || {};
     // מערך התמונות הקיימות
     let existingImages = Array.from(existingImagesDiv.querySelectorAll("img")).map(img => img.src);
 
+    // פונקציה לעדכון אינדקסים
+    function updateImageIndexes() {
+      const wrappers = existingImagesDiv.querySelectorAll(".edit-property-image-wrapper");
+      wrappers.forEach((wrapper, index) => {
+        wrapper.dataset.index = index;
+      });
+    }
+
     // הסרת תמונה קיימת
     existingImagesDiv.addEventListener("click", (e) => {
       if (e.target.classList.contains("edit-property-remove-btn")) {
@@ -160,22 +193,69 @@ const location = property.location || {};
         const index = Number(wrapper.dataset.index);
         existingImages.splice(index, 1);
         wrapper.remove();
+        updateImageIndexes();
       }
     });
+
+    // מערך התמונות החדשות
+    let newImages = [];
 
     // הצגת תצוגה מקדימה של תמונות חדשות
     imageInput.addEventListener("change", () => {
       previewContainer.innerHTML = "";
-      Array.from(imageInput.files).forEach((file) => {
+      newImages = [];
+      
+      Array.from(imageInput.files).forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = (e) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "edit-property-image-wrapper";
+          wrapper.dataset.newIndex = index;
+          
           const img = document.createElement("img");
           img.src = e.target.result;
           img.width = 150;
-          previewContainer.appendChild(img);
+          img.height = 150;
+          img.style.borderRadius = "8px";
+          
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "edit-property-remove-btn";
+          removeBtn.textContent = "×";
+          removeBtn.dataset.newIndex = index;
+          
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          previewContainer.appendChild(wrapper);
+          
+          newImages.push(file);
         };
         reader.readAsDataURL(file);
       });
+    });
+
+    // הסרת תמונה חדשה מתצוגה מקדימה
+    previewContainer.addEventListener("click", (e) => {
+      if (e.target.classList.contains("edit-property-remove-btn")) {
+        const wrapper = e.target.parentElement;
+        const index = Number(e.target.dataset.newIndex);
+        
+        // הסר מהמערך
+        newImages.splice(index, 1);
+        wrapper.remove();
+        
+        // עדכן את ה-input
+        const dt = new DataTransfer();
+        newImages.forEach(file => dt.items.add(file));
+        imageInput.files = dt.files;
+        
+        // עדכן אינדקסים
+        const remainingWrappers = previewContainer.querySelectorAll(".edit-property-image-wrapper");
+        remainingWrappers.forEach((wrapper, newIndex) => {
+          wrapper.dataset.newIndex = newIndex;
+          wrapper.querySelector(".edit-property-remove-btn").dataset.newIndex = newIndex;
+        });
+      }
     });
 
     // שמירת שינויים
@@ -188,12 +268,12 @@ const location = property.location || {};
       existingImages.forEach(src => formData.append("existingImages", src));
 
       // הוסף את התמונות החדשות
-      Array.from(imageInput.files).forEach(file => formData.append("images", file));
+      newImages.forEach(file => formData.append("images", file));
 
       try {
         const session = sessionStorage.getItem("sb-session");
         if (!session) {
-          msg.textContent = "❌ אין הרשאה – אנא התחבר מחדש";
+          msg.textContent = translations.noPermission;
           msg.style.color = "red";
           return;
         }
@@ -209,7 +289,7 @@ const location = property.location || {};
         const result = await res.json();
 
         if (result.success) {
-          msg.textContent = "✅ הדירה עודכנה בהצלחה!";
+          msg.textContent = `${translations.propertyUpdated} (${result.images.length} תמונות)`;
           msg.style.color = "green";
 
           // עדכון תמונות קיימות אחרי עריכה
@@ -221,6 +301,11 @@ const location = property.location || {};
             wrapper.dataset.index = i;
             const img = document.createElement("img");
             img.src = src;
+            img.style.width = "150px";
+            img.style.height = "150px";
+            img.style.borderRadius = "8px";
+            img.style.objectFit = "cover";
+            img.style.border = "2px solid #e0e0e0";
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "edit-property-remove-btn";
@@ -230,13 +315,14 @@ const location = property.location || {};
             existingImagesDiv.appendChild(wrapper);
           });
           existingImages = [...result.images];
+          newImages = [];
         } else {
           msg.textContent = `❌ שגיאה: ${result.message}`;
           msg.style.color = "red";
         }
       } catch (err) {
         console.error(err);
-        msg.textContent = "❌ שגיאה בחיבור לשרת";
+        msg.textContent = translations.connectionError;
         msg.style.color = "red";
       }
     });

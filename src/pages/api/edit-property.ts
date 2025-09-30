@@ -19,13 +19,7 @@ export async function POST({ request }: { request: Request }): Promise<Response>
     }
 
     // בדיקת role
-    const { data: roleData, error: roleError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (roleError || roleData?.role !== "admin") {
+    if (user.role !== "admin") {
       return new Response(JSON.stringify({ success: false, message: "Access denied, admin role required" }), { status: 403 });
     }
 

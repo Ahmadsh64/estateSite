@@ -3,6 +3,8 @@ import { supabase } from "../../lib/supabaseClient";
 import type { Property } from "../../types/property";
 import i18next from "../../i18n";
 
+// בדיקת הרשאות תתבצע בצד הלקוח
+
 let properties: Property[] = [];
 
 // --- שליפת דירות מ-Supabase ---
@@ -14,7 +16,7 @@ const { data, error } = await supabase
 if (error) {
   console.error("שגיאה בשליפת הדירות:", error.message);
   const errorMessage = document.createElement("div");
-  errorMessage.textContent = i18next.t("admin.errorFetchingProperties");
+        errorMessage.textContent = "שגיאה בטעינת הנכסים";
   errorMessage.style.color = "red";
   document.body.appendChild(errorMessage);
 } else if (data) {
@@ -124,7 +126,31 @@ if (error) {
     </main>
 
     <script type="module">
-      const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
+      // תרגומים זמניים לצד הלקוח
+      const translations = {
+        propertyRestored: "הנכס שוחזר בהצלחה!",
+        propertyHidden: "הנכס הוסתר בהצלחה!",
+        connectionError: "❌ שגיאה בחיבור לשרת",
+        deleteError: "❌ שגיאה במחיקת נכס",
+        restoreError: "❌ שגיאה בשחזור נכס",
+        errorFetchingProperties: "שגיאה בטעינת הנכסים",
+        status: "סטטוס",
+        active: "פעיל",
+        hidden: "מוסתר",
+        edit: "עריכה",
+        hide: "הסתר",
+        restore: "שחזור"
+      };
+
+      function initDashboard() {
+        const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
+
+        // בדיקת הרשאות מנהל
+        if (!session.access_token) {
+          alert("❌ אין הרשאה – אנא התחבר מחדש");
+          window.location.href = "/admin/login";
+          return;
+        }
 
       // --- המשך טעינת הדף ---
       async function toggleProperty(id, activate) {
@@ -154,7 +180,7 @@ if (error) {
 
           if (result.success) {
             alert(
-              activate ? i18next.t("admin.propertyRestored") : i18next.t("admin.propertyHidden"),
+              activate ? translations.propertyRestored : translations.propertyHidden,
             );
 
             const propertyCard = document.querySelector(
@@ -169,7 +195,7 @@ if (error) {
               );
 
               if (statusText)
-                statusText.innerText = `${i18next.t("admin.status")}: ${activate ? i18next.t("admin.active") : i18next.t("admin.hidden")}`;
+                statusText.innerText = `${translations.status}: ${activate ? translations.active : translations.hidden}`;
 
               if (statusButton) {
                 statusButton.setAttribute(
@@ -179,11 +205,11 @@ if (error) {
                 if (activate) {
                   statusButton.classList.remove("admin-restore-btn");
                   statusButton.classList.add("admin-delete-btn");
-                  statusButton.innerText = "🗑️ {i18next.t('admin.hide')}";
+                  statusButton.innerText = `🗑️ ${translations.hide}`;
                 } else {
                   statusButton.classList.remove("admin-delete-btn");
                   statusButton.classList.add("admin-restore-btn");
-                  statusButton.innerText = "♻️ {i18next.t('admin.restore')}";
+                  statusButton.innerText = `♻️ ${translations.restore}`;
                 }
               }
             }
@@ -214,6 +240,10 @@ if (error) {
             toggleProperty(id, activate);
           });
         });
+
+        // הפעלת הדשבורד
+        initDashboard();
+      }
     </script>
   </body>
 </html>

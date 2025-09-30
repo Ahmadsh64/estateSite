@@ -32,6 +32,16 @@ import i18next from '../../i18n.js';
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
   );
 
+  // תרגומים זמניים לצד הלקוח
+  const translations = {
+    fillAllFields: "אנא מלא את כל השדות",
+    loginError: "שגיאה בהתחברות",
+    noSession: "Session לא נוצר",
+    userError: "שגיאה בהבאת נתוני המשתמש",
+    noPermissions: "❌ אין הרשאה – אנא התחבר מחדש",
+    serverError: "שגיאה בשרת – נסה שוב"
+  };
+
   const form = document.getElementById('loginForm');
   const msg = document.getElementById('loginMessage');
 
@@ -43,7 +53,7 @@ import i18next from '../../i18n.js';
     const password = form.password.value;
 
     if (!email || !password) {
-      msg.textContent = "❌ אנא מלא את כל השדות";
+      msg.textContent = "❌ " + translations.fillAllFields;
       return;
     }
 
@@ -52,12 +62,12 @@ import i18next from '../../i18n.js';
 
       if (error) {
         console.error("Sign-in Error:", error.message);
-        msg.textContent = "❌ שגיאה בהתחברות: " + error.message;
+        msg.textContent = "❌ " + translations.loginError + ": " + error.message;
         return;
       }
 
       if (!data.session) {
-        msg.textContent = "❌ Session לא נוצר";
+        msg.textContent = "❌ " + translations.noSession;
         return;
       }
 
@@ -65,22 +75,15 @@ import i18next from '../../i18n.js';
       const { data: user, error: userError } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        msg.textContent = "❌ שגיאה בהבאת נתוני המשתמש";
+        msg.textContent = "❌ " + translations.userError;
         return;
       }
 
       console.log('User Data:', user); // הדפסת נתוני המשתמש
 
-      // אם תפקיד המשתמש לא מוגדר כ "admin"
-      // יהיה צורך לבדוק זאת מתוך טבלת המשתמשים ב-Supabase אם הוספתם את התפקיד
-      const { data: userProfile, error: userProfileError } = await supabase
-        .from('users') // שמות טבלאות או עמודות יכולים להשתנות בהתאם להגדרות שלך
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (userProfileError || !userProfile || userProfile.role !== 'admin') {
-        msg.textContent = "❌ אין לך הרשאות מנהל";
+      // בדיקת הרשאות מנהל - בדיקה ב-user_metadata
+      if (user.user?.role !== 'admin') {
+        msg.textContent = translations.noPermissions;
         return;
       }
 
@@ -92,7 +95,7 @@ import i18next from '../../i18n.js';
 
     } catch (err) {
       console.error("Server error:", err);
-      msg.textContent = "❌ שגיאה בשרת – נסה שוב";
+      msg.textContent = "❌ " + translations.serverError;
     }
   });
 </script>
