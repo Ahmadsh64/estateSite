@@ -1,5 +1,5 @@
 ---
-import i18next from "../i18n";
+import i18next from "../i18n.js";
 import { supabase } from "../lib/supabaseClient";
 import type { Property } from "../types/property";
 
@@ -33,7 +33,7 @@ const { data, error } = await query;
 if (!error && data) {
   properties = data as Property[]; // המרת הנתונים לטיפוס Property[]
 } else {
-  console.error("שגיאה בשליפת הדירות:", error?.message);
+  console.error(i18next.t("admin.errorFetchingProperties"), error?.message);
 }
 
 // מערך של כל התנאים לסינון
@@ -92,17 +92,17 @@ filters.forEach(({ condition, filter }) => {
       <nav>
         <!-- כפתורים לסוגי נכסים -->
         <a href="/" class="filter-btn">{i18next.t("search.apartments")}</a>
-        <a href="/?type=בית" class="filter-btn">{i18next.t("search.houses")}</a>
-        <a href="/?type=צימר" class="filter-btn">{i18next.t("search.cabins")}</a
+        <a href={`/?type=${i18next.t("search.houses")}`} class="filter-btn">{i18next.t("search.houses")}</a>
+        <a href={`/?type=${i18next.t("search.cabins")}`} class="filter-btn">{i18next.t("search.cabins")}</a
         >
-        <a href="/?type=וילה" class="filter-btn">{i18next.t("search.villas")}</a
+        <a href={`/?type=${i18next.t("search.villas")}`} class="filter-btn">{i18next.t("search.villas")}</a
         >
-        <a href="/?type=מלון" class="filter-btn">{i18next.t("search.hotels")}</a
+        <a href={`/?type=${i18next.t("search.hotels")}`} class="filter-btn">{i18next.t("search.hotels")}</a
         >
-        <a href="/?type=אטרקציה" class="filter-btn"
+        <a href={`/?type=${i18next.t("search.attractions")}`} class="filter-btn"
           >{i18next.t("search.attractions")}</a
         >
-        <a href="/?type=קמפינג" class="filter-btn"
+        <a href={`/?type=${i18next.t("search.camping")}`} class="filter-btn"
           >{i18next.t("search.camping")}</a
         >
       </nav>
@@ -233,10 +233,10 @@ filters.forEach(({ condition, filter }) => {
 
                     <p class="home-property-features">
                       {[
-                        { label: "חדרים", value: p.bedrooms },
-                        { label: "מיטות", value: p.beds },
-                        { label: "חדרי אמבטיה", value: p.bathrooms },
-                        { label: "נפשות מקסימום", value: p.occupancy },
+                        { label: i18next.t("property.rooms"), value: p.bedrooms },
+                        { label: i18next.t("property.beds"), value: p.beds },
+                        { label: i18next.t("property.bathrooms"), value: p.bathrooms },
+                        { label: i18next.t("property.maxOccupancy"), value: p.occupancy },
                       ].map((feature, i) => (
                         <span class="property-feature">
                           {feature.label}: {feature.value} {i < 8 ? "| " : ""}
@@ -249,7 +249,7 @@ filters.forEach(({ condition, filter }) => {
 
                   <div class="home-property-contact">
                     <p class="home-property-whatsapp">
-                      {p.whatsapp ? `📞 ${p.whatsapp}` : "אין פרטי קשר"}
+                      {p.whatsapp ? `📞 ${p.whatsapp}` : i18next.t("property.noContactInfo")}
                     </p>
                   </div>
                 </div>

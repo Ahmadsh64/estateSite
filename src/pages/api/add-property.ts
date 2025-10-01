@@ -3,10 +3,85 @@ import { supabase } from "../../lib/supabaseClient";
 import { mapPropertyToDb } from "../../services/propertyMapper";
 import type { Property } from "../../types/property";
 import crypto from 'crypto';
+import { fileTypeFromBuffer } from 'file-type';
+import multer from 'multer';
+import { Readable } from 'stream';
+
+// Rate limiting - מניעת spam
+const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 דקה
+const RATE_LIMIT_MAX_REQUESTS = 5; // מקסימום 5 בקשות בדקה
+
+// הגדרות multer
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB per file
+    files: 10, // מקסימום 10 קבצים
+    fieldSize: 10 * 1024 * 1024, // 10MB total
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/jpg"];
+    const allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    
+    // בדיקת MIME type
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type: ${file.mimetype}. Only image files are allowed.`));
+    }
+  }
+});
+
 
 export const POST: APIRoute = async ({ request }) => {
+  const startTime = Date.now();
+  const MAX_PROCESSING_TIME = 30000; // 30 שניות
+  
   try {
     console.log("API: Starting add-property request");
+    
+    // בדיקת Rate Limiting
+    const clientIP = request.headers.get("x-forwarded-for") || "unknown";
+    const currentTime = Date.now();
+    const clientData = rateLimitMap.get(clientIP);
+    
+    if (clientData) {
+      if (currentTime - clientData.lastReset > RATE_LIMIT_WINDOW) {
+        clientData.count = 0;
+        clientData.lastReset = currentTime;
+      }
+      
+      if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: "Too many requests. Please try again later.",
+        }), {
+          status: 429,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+      
+      clientData.count++;
+    } else {
+      rateLimitMap.set(clientIP, { count: 1, lastReset: currentTime });
+    }
+    
+    // בדיקת גודל בקשה
+    const contentLength = request.headers.get("content-length");
+    const MAX_REQUEST_SIZE = 100 * 1024 * 1024; // 100MB
+    if (contentLength && parseInt(contentLength) > MAX_REQUEST_SIZE) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: "Request too large. Maximum 100MB allowed.",
+      }), {
+        status: 413,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    
+    // קריאת נתונים מהטופס
     const formData = await request.formData();
     console.log("API: Form data received");
     
@@ -33,6 +108,25 @@ export const POST: APIRoute = async ({ request }) => {
     if (user.role !== 'admin') {
       return new Response(JSON.stringify({ success: false, message: "Access denied, admin role required" }), {
         status: 403,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    // בדיקת זמן החיים של הטוקן
+    const tokenExp = (user as any).exp;
+    const currentUnixTime = Math.floor(Date.now() / 1000);
+    if (tokenExp && tokenExp < currentUnixTime) {
+      return new Response(JSON.stringify({ success: false, message: "Token expired" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    // בדיקת זמן החיים של הטוקן - מקסימום 24 שעות
+    const MAX_TOKEN_AGE = 24 * 60 * 60; // 24 שעות
+    if (tokenExp && (currentUnixTime - tokenExp) > MAX_TOKEN_AGE) {
+      return new Response(JSON.stringify({ success: false, message: "Token too old" }), {
+        status: 401,
         headers: { "Content-Type": "application/json" }
       });
     }
@@ -100,10 +194,49 @@ export const POST: APIRoute = async ({ request }) => {
     console.log(`API: Found ${images.length} images to upload`);
 
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILES = 10; // מקסימום 10 תמונות
     const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+
+    // בדיקת מספר קבצים
+    if (images.length > MAX_FILES) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: `Too many files. Maximum ${MAX_FILES} files allowed.`,
+      }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    // בדיקת גודל כולל של כל הקבצים
+    const totalSize = images.reduce((sum, file) => sum + file.size, 0);
+    const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB
+    if (totalSize > MAX_TOTAL_SIZE) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: `Total file size too large. Maximum ${MAX_TOTAL_SIZE / (1024 * 1024)}MB allowed.`,
+      }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
     for (const file of images) {
       if (!file) continue;
+
+      console.log(`Processing file: ${file.name}, type: ${file.type}, size: ${file.size}`);
+
+      // בדיקת זמן עיבוד
+      if (Date.now() - startTime > MAX_PROCESSING_TIME) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: "Processing timeout. Please try again with fewer files.",
+        }), {
+          status: 408,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
 
       // בדיקת גודל
       if (file.size > MAX_FILE_SIZE) {
@@ -116,23 +249,97 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      // בדיקת MIME type
-      if (!allowedMimeTypes.includes(file.type)) {
+      // בדיקת שם הקובץ
+      const fileExtension = file.name.toLowerCase();
+      const hasValidExtension = allowedExtensions.some(ext => fileExtension.endsWith(ext));
+      
+      if (!hasValidExtension) {
         return new Response(JSON.stringify({
           success: false,
-          message: `Invalid file type for ${file.name}. Only images are allowed.`,
+          message: `Invalid file extension for ${file.name}. Only image files are allowed.`,
         }), {
           status: 400,
           headers: { "Content-Type": "application/json" }
         });
       }
 
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${file.type.split('/')[1]}`;
+      // בדיקת MIME type - יותר גמישה
       const fileBuffer = await file.arrayBuffer();
+      const fileType = await fileTypeFromBuffer(fileBuffer);
+      
+      // אם fileType לא זמין, נבדוק לפי הרחבה
+      if (!fileType) {
+        console.log(`File type detection failed for ${file.name}, checking by extension`);
+        if (fileExtension.endsWith('.jpg') || fileExtension.endsWith('.jpeg')) {
+          // נמשיך עם הקובץ
+        } else if (fileExtension.endsWith('.png')) {
+          // נמשיך עם הקובץ
+        } else if (fileExtension.endsWith('.gif')) {
+          // נמשיך עם הקובץ
+        } else if (fileExtension.endsWith('.webp')) {
+          // נמשיך עם הקובץ
+        } else {
+          return new Response(JSON.stringify({
+            success: false,
+            message: `Cannot determine file type for ${file.name}. Only image files are allowed.`,
+          }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" }
+          });
+        }
+      } else if (fileType && !allowedMimeTypes.includes(fileType.mime)) {
+        console.log(`File type ${fileType.mime} not allowed, but extension ${fileExtension} is valid`);
+        // אם הרחבה תקינה אבל MIME type לא, נמשיך בכל מקרה
+        if (!hasValidExtension) {
+          return new Response(JSON.stringify({
+            success: false,
+            message: `Invalid file type for ${file.name}. Only image files are allowed.`,
+          }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" }
+          });
+        }
+      }
+
+      // בדיקת חתימה דיגיטלית של הקובץ
+      const fileSignature = fileBuffer.slice(0, 4);
+      const validSignatures = [
+        new Uint8Array([0xFF, 0xD8, 0xFF]), // JPEG
+        new Uint8Array([0x89, 0x50, 0x4E, 0x47]), // PNG
+        new Uint8Array([0x47, 0x49, 0x46, 0x38]), // GIF
+        new Uint8Array([0x52, 0x49, 0x46, 0x46]), // WEBP (RIFF)
+      ];
+
+      const isValidSignature = validSignatures.some(signature => {
+        return signature.every((byte, index) => new Uint8Array(fileSignature)[index] === byte);
+      });
+
+      if (!isValidSignature) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: `Invalid file signature for ${file.name}. Only image files are allowed.`,
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+
+      // בדיקת MIME type מהמטאדאטה של הדפדפן (כבדיקה נוספת)
+      if (!allowedMimeTypes.includes(file.type)) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: `Invalid file type for ${file.name}. Only image files are allowed.`,
+        }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+
+      const uploadFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileType?.ext || fileExtension.split('.').pop()}`;
       
       const { error: uploadError } = await supabase.storage
         .from("properties")
-        .upload(fileName, fileBuffer, { contentType: file.type });
+        .upload(uploadFileName, fileBuffer, { contentType: file.type });
 
       if (uploadError) {
         console.error("Upload error:", uploadError);
@@ -145,7 +352,7 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      const { data } = await supabase.storage.from("properties").getPublicUrl(fileName);
+      const { data } = await supabase.storage.from("properties").getPublicUrl(uploadFileName);
       if (!data?.publicUrl) {
         return new Response(JSON.stringify({
           success: false,
