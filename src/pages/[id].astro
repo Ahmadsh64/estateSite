@@ -1,5 +1,5 @@
 ---
-import i18next from "../i18n";
+import i18next from "../i18n.js";
 import { supabase } from "../lib/supabaseClient";
 import type { Property } from "../types/property";  // ייבוא טיפוס Property
 import { mapDbToProperty } from "../services/propertyMapper";  // ייבוא פונקציית המרה
@@ -24,7 +24,7 @@ const { data, error } = await supabase
   .single();
 
 if (error) {
-  console.error(i18next.t("property.errorLoadingProperty"), error.message);
+  console.error(i18next.t("common.errors.errorLoadingProperty"), error.message);
 } 
 if (data) {
   // המרת הנתונים לטיפוס Property באמצעות הפונקציה
@@ -462,7 +462,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
           mainImage.addEventListener("click", openGallery);
         }
 
-        // כפתור "עוד תמונות"
+        // כפתור "עוד תמונות" - {i18next.t("property.moreImages")}
         const moreImagesButton = document.querySelector(".more-images-fullwidth");
         if (moreImagesButton) {
           moreImagesButton.addEventListener("click", openGallery);
@@ -559,15 +559,15 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
             
             try {
               // כאן תוכל להוסיף שליחה לשרת
-              console.log(i18next.t("property.formSubmitted"), data);
+              console.log(i18next.t("common.success.formSubmitted"), data);
               
               // הודעת הצלחה
-              alert(i18next.t("property.thankYou"));
+              alert(i18next.t("common.messages.thankYou"));
               sidebarContactForm.reset();
               
             } catch (error) {
-              console.error(i18next.t("property.errorSendingForm"), error);
-              alert(i18next.t("property.errorSendingRequest"));
+              console.error(i18next.t("common.errors.errorSendingForm"), error);
+              alert(i18next.t("common.errors.errorSendingRequest"));
             }
           });
         }

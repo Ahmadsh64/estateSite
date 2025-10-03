@@ -26,11 +26,12 @@ const location = property.location || {};
 ---
 
 <html lang="he">
-<head>
-  <meta charset="UTF-8" />
-  <title>{i18next.t("admin.editProperty", { propertyTitle: property.title })}</title>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <title>{i18next.t("admin.editProperty", { propertyTitle: property.title })}</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/js/i18n.js" is:inline></script>
+  </head>
 <body dir="rtl">
   <header class="edit-property-header">
     <h1>{i18next.t("admin.editProperty", { propertyTitle: property.title })}</h1>
@@ -152,14 +153,10 @@ const location = property.location || {};
       window.location.href = "/admin/login";
     }
 
-    // תרגומים זמניים לצד הלקוח
-    const translations = {
-      noPermission: "❌ אין הרשאה – אנא התחבר מחדש",
-      propertyUpdated: "✅ הדירה עודכנה בהצלחה!",
-      connectionError: "❌ שגיאה בחיבור לשרת",
-      fillAllFields: "אנא מלא את כל השדות",
-      invalidPhone: "מספר טלפון לא תקין",
-      invalidWhatsApp: "מספר WhatsApp לא תקין"
+    // שימוש ב-i18n הגלובלי
+    // @ts-ignore
+    const i18next = window.i18next || {
+      t: (key) => key // fallback אם i18n לא זמין
     };
 
     const form = document.getElementById("editForm");
@@ -273,7 +270,7 @@ const location = property.location || {};
       try {
         const session = sessionStorage.getItem("sb-session");
         if (!session) {
-          msg.textContent = translations.noPermission;
+          msg.textContent = window.i18next.t("admin.noPermission");
           msg.style.color = "red";
           return;
         }
@@ -289,7 +286,7 @@ const location = property.location || {};
         const result = await res.json();
 
         if (result.success) {
-          msg.textContent = `${translations.propertyUpdated} (${result.images.length} תמונות)`;
+          msg.textContent = `${window.i18next.t("common.success.propertyUpdated")} (${result.images.length} תמונות)`;
           msg.style.color = "green";
 
           // עדכון תמונות קיימות אחרי עריכה
@@ -317,12 +314,12 @@ const location = property.location || {};
           existingImages = [...result.images];
           newImages = [];
         } else {
-          msg.textContent = `❌ שגיאה: ${result.message}`;
+          msg.textContent = `❌ ${window.i18next.t("common.errors.error")}: ${result.message}`;
           msg.style.color = "red";
         }
       } catch (err) {
         console.error(err);
-        msg.textContent = translations.connectionError;
+        msg.textContent = window.i18next.t("common.errors.connectionError");
         msg.style.color = "red";
       }
     });

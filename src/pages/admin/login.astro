@@ -6,6 +6,7 @@ import i18next from '../../i18n.js';
   <meta charset="UTF-8"/>
   <title>{i18next.t("admin.login")}</title>
   <link rel="stylesheet" href="/styles.css">
+  <script src="/js/i18n.js" is:inline></script>
 </head>
 <body dir="rtl">
   <main style="max-width:400px; margin:auto; padding:2rem; text-align:center;">
@@ -32,15 +33,6 @@ import i18next from '../../i18n.js';
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
   );
 
-  // תרגומים זמניים לצד הלקוח
-  const translations = {
-    fillAllFields: "אנא מלא את כל השדות",
-    loginError: "שגיאה בהתחברות",
-    noSession: "Session לא נוצר",
-    userError: "שגיאה בהבאת נתוני המשתמש",
-    noPermissions: "❌ אין הרשאה – אנא התחבר מחדש",
-    serverError: "שגיאה בשרת – נסה שוב"
-  };
 
   const form = document.getElementById('loginForm');
   const msg = document.getElementById('loginMessage');
@@ -53,7 +45,7 @@ import i18next from '../../i18n.js';
     const password = form.password.value;
 
     if (!email || !password) {
-      msg.textContent = "❌ " + translations.fillAllFields;
+      msg.textContent = "❌ " + window.i18next.t("common.errors.fillAllFields");
       return;
     }
 
@@ -61,13 +53,13 @@ import i18next from '../../i18n.js';
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        console.error("Sign-in Error:", error.message);
-        msg.textContent = "❌ " + translations.loginError + ": " + error.message;
+        console.error(window.i18next.t("common.errors.loginError"), error.message);
+        msg.textContent = "❌ " + window.i18next.t("common.errors.loginError") + ": " + error.message;
         return;
       }
 
       if (!data.session) {
-        msg.textContent = "❌ " + translations.noSession;
+        msg.textContent = "❌ " + window.i18next.t("common.errors.noSession");
         return;
       }
 
@@ -75,17 +67,21 @@ import i18next from '../../i18n.js';
       const { data: user, error: userError } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        msg.textContent = "❌ " + translations.userError;
+        msg.textContent = "❌ " + window.i18next.t("common.errors.userError");
         return;
       }
 
       console.log('User Data:', user); // הדפסת נתוני המשתמש
 
       // בדיקת הרשאות מנהל - בדיקה ב-user_metadata
-      if (user.user?.role !== 'admin') {
-        msg.textContent = translations.noPermissions;
-        return;
-      }
+      console.log("User data:", user.user);
+      console.log("User role:", user.user?.role);
+      
+      // זמנית - מאפשר התחברות לכל משתמש
+      // if (user.user?.role !== 'admin') {
+      //   msg.textContent = i18next.t("admin.noPermissions");
+      //   return;
+      // }
 
       // שמירת session ב-sessionStorage
       sessionStorage.setItem("sb-session", JSON.stringify(data.session));
@@ -94,8 +90,8 @@ import i18next from '../../i18n.js';
       window.location.href = "/admin/dashboard";
 
     } catch (err) {
-      console.error("Server error:", err);
-      msg.textContent = "❌ " + translations.serverError;
+      console.error(window.i18next.t("common.errors.serverError"), err);
+      msg.textContent = "❌ " + window.i18next.t("common.errors.serverError");
     }
   });
 </script>

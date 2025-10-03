@@ -1,33 +1,4 @@
 import i18next from 'i18next';
-// i18n.js
-export const translations = {
-  en: {
-    admin: {
-      noPermission: "❌ No permission – Please log in again",
-      connectionError: "❌ Connection error",
-      successPropertyAdded: "✅ Property added successfully!",
-      errorFileType: "❌ Unsupported file type for",
-      onlyImagesSupported: "Only images are supported",
-      error: "❌ Error:",
-      fillAllFields: "Please fill all required fields",
-      invalidPhone: "Invalid phone number",
-      invalidWhatsApp: "Invalid WhatsApp number"
-    }
-  },
-  he: {
-    admin: {
-      noPermission: "❌ אין הרשאה – אנא התחבר מחדש",
-      connectionError: "❌ שגיאה בחיבור לשרת",
-      successPropertyAdded: "✅ הדירה נוספה בהצלחה!",
-      errorFileType: "❌ סוג קובץ לא נתמך עבור",
-      onlyImagesSupported: "רק תמונות נתמכות",
-      error: "❌ שגיאה:",
-      fillAllFields: "אנא מלא את כל השדות הנדרשים",
-      invalidPhone: "מספר טלפון לא תקין",
-      invalidWhatsApp: "מספר WhatsApp לא תקין"
-    }
-  }
-};
 
 i18next.init({
   fallbackLng: 'he', // ברירת מחדל
@@ -139,35 +110,37 @@ i18next.init({
         "price": "Price",
         "searchButton": "Search 🔎",
       },
-      "common": {
-        "notSpecified": "Not specified",
-        "notAvailable": "Not available",
-        "errors": {
-          "loginError": "Login error",
-          "fillAllFields": "Please fill in all fields",
-          "connectionError": "❌ Connection error with the server",
-          "noPermission": "❌ No permission – please log in again",
-          "invalidPhone": "Invalid phone number",
-          "invalidWhatsApp": "Invalid WhatsApp number",
-          "selectAtLeastOneImage": "Please select at least one image"
+        "common": {
+          "notSpecified": "Not specified",
+          "notAvailable": "Not available",
+          "errors": {
+            "loginError": "Login error",
+            "fillAllFields": "Please fill in all fields",
+            "fillAllFieldsRequired": "Please fill in all required fields",
+            "invalidPhone": "Invalid phone number",
+            "connectionError": "Connection error with server",
+            "serverError": "Server error, please try again",
+            "unknownError": "Unknown error occurred",
+            "noSession": "Session not created",
+            "userError": "Error fetching user data",
+            "errorFetchingProperties": "Error loading properties",
+            "errorLoadingProperty": "Error loading property",
+            "errorSendingForm": "Error sending form",
+            "errorSendingRequest": "An error occurred while sending the request. Please try again."
+          },
+          "success": {
+            "propertyAdded": "Property successfully added!",
+            "propertyUpdated": "Property updated successfully!",
+            "propertyRestored": "Property restored successfully!",
+            "propertyHidden": "Property hidden successfully!",
+            "formSubmitted": "Form submitted successfully"
+          },
+          "messages": {
+            "thankYou": "Thank you! Your request has been sent successfully. We will get back to you soon.",
+            "sendingData": "Sending data...",
+            "loading": "Loading..."
+          }
         },
-        "admin": {
-          "noSession": "Session not created",
-          "userError": "Error fetching user data",
-          "serverError": "Server error – please try again",
-          "propertyRestored": "Property restored successfully!",
-          "propertyHidden": "Property hidden successfully!",
-          "deleteError": "❌ Error deleting property",
-          "restoreError": "❌ Error restoring property",
-          "errorFetchingProperties": "Error fetching properties",
-          "status": "Status",
-          "active": "Active",
-          "hidden": "Hidden",
-          "edit": "Edit",
-          "hide": "Hide",
-          "restore": "Restore"
-        }
-      },
 "admin": {
             "editProperty": "Edit Property - {{propertyTitle}}",
           "backToDashboard": "Back to Dashboard",
@@ -258,8 +231,8 @@ i18next.init({
   "nearbyPublicTransport": "Public Transport",
   "save": "Save",
   "successPropertyAdded": "✅ Property successfully added!",
-          "errorFileType": "❌ Unsupported file type for {{fileName}}. Only images are supported.",
-          "onlyImagesSupported": "Only images are supported",
+  "errorFileType": "❌ Unsupported file type for {{fileName}}. Only images are supported.",
+  "onlyImagesSupported": "Only images are supported",
   "connectionError": "❌ Connection error with the server.",
   "error": "Error",
   "formError": "Form submission error",
@@ -486,27 +459,29 @@ i18next.init({
           "errors": {
             "loginError": "שגיאה בהתחברות",
             "fillAllFields": "אנא מלא את כל השדות",
-            "connectionError": "❌ שגיאה בחיבור לשרת",
-            "noPermission": "❌ אין הרשאה – אנא התחבר מחדש",
+            "fillAllFieldsRequired": "אנא מלא את כל השדות הנדרשים",
             "invalidPhone": "מספר טלפון לא תקין",
-            "invalidWhatsApp": "מספר WhatsApp לא תקין",
-            "selectAtLeastOneImage": "אנא בחר לפחות תמונה אחת"
-          },
-          "admin": {
+            "connectionError": "שגיאה בחיבור לשרת",
+            "serverError": "שגיאה בשרת – נסה שוב",
+            "unknownError": "אירעה שגיאה לא ידועה",
             "noSession": "Session לא נוצר",
             "userError": "שגיאה בהבאת נתוני המשתמש",
-            "serverError": "שגיאה בשרת – נסה שוב",
+            "errorFetchingProperties": "שגיאה בטעינת הנכסים",
+            "errorLoadingProperty": "שגיאה בטעינת הנכס",
+            "errorSendingForm": "שגיאה בשליחת הטופס",
+            "errorSendingRequest": "אירעה שגיאה בשליחת הפנייה. אנא נסה שוב."
+          },
+          "success": {
+            "propertyAdded": "הדירה נוספה בהצלחה!",
+            "propertyUpdated": "הדירה עודכנה בהצלחה!",
             "propertyRestored": "הנכס שוחזר בהצלחה!",
             "propertyHidden": "הנכס הוסתר בהצלחה!",
-            "deleteError": "❌ שגיאה במחיקת נכס",
-            "restoreError": "❌ שגיאה בשחזור נכס",
-            "errorFetchingProperties": "שגיאה בטעינת הנכסים",
-            "status": "סטטוס",
-            "active": "פעיל",
-            "hidden": "מוסתר",
-            "edit": "עריכה",
-            "hide": "הסתר",
-            "restore": "שחזור"
+            "formSubmitted": "הטופס נשלח בהצלחה"
+          },
+          "messages": {
+            "thankYou": "תודה! פנייתך נשלחה בהצלחה. נחזור אליך בהקדם.",
+            "sendingData": "שולח נתונים...",
+            "loading": "טוען..."
           }
         },
         "admin": {
@@ -558,7 +533,6 @@ i18next.init({
             "restoreError": "❌ שגיאה בשחזור נכס",
             "successPropertyAdded": "✅ הדירה נוספה בהצלחה!",
             "errorFileType": "❌ סוג קובץ לא נתמך עבור {{fileName}}. רק תמונות נתמכות.",
-          "onlyImagesSupported": "רק תמונות נתמכות",
             "formError": "❌ שגיאה במילוי הטופס",
             "cancel": "ביטול",
             "login": "כניסת מנהל",
@@ -635,6 +609,7 @@ i18next.init({
   "save": "שמור",
   "successPropertyAdded": "✅ הדירה נוספה בהצלחה!",
   "errorFileType": "❌ סוג קובץ לא נתמך עבור {{fileName}}. רק תמונות נתמכות.",
+  "onlyImagesSupported": "רק תמונות נתמכות",
   "connectionError": "❌ שגיאה בחיבור לשרת",
   "error": "שגיאה",
   "formError": "שגיאה במילוי הטופס",

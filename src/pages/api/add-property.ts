@@ -24,7 +24,7 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/jpg"];
     const allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-    
+
     // בדיקת MIME type
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
@@ -38,21 +38,21 @@ const upload = multer({
 export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   const MAX_PROCESSING_TIME = 30000; // 30 שניות
-  
+
   try {
     console.log("API: Starting add-property request");
-    
+
     // בדיקת Rate Limiting
     const clientIP = request.headers.get("x-forwarded-for") || "unknown";
     const currentTime = Date.now();
     const clientData = rateLimitMap.get(clientIP);
-    
+
     if (clientData) {
       if (currentTime - clientData.lastReset > RATE_LIMIT_WINDOW) {
         clientData.count = 0;
         clientData.lastReset = currentTime;
       }
-      
+
       if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
         return new Response(JSON.stringify({
           success: false,
@@ -62,12 +62,12 @@ export const POST: APIRoute = async ({ request }) => {
           headers: { "Content-Type": "application/json" }
         });
       }
-      
+
       clientData.count++;
     } else {
       rateLimitMap.set(clientIP, { count: 1, lastReset: currentTime });
     }
-    
+
     // בדיקת גודל בקשה
     const contentLength = request.headers.get("content-length");
     const MAX_REQUEST_SIZE = 100 * 1024 * 1024; // 100MB
@@ -80,11 +80,11 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { "Content-Type": "application/json" }
       });
     }
-    
+
     // קריאת נתונים מהטופס
     const formData = await request.formData();
     console.log("API: Form data received");
-    
+
     // בדיקת הרשאות
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
@@ -104,7 +104,8 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // בדיקת role
+    // בדיקת role 
+    console.log("User role:", user.role);
     if (user.role !== 'admin') {
       return new Response(JSON.stringify({ success: false, message: "Access denied, admin role required" }), {
         status: 403,
@@ -252,7 +253,7 @@ export const POST: APIRoute = async ({ request }) => {
       // בדיקת שם הקובץ
       const fileExtension = file.name.toLowerCase();
       const hasValidExtension = allowedExtensions.some(ext => fileExtension.endsWith(ext));
-      
+
       if (!hasValidExtension) {
         return new Response(JSON.stringify({
           success: false,
@@ -266,7 +267,7 @@ export const POST: APIRoute = async ({ request }) => {
       // בדיקת MIME type - יותר גמישה
       const fileBuffer = await file.arrayBuffer();
       const fileType = await fileTypeFromBuffer(fileBuffer);
-      
+
       // אם fileType לא זמין, נבדוק לפי הרחבה
       if (!fileType) {
         console.log(`File type detection failed for ${file.name}, checking by extension`);
@@ -336,7 +337,7 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       const uploadFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileType?.ext || fileExtension.split('.').pop()}`;
-      
+
       const { error: uploadError } = await supabase.storage
         .from("properties")
         .upload(uploadFileName, fileBuffer, { contentType: file.type });
@@ -393,9 +394,9 @@ export const POST: APIRoute = async ({ request }) => {
   } catch (err) {
     console.error("Server error:", err);
     console.error("Error stack:", err instanceof Error ? err.stack : "No stack trace");
-    return new Response(JSON.stringify({ 
-      success: false, 
-      message: err instanceof Error ? err.message : "Server error" 
+    return new Response(JSON.stringify({
+      success: false,
+      message: err instanceof Error ? err.message : "Server error"
     }), {
       status: 500,
       headers: { "Content-Type": "application/json" }

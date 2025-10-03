@@ -14,11 +14,8 @@ const { data, error } = await supabase
   .order("created_at", { ascending: false });
 
 if (error) {
-  console.error("שגיאה בשליפת הדירות:", error.message);
-  const errorMessage = document.createElement("div");
-        errorMessage.textContent = "שגיאה בטעינת הנכסים";
-  errorMessage.style.color = "red";
-  document.body.appendChild(errorMessage);
+  console.error(i18next.t("common.errors.errorFetchingProperties"), error.message);
+  properties = [];
 } else if (data) {
   properties = data.map((p: any) => ({
     id: p.id,
@@ -57,6 +54,7 @@ if (error) {
     <meta charset="UTF-8" />
     <title>{i18next.t("admin.propertyManagement")}</title>
     <link rel="stylesheet" href="/styles.css" />
+    <script src="/js/i18n.js" is:inline></script>
   </head>
   <body dir="rtl">
     <header class="admin-header">
@@ -126,37 +124,19 @@ if (error) {
     </main>
 
     <script type="module">
-      // תרגומים זמניים לצד הלקוח
-      const translations = {
-        propertyRestored: "הנכס שוחזר בהצלחה!",
-        propertyHidden: "הנכס הוסתר בהצלחה!",
-        connectionError: "❌ שגיאה בחיבור לשרת",
-        deleteError: "❌ שגיאה במחיקת נכס",
-        restoreError: "❌ שגיאה בשחזור נכס",
-        errorFetchingProperties: "שגיאה בטעינת הנכסים",
-        status: "סטטוס",
-        active: "פעיל",
-        hidden: "מוסתר",
-        edit: "עריכה",
-        hide: "הסתר",
-        restore: "שחזור"
+      // שימוש ב-i18n הגלובלי
+      // @ts-ignore
+      const i18next = window.i18next || {
+        t: (key) => key // fallback אם i18n לא זמין
       };
 
-      function initDashboard() {
-        const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
-
-        // בדיקת הרשאות מנהל
-        if (!session.access_token) {
-          alert("❌ אין הרשאה – אנא התחבר מחדש");
-          window.location.href = "/admin/login";
-          return;
-        }
-
-      // --- המשך טעינת הדף ---
+      // פונקציה להסתרה/שחזור נכס
       async function toggleProperty(id, activate) {
+        const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
         const token = session.access_token;
+        
         if (!token) {
-          alert("❌ אין הרשאה – אנא התחבר מחדש");
+          alert(window.i18next.t("admin.noPermission"));
           window.location.href = "/admin/login";
           return;
         }
@@ -180,7 +160,7 @@ if (error) {
 
           if (result.success) {
             alert(
-              activate ? translations.propertyRestored : translations.propertyHidden,
+              activate ? window.i18next.t("common.success.propertyRestored") : window.i18next.t("common.success.propertyHidden"),
             );
 
             const propertyCard = document.querySelector(
@@ -195,7 +175,7 @@ if (error) {
               );
 
               if (statusText)
-                statusText.innerText = `${translations.status}: ${activate ? translations.active : translations.hidden}`;
+                statusText.innerText = `${window.i18next.t("admin.status")}: ${activate ? window.i18next.t("admin.active") : window.i18next.t("admin.hidden")}`;
 
               if (statusButton) {
                 statusButton.setAttribute(
@@ -205,45 +185,62 @@ if (error) {
                 if (activate) {
                   statusButton.classList.remove("admin-restore-btn");
                   statusButton.classList.add("admin-delete-btn");
-                  statusButton.innerText = `🗑️ ${translations.hide}`;
+                  statusButton.innerText = `🗑️ ${window.i18next.t("admin.hide")}`;
                 } else {
                   statusButton.classList.remove("admin-delete-btn");
                   statusButton.classList.add("admin-restore-btn");
-                  statusButton.innerText = `♻️ ${translations.restore}`;
+                  statusButton.innerText = `♻️ ${window.i18next.t("admin.restore")}`;
                 }
               }
+              
+              // עדכון שקיפות הכרטיס
+              propertyCard.style.opacity = activate ? "1" : "0.5";
             }
           } else {
             if (result.status === 403) window.location.href = "/admin/login";
-            else alert("❌ שגיאה: " + result.message);
+            else alert(window.i18next.t("common.errors.unknownError") + ": " + result.message);
           }
         } catch (err) {
           if (loadingSpinner) loadingSpinner.style.display = "none";
           console.error(err);
-          alert("❌ שגיאה בחיבור לשרת");
+          alert(window.i18next.t("common.errors.connectionError"));
         }
       }
 
-      // יציאה מהמערכת
-      document.getElementById("logout-btn").addEventListener("click", () => {
-        sessionStorage.removeItem("sb-session");
-        window.location.href = "/admin/login";
-      });
+      // פונקציה לאתחול הדשבורד
+      function initDashboard() {
+        const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
 
-      // חיבור כפתורים לפונקציה
-      document
-        .querySelectorAll(".admin-delete-btn, .admin-restore-btn")
-        .forEach((button) => {
-          button.addEventListener("click", () => {
-            const id = button.getAttribute("data-id");
-            const activate = button.getAttribute("data-activate") === "true";
-            toggleProperty(id, activate);
+        // בדיקת הרשאות מנהל
+        if (!session.access_token) {
+          alert(window.i18next.t("admin.noPermission"));
+          window.location.href = "/admin/login";
+          return;
+        }
+
+        // יציאה מהמערכת
+        const logoutBtn = document.getElementById("logout-btn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", () => {
+            sessionStorage.removeItem("sb-session");
+            window.location.href = "/admin/login";
           });
-        });
+        }
 
-        // הפעלת הדשבורד
-        initDashboard();
+        // חיבור כפתורים לפונקציה
+        document
+          .querySelectorAll(".admin-delete-btn, .admin-restore-btn")
+          .forEach((button) => {
+            button.addEventListener("click", () => {
+              const id = button.getAttribute("data-id");
+              const activate = button.getAttribute("data-activate") === "true";
+              toggleProperty(id, activate);
+            });
+          });
       }
+
+      // הפעלת הדשבורד כשהדף נטען
+      document.addEventListener("DOMContentLoaded", initDashboard);
     </script>
   </body>
 </html>

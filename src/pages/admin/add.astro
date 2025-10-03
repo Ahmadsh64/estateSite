@@ -10,6 +10,7 @@ import i18next from '../../i18n.js';
     <title>➕ {i18next.t("admin.addNewProperty")}</title>
     <link rel="stylesheet" href="/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/js/i18n.js" is:inline></script>
   </head>
   <body dir="rtl">
     <header class="admin-header">
@@ -290,25 +291,24 @@ import i18next from '../../i18n.js';
 
 
     <script type="module">
+      // שימוש ב-i18n שכבר מאותחל בצד השרת
+      // @ts-ignore
+      const i18next = window.i18next || {
+        t: (key) => key // fallback אם i18n לא זמין
+      };
+
       // בדיקת הרשאות מנהל
       const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
+      console.log("Session data:", session);
       if (!session.access_token) {
-        alert(i18next.t("admin.noPermission"));
+        console.log("No access token found, redirecting to login");
+        alert(window.i18next.t("admin.noPermission"));
         window.location.href = "/admin/login";
+      } else {
+        console.log("Access token found:", session.access_token.substring(0, 20) + "...");
       }
 
-      // תרגומים זמניים לצד הלקוח
-      const translations = {
-        noPermission: "❌ אין הרשאה – אנא התחבר מחדש",
-        connectionError: "❌ שגיאה בחיבור לשרת",
-        successPropertyAdded: "✅ הדירה נוספה בהצלחה!",
-        errorFileType: "❌ סוג קובץ לא נתמך עבור",
-        onlyImagesSupported: "רק תמונות נתמכות",
-        error: "❌ שגיאה:",
-        fillAllFields: "אנא מלא את כל השדות הנדרשים",
-        invalidPhone: "מספר טלפון לא תקין",
-        invalidWhatsApp: "מספר WhatsApp לא תקין"
-      };
+      // שימוש בתרגומים מ-i18n הגלובלי
 
       const form = document.getElementById("admin-add-form");
       const msg = document.getElementById("admin-add-message");
@@ -397,7 +397,7 @@ import i18next from '../../i18n.js';
         const requiredFields = ["title", "price", "city", "description"];
         for (const field of requiredFields) {
           if (!form[field].value.trim()) {
-            showError(translations.fillAllFields);
+            showError(window.i18next.t("common.errors.fillAllFieldsRequired"));
             form[field].focus();
             return;
           }
@@ -405,24 +405,24 @@ import i18next from '../../i18n.js';
 
         // בדיקת תמונות
         if (fileInput.files.length === 0) {
-          showError("אנא בחר לפחות תמונה אחת");
+          showError(window.i18next.t("property.selectAtLeastOneImage"));
           return;
         }
 
         // בדיקת תקינות טלפון
         if (form.phone.value && !validatePhone(form.phone.value)) {
-          showError(translations.invalidPhone);
+          showError(window.i18next.t("common.errors.invalidPhone"));
           form.phone.focus();
           return;
         }
 
         if (form.whatsapp.value && !validatePhone(form.whatsapp.value)) {
-          showError(translations.invalidWhatsApp);
+          showError(window.i18next.t("common.errors.invalidPhone"));
           form.whatsapp.focus();
           return;
         }
 
-        showLoading("שולח נתונים...");
+        showLoading(window.i18next.t("common.messages.sendingData"));
 
         const formData = new FormData(form);
 
@@ -448,7 +448,7 @@ import i18next from '../../i18n.js';
 
         for (const file of files) {
           if (!allowedMimeTypes.includes(file.type)) {
-            showError(`${translations.errorFileType} ${file.name}. ${translations.onlyImagesSupported}`);
+            showError(`${window.i18next.t("admin.errorFileType")} ${file.name}. ${window.i18next.t("admin.onlyImagesSupported")}`);
             return;
           }
         }
@@ -456,7 +456,7 @@ import i18next from '../../i18n.js';
         // קבלת הטוקן מה-sessionStorage
         const session = sessionStorage.getItem("sb-session");
         if (!session) {
-          showError(translations.noPermission);
+          showError(window.i18next.t("admin.noPermission"));
           setTimeout(() => {
             window.location.href = "/admin/login";
           }, 3000);
@@ -466,6 +466,7 @@ import i18next from '../../i18n.js';
         const token = JSON.parse(session).access_token;
 
         try {
+          console.log("Sending request to /api/add-property with token:", token.substring(0, 20) + "...");
           const res = await fetch("/api/add-property", {
             method: "POST",
             headers: {
@@ -474,16 +475,18 @@ import i18next from '../../i18n.js';
             body: formData,
           });
 
+          console.log("Response status:", res.status);
           const result = await res.json();
+          console.log("Response result:", result);
 
           if (result.success) {
-            showSuccess(translations.successPropertyAdded);
+            showSuccess(window.i18next.t("common.success.propertyAdded"));
             form.reset();
             filePreview.innerHTML = "";
             // גלילה למעלה
             window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
-            showError(`${translations.error} ${result.message}`);
+            showError(`${window.i18next.t("common.errors.error")} ${result.message}`);
             if (res.status === 403) {
               setTimeout(() => {
                 window.location.href = "/admin/login";
@@ -492,7 +495,7 @@ import i18next from '../../i18n.js';
           }
         } catch (err) {
           console.error(err);
-          showError(translations.connectionError);
+          showError(window.i18next.t("common.errors.connectionError"));
         }
       });
     </script>
