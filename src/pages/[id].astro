@@ -245,7 +245,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
               
               <!-- טופס יצירת קשר -->
               <div class="contact-form-card">
-                <h3 class="contact-form-title">אני רוצה להתארח כאן</h3>
+                <h3 class="contact-form-title">{i18next.t("property.contactForm")}</h3>
                 <form id="sidebarContactForm" class="sidebar-contact-form">
                   <!-- Hidden fields for property data -->
                   <input type="hidden" name="propertyId" value={property.id}>
@@ -253,46 +253,46 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
                   <input type="hidden" name="propertyPrice" value={property.price}>
                   
                   <div class="form-group">
-                    <label for="full-name-sidebar">שם מלא</label>
+                    <label for="full-name-sidebar">{i18next.t("property.fullName")}</label>
                     <input type="text" id="full-name-sidebar" name="full-name" placeholder={i18next.t("property.enterFullName")} required>
                   </div>
 
                   <div class="form-group">
-                    <label for="email-sidebar">כתובת דואר אלקטרוני</label>
+                    <label for="email-sidebar">{i18next.t("property.email")}</label>
                     <input type="email" id="email-sidebar" name="email" placeholder={i18next.t("property.enterEmail")} required>
                   </div>
 
                   <div class="form-group">
-                    <label for="phone-sidebar">מספר טלפון</label>
+                    <label for="phone-sidebar">{i18next.t("property.call")}</label>
                     <input type="tel" id="phone-sidebar" name="phone" placeholder={i18next.t("property.enterPhone")} required>
                   </div>
 
                   <div class="form-group">
-                    <label for="guests-sidebar">בחירת הרכב</label>
+                    <label for="guests-sidebar">{i18next.t("property.selectGuests")}</label>
                     <select id="guests-sidebar" name="guests">
-                      <option value="1">1 נופש</option>
-                      <option value="2" selected>2 נופשים</option>
-                      <option value="3">3 נופשים</option>
-                      <option value="4">4 נופשים</option>
-                      <option value="5">5 נופשים</option>
-                      <option value="6">6 נופשים</option>
-                      <option value="7">7 נופשים</option>
-                      <option value="8">8 נופשים</option>
+                      <option value="1">1 {i18next.t("property.guest")}</option>
+                      <option value="2" selected>2 {i18next.t("property.guests")}</option>
+                      <option value="3">3 {i18next.t("property.guests")}</option>
+                      <option value="4">4 {i18next.t("property.guests")}</option>
+                      <option value="5">5 {i18next.t("property.guests")}</option>
+                      <option value="6">6 {i18next.t("property.guests")}</option>
+                      <option value="7">7 {i18next.t("property.guests")}</option>
+                      <option value="8">8 {i18next.t("property.guests")}</option>
                     </select>
                   </div>
 
                   <div class="form-group">
-                    <label for="checkin-sidebar">צ'ק-אין</label>
+                    <label for="checkin-sidebar">{i18next.t("property.checkintime")}</label>
                     <input type="date" id="checkin-sidebar" name="checkin" required>
                   </div>
 
                   <div class="form-group">
-                    <label for="checkout-sidebar">צ'ק-אאוט</label>
+                    <label for="checkout-sidebar">{i18next.t("property.checkouttime")}</label>
                     <input type="date" id="checkout-sidebar" name="checkout" required>
                   </div>
 
                   <div class="form-group">
-                    <label for="special-requests-sidebar">בקשות מיוחדות</label>
+                    <label for="special-requests-sidebar">{i18next.t("property.specialRequests")}</label>
                     <textarea id="special-requests-sidebar" name="special-requests" placeholder={i18next.t("property.specialRequestsPlaceholder")} rows="3"></textarea>
                   </div>
 
@@ -300,11 +300,11 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
                     <label class="checkbox-label">
                       <input type="checkbox" id="offers-sidebar" name="offers">
                       <span class="checkmark"></span>
-                      מעוניין לקבל מבצעים בדואר אלקטרוני
+                      {i18next.t("property.receiveOffers")}
                     </label>
                   </div>
 
-                  <button type="submit" class="submit-btn-sidebar">חזרו אלי</button>
+                  <button type="submit" class="submit-btn-sidebar">{i18next.t("property.submitButton")}</button>
                 </form>
               </div>
             </div>
@@ -557,7 +557,7 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
             // הצגת אינדיקטור טעינה
             const submitBtn = sidebarContactForm.querySelector('.submit-btn-sidebar');
             const originalBtnText = submitBtn.textContent;
-            submitBtn.textContent = 'שולח...';
+            submitBtn.textContent = window.i18next.t("property.sendingData");
             submitBtn.disabled = true;
             
             try {
@@ -579,19 +579,19 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
               
               if (result.success) {
                 // הודעת הצלחה
-                alert(result.message || "תודה! בקשתך נשלחה בהצלחה. נחזור אליך בהקדם.");
+                alert(result.message || window.i18next.t("common.messages.thankYou"));
                 sidebarContactForm.reset();
                 
                 // אפשרות להפניה לדף תודה או סגירת מודאל
                 // window.location.href = "/thank-you";
               } else {
                 // הודעת שגיאה
-                alert(result.message || "אירעה שגיאה בשליחת הבקשה. אנא נסה שוב.");
+                alert(result.message || window.i18next.t("common.errors.errorSendingRequest"));
               }
               
             } catch (error) {
               console.error("Error sending form:", error);
-              alert("אירעה שגיאה בחיבור לשרת. אנא נסה שוב מאוחר יותר.");
+              alert(window.i18next.t("common.errors.connectionError"));
             } finally {
               // החזרת כפתור למצב רגיל
               submitBtn.textContent = originalBtnText;

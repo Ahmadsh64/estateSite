@@ -168,7 +168,19 @@ export const POST: APIRoute = async ({ request }) => {
       has_grill: formData.get("has_grill") === "on",
       suitable_for: (() => {
         try {
-          return JSON.parse((formData.get("suitable_for") as string) || "[]");
+          const suitableForValue = formData.get("suitable_for") as string;
+          if (!suitableForValue) return [];
+          
+          // אם זה כבר מערך, החזר אותו
+          if (Array.isArray(suitableForValue)) return suitableForValue;
+          
+          // אם זה JSON string, פרסר אותו
+          if (suitableForValue.startsWith('[') || suitableForValue.startsWith('{')) {
+            return JSON.parse(suitableForValue);
+          }
+          
+          // אם זה string רגיל, החזר כמערך
+          return [suitableForValue];
         } catch (e) {
           console.error("Error parsing suitable_for:", e);
           return [];
@@ -176,7 +188,19 @@ export const POST: APIRoute = async ({ request }) => {
       })(),
       nearby: (() => {
         try {
-          return JSON.parse((formData.get("nearby") as string) || "[]");
+          const nearbyValue = formData.get("nearby") as string;
+          if (!nearbyValue) return [];
+          
+          // אם זה כבר מערך, החזר אותו
+          if (Array.isArray(nearbyValue)) return nearbyValue;
+          
+          // אם זה JSON string, פרסר אותו
+          if (nearbyValue.startsWith('[') || nearbyValue.startsWith('{')) {
+            return JSON.parse(nearbyValue);
+          }
+          
+          // אם זה string רגיל, החזר כמערך
+          return [nearbyValue];
         } catch (e) {
           console.error("Error parsing nearby:", e);
           return [];

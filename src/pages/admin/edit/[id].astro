@@ -261,6 +261,17 @@ const location = property.location || {};
       const formData = new FormData(form);
       formData.append("id", form.dataset.id);
 
+      // איסוף כל ה-checkboxes מסוג suitableFor ו-nearby כמערכים
+      const suitableFor = Array.from(
+        form.querySelectorAll('input[name="suitable_for"]:checked'),
+      ).map((cb) => cb.value);
+      const nearby = Array.from(
+        form.querySelectorAll('input[name="nearby"]:checked'),
+      ).map((cb) => cb.value);
+
+      formData.append("suitable_for", JSON.stringify(suitableFor));
+      formData.append("nearby", JSON.stringify(nearby));
+
       // צרף את התמונות הקיימות
       existingImages.forEach(src => formData.append("existingImages", src));
 
