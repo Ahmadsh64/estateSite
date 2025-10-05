@@ -1,0 +1,304 @@
+---
+import { supabase } from "../../lib/supabaseClient";
+import i18next from "../../i18n.js";
+
+// שליפת בקשות יצירת קשר
+let contactRequests: any[] = [];
+
+const { data, error } = await supabase
+  .from("contact_requests")
+  .select("*")
+  .order("created_at", { ascending: false });
+
+if (!error && data) {
+  contactRequests = data;
+} else {
+  console.error("Error fetching contact requests:", error);
+}
+---
+
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ניהול בקשות יצירת קשר</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/js/i18n.js" is:inline></script>
+  </head>
+  <body dir="rtl">
+    <header class="admin-header">
+      <div class="admin-header-content">
+        <h1 class="admin-title">
+          <span class="admin-icon">📧</span>
+          ניהול בקשות יצירת קשר
+        </h1>
+        <nav class="admin-nav">
+          <a href="/admin/dashboard" class="admin-nav-btn back-btn">
+            <span class="btn-icon">⬅️</span>
+            חזרה לדשבורד
+          </a>
+          <button id="logout-btn" class="admin-nav-btn logout-btn">
+            <span class="btn-icon">🚪</span>
+            יציאה
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <div class="admin-container">
+        <!-- סטטיסטיקות -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>סה"כ בקשות</h3>
+            <span class="stat-number">{contactRequests.length}</span>
+          </div>
+          <div class="stat-card">
+            <h3>בקשות ממתינות</h3>
+            <span class="stat-number">{contactRequests.filter(r => r.status === 'pending').length}</span>
+          </div>
+          <div class="stat-card">
+            <h3>נוצר קשר</h3>
+            <span class="stat-number">{contactRequests.filter(r => r.status === 'contacted').length}</span>
+          </div>
+          <div class="stat-card">
+            <h3>סגורות</h3>
+            <span class="stat-number">{contactRequests.filter(r => r.status === 'closed').length}</span>
+          </div>
+        </div>
+
+        <!-- רשימת בקשות -->
+        <div class="contact-requests-list">
+          {contactRequests.length > 0 ? (
+            contactRequests.map((request) => (
+              <div class="contact-request-card" data-id={request.id} data-status={request.status}>
+                <div class="request-header">
+                  <div class="request-info">
+                    <h3 class="request-title">{request.property_title}</h3>
+                    <p class="request-client">
+                      <strong>{request.full_name}</strong> - {request.email}
+                    </p>
+                    <p class="request-dates">
+                      📅 {new Date(request.checkin_date).toLocaleDateString('he-IL')} - 
+                      {new Date(request.checkout_date).toLocaleDateString('he-IL')}
+                    </p>
+                    <p class="request-guests">
+                      👥 {request.guests} נופשים
+                    </p>
+                  </div>
+                  <div class="request-status">
+                    <span class={`status-badge status-${request.status}`}>
+                      {request.status === 'pending' ? 'ממתין' : 
+                       request.status === 'contacted' ? 'נוצר קשר' : 'סגור'}
+                    </span>
+                    <p class="request-date">
+                      {new Date(request.created_at).toLocaleDateString('he-IL')} 
+                      {new Date(request.created_at).toLocaleTimeString('he-IL')}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="request-details">
+                  <div class="detail-row">
+                    <strong>טלפון:</strong>
+                    <a href={`tel:${request.phone}`} class="contact-link">📞 {request.phone}</a>
+                  </div>
+                  {request.special_requests && (
+                    <div class="detail-row">
+                      <strong>בקשות מיוחדות:</strong>
+                      <p class="special-requests">{request.special_requests}</p>
+                    </div>
+                  )}
+                  <div class="detail-row">
+                    <strong>מחיר הנכס:</strong>
+                    <span>{request.property_price.toLocaleString('he-IL')} ₪</span>
+                  </div>
+                </div>
+
+                <div class="request-actions">
+                  <a href={`tel:${request.phone}`} class="action-btn call-btn">
+                    📞 התקשר
+                  </a>
+                  <a href={`mailto:${request.email}?subject=בקשה לדירה: ${request.property_title}`} class="action-btn email-btn">
+                    📧 שלח אימייל
+                  </a>
+                  <a href={`https://wa.me/972${request.phone.replace(/^0/, '')}?text=שלום ${request.full_name}, אני מתקשר בנוגע לבקשה לדירה: ${request.property_title}`} 
+                     target="_blank" class="action-btn whatsapp-btn">
+                    💬 WhatsApp
+                  </a>
+                  
+                  {request.status === 'pending' && (
+                    <button class="action-btn mark-contacted-btn" data-id={request.id}>
+                      ✅ סמן כנוצר קשר
+                    </button>
+                  )}
+                  
+                  {request.status === 'contacted' && (
+                    <button class="action-btn mark-closed-btn" data-id={request.id}>
+                      🔒 סגור בקשה
+                    </button>
+                  )}
+                  
+                  <button class="action-btn delete-btn" data-id={request.id}>
+                    🗑️ מחק
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div class="no-requests">
+              <p>אין בקשות יצירת קשר כרגע</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+
+    <script type="module">
+      // בדיקת הרשאות מנהל
+      const session = JSON.parse(sessionStorage.getItem("sb-session") || "{}");
+      if (!session.access_token) {
+        alert("אין הרשאה - אנא התחבר מחדש");
+        window.location.href = "/admin/login";
+      }
+
+      // כפתור יציאה
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        sessionStorage.removeItem("sb-session");
+        window.location.href = "/admin/login";
+      });
+
+      // פונקציה לעדכון סטטוס בקשה
+      async function updateRequestStatus(requestId, newStatus) {
+        try {
+          console.log(`Updating request ${requestId} to status ${newStatus}`);
+          
+          if (!session.access_token) {
+            alert("אין הרשאה - אנא התחבר מחדש");
+            window.location.href = "/admin/login";
+            return;
+          }
+          
+          const response = await fetch("/api/contact-request", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              id: requestId,
+              status: newStatus
+            })
+          });
+
+          console.log(`Response status: ${response.status}`);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`HTTP error: ${response.status} - ${errorText}`);
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log("Update result:", result);
+          
+          if (result.success) {
+            // עדכון UI
+            const requestCard = document.querySelector(`[data-id="${requestId}"]`);
+            if (requestCard) {
+              requestCard.dataset.status = newStatus;
+              const statusBadge = requestCard.querySelector('.status-badge');
+              if (statusBadge) {
+                statusBadge.className = `status-badge status-${newStatus}`;
+                statusBadge.textContent = newStatus === 'pending' ? 'ממתין' : 
+                                         newStatus === 'contacted' ? 'נוצר קשר' : 'סגור';
+              }
+              
+              // עדכון כפתורים
+              const markBtn = requestCard.querySelector('.mark-contacted-btn, .mark-closed-btn');
+              if (markBtn) {
+                if (newStatus === 'contacted') {
+                  markBtn.textContent = '🔒 סגור בקשה';
+                  markBtn.className = 'action-btn mark-closed-btn';
+                } else if (newStatus === 'closed') {
+                  markBtn.remove();
+                }
+              }
+            }
+            
+            alert("הסטטוס עודכן בהצלחה!");
+          } else {
+            console.error("Update failed:", result.message);
+            alert("שגיאה בעדכון הסטטוס: " + result.message);
+          }
+        } catch (error) {
+          console.error("Error updating status:", error);
+          alert("שגיאה בעדכון הסטטוס: " + error.message);
+        }
+      }
+
+      // פונקציה למחיקת בקשה
+      async function deleteRequest(requestId) {
+        if (!confirm("האם אתה בטוח שברצונך למחוק את הבקשה?")) {
+          return;
+        }
+
+        try {
+          console.log(`Deleting request ${requestId}`);
+          
+          if (!session.access_token) {
+            alert("אין הרשאה - אנא התחבר מחדש");
+            window.location.href = "/admin/login";
+            return;
+          }
+          
+          const response = await fetch("/api/contact-request", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({ id: requestId })
+          });
+
+          console.log(`Response status: ${response.status}`);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`HTTP error: ${response.status} - ${errorText}`);
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log("Delete result:", result);
+          
+          if (result.success) {
+            // הסרת הקלף מהממשק
+            const requestCard = document.querySelector(`[data-id="${requestId}"]`);
+            if (requestCard) {
+              requestCard.remove();
+            }
+            alert("הבקשה נמחקה בהצלחה!");
+          } else {
+            console.error("Delete failed:", result.message);
+            alert("שגיאה במחיקת הבקשה: " + result.message);
+          }
+        } catch (error) {
+          console.error("Error deleting request:", error);
+          alert("שגיאה במחיקת הבקשה: " + error.message);
+        }
+      }
+
+      // חיבור אירועים לכפתורים
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("mark-contacted-btn")) {
+          updateRequestStatus(e.target.dataset.id, "contacted");
+        } else if (e.target.classList.contains("mark-closed-btn")) {
+          updateRequestStatus(e.target.dataset.id, "closed");
+        } else if (e.target.classList.contains("delete-btn")) {
+          deleteRequest(e.target.dataset.id);
+        }
+      });
+    </script>
+
+  </body>
+</html>

@@ -247,6 +247,11 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
               <div class="contact-form-card">
                 <h3 class="contact-form-title">אני רוצה להתארח כאן</h3>
                 <form id="sidebarContactForm" class="sidebar-contact-form">
+                  <!-- Hidden fields for property data -->
+                  <input type="hidden" name="propertyId" value={property.id}>
+                  <input type="hidden" name="propertyTitle" value={property.title}>
+                  <input type="hidden" name="propertyPrice" value={property.price}>
+                  
                   <div class="form-group">
                     <label for="full-name-sidebar">שם מלא</label>
                     <input type="text" id="full-name-sidebar" name="full-name" placeholder={i18next.t("property.enterFullName")} required>
@@ -549,25 +554,48 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
           sidebarContactForm.addEventListener("submit", async function(e) {
             e.preventDefault();
             
-            const formData = new FormData(sidebarContactForm);
-            const data = Object.fromEntries(formData.entries());
-            
-            // הוספת פרטי הנכס
-            data.propertyId = "{property.id}";
-            data.propertyTitle = "{property.title}";
-            data.propertyPrice = "{property.price}";
+            // הצגת אינדיקטור טעינה
+            const submitBtn = sidebarContactForm.querySelector('.submit-btn-sidebar');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'שולח...';
+            submitBtn.disabled = true;
             
             try {
-              // כאן תוכל להוסיף שליחה לשרת
-              console.log(i18next.t("common.success.formSubmitted"), data);
+              const formData = new FormData(sidebarContactForm);
               
-              // הודעת הצלחה
-              alert(i18next.t("common.messages.thankYou"));
-              sidebarContactForm.reset();
+              // Debug: הדפסת הנתונים שנשלחים
+              console.log("Sending form data:");
+              for (const [key, value] of formData) {
+                console.log(`${key}: ${value}`);
+              }
+              
+              // שליחה לשרת
+              const response = await fetch("/api/contact-request", {
+                method: "POST",
+                body: formData
+              });
+              
+              const result = await response.json();
+              
+              if (result.success) {
+                // הודעת הצלחה
+                alert(result.message || "תודה! בקשתך נשלחה בהצלחה. נחזור אליך בהקדם.");
+                sidebarContactForm.reset();
+                
+                // אפשרות להפניה לדף תודה או סגירת מודאל
+                // window.location.href = "/thank-you";
+              } else {
+                // הודעת שגיאה
+                alert(result.message || "אירעה שגיאה בשליחת הבקשה. אנא נסה שוב.");
+              }
               
             } catch (error) {
-              console.error(i18next.t("common.errors.errorSendingForm"), error);
-              alert(i18next.t("common.errors.errorSendingRequest"));
+              console.error("Error sending form:", error);
+              alert("אירעה שגיאה בחיבור לשרת. אנא נסה שוב מאוחר יותר.");
+            } finally {
+              // החזרת כפתור למצב רגיל
+              submitBtn.textContent = originalBtnText;
+              submitBtn.disabled = false;
             }
           });
         }
