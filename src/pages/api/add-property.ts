@@ -7,11 +7,6 @@ import { fileTypeFromBuffer } from 'file-type';
 import multer from 'multer';
 import { Readable } from 'stream';
 
-// Rate limiting - מניעת spam
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 דקה
-const RATE_LIMIT_MAX_REQUESTS = 5; // מקסימום 5 בקשות בדקה
-
 // הגדרות multer
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -41,32 +36,6 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     console.log("API: Starting add-property request");
-
-    // בדיקת Rate Limiting
-    const clientIP = request.headers.get("x-forwarded-for") || "unknown";
-    const currentTime = Date.now();
-    const clientData = rateLimitMap.get(clientIP);
-
-    if (clientData) {
-      if (currentTime - clientData.lastReset > RATE_LIMIT_WINDOW) {
-        clientData.count = 0;
-        clientData.lastReset = currentTime;
-      }
-
-      if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: "Too many requests. Please try again later.",
-        }), {
-          status: 429,
-          headers: { "Content-Type": "application/json" }
-        });
-      }
-
-      clientData.count++;
-    } else {
-      rateLimitMap.set(clientIP, { count: 1, lastReset: currentTime });
-    }
 
     // בדיקת גודל בקשה
     const contentLength = request.headers.get("content-length");
@@ -168,19 +137,7 @@ export const POST: APIRoute = async ({ request }) => {
       has_grill: formData.get("has_grill") === "on",
       suitable_for: (() => {
         try {
-          const suitableForValue = formData.get("suitable_for") as string;
-          if (!suitableForValue) return [];
-          
-          // אם זה כבר מערך, החזר אותו
-          if (Array.isArray(suitableForValue)) return suitableForValue;
-          
-          // אם זה JSON string, פרסר אותו
-          if (suitableForValue.startsWith('[') || suitableForValue.startsWith('{')) {
-            return JSON.parse(suitableForValue);
-          }
-          
-          // אם זה string רגיל, החזר כמערך
-          return [suitableForValue];
+          return JSON.parse((formData.get("suitable_for") as string) || "[]");
         } catch (e) {
           console.error("Error parsing suitable_for:", e);
           return [];
@@ -188,19 +145,7 @@ export const POST: APIRoute = async ({ request }) => {
       })(),
       nearby: (() => {
         try {
-          const nearbyValue = formData.get("nearby") as string;
-          if (!nearbyValue) return [];
-          
-          // אם זה כבר מערך, החזר אותו
-          if (Array.isArray(nearbyValue)) return nearbyValue;
-          
-          // אם זה JSON string, פרסר אותו
-          if (nearbyValue.startsWith('[') || nearbyValue.startsWith('{')) {
-            return JSON.parse(nearbyValue);
-          }
-          
-          // אם זה string רגיל, החזר כמערך
-          return [nearbyValue];
+          return JSON.parse((formData.get("nearby") as string) || "[]");
         } catch (e) {
           console.error("Error parsing nearby:", e);
           return [];

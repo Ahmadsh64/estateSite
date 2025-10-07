@@ -3,42 +3,11 @@ import type { Property } from "../../types/property";
 import { mapPropertyToDb } from "../../services/propertyMapper";
 import { fileTypeFromBuffer } from 'file-type';
 
-// Rate limiting - מניעת spam
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 דקה
-const RATE_LIMIT_MAX_REQUESTS = 5; // מקסימום 5 בקשות בדקה
-
 export async function POST({ request }: { request: Request }): Promise<Response> {
   const startTime = Date.now();
   const MAX_PROCESSING_TIME = 30000; // 30 שניות
   
   try {
-    // בדיקת Rate Limiting
-    const clientIP = request.headers.get("x-forwarded-for") || "unknown";
-    const currentTime = Date.now();
-    const clientData = rateLimitMap.get(clientIP);
-    
-    if (clientData) {
-      if (currentTime - clientData.lastReset > RATE_LIMIT_WINDOW) {
-        clientData.count = 0;
-        clientData.lastReset = currentTime;
-      }
-      
-      if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: "Too many requests. Please try again later.",
-        }), {
-          status: 429,
-          headers: { "Content-Type": "application/json" }
-        });
-      }
-      
-      clientData.count++;
-    } else {
-      rateLimitMap.set(clientIP, { count: 1, lastReset: currentTime });
-    }
-    
     // בדיקת גודל בקשה
     const contentLength = request.headers.get("content-length");
     const MAX_REQUEST_SIZE = 100 * 1024 * 1024; // 100MB
