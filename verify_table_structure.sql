@@ -60,3 +60,4 @@ SELECT
     COUNT(guests) as has_guests,
     COUNT(contacted) as has_contacted_status
 FROM contact_requests;
+

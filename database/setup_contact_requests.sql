@@ -85,3 +85,4 @@ GRANT ALL ON contact_requests TO authenticated;
 -- ✅ סיום! הטבלה מוכנה לשימוש
 -- בדיקה מהירה:
 -- SELECT COUNT(*) FROM contact_requests;
+
