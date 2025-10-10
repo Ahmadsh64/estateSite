@@ -21,6 +21,7 @@ export async function POST({ request }: { request: Request }): Promise<Response>
       });
     }
     
+    
     // --- Authorization ---
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
