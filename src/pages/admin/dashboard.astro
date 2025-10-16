@@ -33,14 +33,14 @@ if (error) {
     beds: p.beds,
     bathrooms: p.bathrooms,
     kitchen: p.kitchen,
-    washingMachine: p.washingMachine,
+    washingmachine: p.washingmachine,
     wifi: p.wifi,
     tv: p.tv,
-    publicTransportNearby: p.publicTransportNearby,
+    publictransportnearby: p.publictransportnearby,
     parking: p.parking,
-    checkInTime: p.checkInTime,
-    checkOutTime: p.checkOutTime,
-    minStayDays: p.minStayDays,
+    checkInTime: p.checkintime,
+    checkOutTime: p.checkouttime,
+    minStayDays: p.minstaydays,
     type: p.type,
     description: p.description,
     is_active: p.is_active ?? true,
@@ -58,13 +58,34 @@ if (error) {
   </head>
   <body dir="rtl">
     <header class="admin-header">
-      <h1 class="admin-title">{i18next.t("admin.propertyManagement")}</h1>
-      <nav class="admin-nav">
-        <a href="/admin/add" class="admin-add-btn">➕ {i18next.t("admin.addNewProperty")}</a>
-        <a href="/admin/contact-requests" class="admin-contact-btn">📧 בקשות יצירת קשר</a>
-        <a href="/" class="admin-home-btn">🏠 {i18next.t("admin.backToHome")}</a>
-        <button id="logout-btn" class="admin-logout-btn">🚪 {i18next.t("admin.logout")}</button>
-      </nav>
+      <div class="logo">
+        <img src="/images/logo.png" alt={i18next.t("property.title")} />
+        <span>{i18next.t("property.title")}</span>
+      </div>
+      <div class="admin-header-content">
+        <h1 class="admin-title">
+          <span class="admin-icon">🏘️</span>
+          {i18next.t("admin.propertyManagement")}
+        </h1>
+        <nav class="admin-nav">
+          <a href="/admin/add" class="admin-nav-btn add-btn">
+            <span class="btn-icon">➕</span>
+            {i18next.t("admin.addNewProperty")}
+          </a>
+          <a href="/admin/contact-requests" class="admin-nav-btn contact-btn">
+            <span class="btn-icon">📧</span>
+            בקשות יצירת קשר
+          </a>
+          <a href="/" class="admin-nav-btn home-btn">
+            <span class="btn-icon">🏠</span>
+            {i18next.t("admin.backToHome")}
+          </a>
+          <button id="logout-btn" class="admin-nav-btn logout-btn">
+            <span class="btn-icon">🚪</span>
+            {i18next.t("admin.logout")}
+          </button>
+        </nav>
+      </div>
     </header>
 
     <main class="admin-main">

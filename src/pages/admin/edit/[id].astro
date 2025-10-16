@@ -33,10 +33,27 @@ const location = property.location || {};
     <script src="/js/i18n.js" is:inline></script>
   </head>
 <body dir="rtl">
-  <header class="edit-property-header">
-    <h1>{i18next.t("admin.editProperty", { propertyTitle: property.title })}</h1>
-    <a href="/admin/dashboard" class="edit-property-back">⬅️ {i18next.t("admin.backToDashboard")}</a>
-    <button id="logout-btn">🚪 {i18next.t("admin.logout")}</button>
+  <header class="admin-header">
+    <div class="logo">
+      <img src="/images/logo.png" alt={i18next.t("property.title")} />
+      <span>{i18next.t("property.title")}</span>
+    </div>
+    <div class="admin-header-content">
+      <h1 class="admin-title">
+        <span class="admin-icon">✏️</span>
+        {i18next.t("admin.editProperty", { propertyTitle: property.title })}
+      </h1>
+      <nav class="admin-nav">
+        <a href="/admin/dashboard" class="admin-nav-btn back-btn">
+          <span class="btn-icon">⬅️</span>
+          {i18next.t("admin.backToDashboard")}
+        </a>
+        <button id="logout-btn" class="admin-nav-btn logout-btn">
+          <span class="btn-icon">🚪</span>
+          {i18next.t("admin.logout")}
+        </button>
+      </nav>
+    </div>
   </header>
 
   <main class="edit-property-main">
@@ -97,14 +114,14 @@ const location = property.location || {};
       <!-- מתקנים -->
       <label>{i18next.t("admin.kitchen")}</label>
       <input type="checkbox" name="kitchen" checked={property.kitchen || false} />
-      <label>{i18next.t("admin.washingMachine")}</label>
-      <input type="checkbox" name="washingMachine" checked={property.washingMachine || false} />
+      <label>{i18next.t("admin.washingmachine")}</label>
+      <input type="checkbox" name="washingmachine" checked={property.washingmachine || false} />
       <label>{i18next.t("admin.wifi")}</label>
       <input type="checkbox" name="wifi" checked={property.wifi || false} />
       <label>{i18next.t("admin.tv")}</label>
       <input type="checkbox" name="tv" checked={property.tv || false} />
-      <label>{i18next.t("admin.publicTransportNearby")}</label>
-      <input type="checkbox" name="publicTransportNearby" checked={property.publicTransportNearby || false} />
+      <label>{i18next.t("admin.publictransportnearby")}</label>
+      <input type="checkbox" name="publictransportnearby" checked={property.publictransportnearby || false} />
       <label>{i18next.t("admin.parking")}</label>
       <input type="checkbox" name="parking" checked={property.parking || false} />
 

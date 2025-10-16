@@ -24,9 +24,9 @@ export interface Property {
   tv?: boolean;
   publictransportnearby?: boolean;
   parking?: boolean;
-  checkintime?: string;
-  checkouttime?: string;
-  minstaydays?: number;
+  checkInTime?: string;
+  checkOutTime?: string;
+  minStayDays?: number;
   type?: string;
   has_pool?: boolean;             // בריכה
   has_private_pool?: boolean;      // בריכה פרטית

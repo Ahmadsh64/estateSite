@@ -13,6 +13,10 @@ import i18next from '../../i18n.js';
   </head>
   <body dir="rtl">
     <header class="admin-header">
+      <div class="logo">
+        <img src="/images/logo.png" alt={i18next.t("property.title")} />
+        <span>{i18next.t("property.title")}</span>
+      </div>
       <div class="admin-header-content">
         <h1 class="admin-title">
           <span class="admin-icon">➕</span>
@@ -222,8 +226,8 @@ import i18next from '../../i18n.js';
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="minstaydays">{i18next.t("admin.minstaydays")}</label>
-              <input type="number" id="minstaydays" name="minstaydays" class="form-input" min="1" placeholder="1" />
+              <label class="form-label" for="minStayDays">{i18next.t("admin.minStayDays")}</label>
+              <input type="number" id="minStayDays" name="minStayDays" class="form-input" min="1" placeholder="1" />
             </div>
           </div>
 

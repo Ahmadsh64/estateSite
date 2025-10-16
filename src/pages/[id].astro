@@ -41,8 +41,27 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body dir="rtl">
-    <header class="detail-header">
-      <a href="/" class="detail-back-btn">⬅ {i18next.t("property.backToList")}</a>
+    <header class="main-header property-header">
+      <div class="header-container">
+        <a href="/admin/login" class="admin-btn admin-btn-left">
+          <span class="btn-icon">🔐</span>
+          {i18next.t("admin.login")}
+        </a>
+        <nav class="main-nav">
+          <a href="/" class="nav-btn">
+            <span class="btn-icon">⬅️</span>
+            {i18next.t("property.backToList")}
+          </a>
+          <a href="/#contact" class="nav-btn">
+            <span class="btn-icon">📞</span>
+            {i18next.t("property.contact")}
+          </a>
+        </nav>
+        <div class="logo">
+          <img src="/images/logo.png" alt={i18next.t("property.title")} />
+          <span class="logo-text">{i18next.t("property.title")}</span>
+        </div>
+      </div>
     </header>
 
     <main class="detail-container-fullwidth">
@@ -181,11 +200,11 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
                     <div class="stay-details-grid">
                       <div class="stay-detail-item">
                         <span class="stay-detail-label">{i18next.t("property.checkInTime")}:</span>
-                        <span class="stay-detail-value">{property.checkintime || i18next.t("common.notSpecified")}</span>
+                        <span class="stay-detail-value">{property.checkInTime || i18next.t("common.notSpecified")}</span>
                       </div>
                       <div class="stay-detail-item">
                         <span class="stay-detail-label">{i18next.t("property.checkOutTime")}:</span>
-                        <span class="stay-detail-value">{property.checkouttime || i18next.t("common.notSpecified")}</span>
+                        <span class="stay-detail-value">{property.checkOutTime || i18next.t("common.notSpecified")}</span>
                       </div>
                       <div class="stay-detail-item">
                         <span class="stay-detail-label">{i18next.t("property.minimumNights")}:</span>

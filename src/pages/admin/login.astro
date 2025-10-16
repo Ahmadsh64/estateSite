@@ -9,8 +9,26 @@ import i18next from '../../i18n.js';
   <script src="/js/i18n.js" is:inline></script>
 </head>
 <body dir="rtl">
+  <header class="main-header">
+    <div class="header-container">
+      <nav class="main-nav">
+        <a href="/" class="nav-btn">
+          <span class="btn-icon">🏠</span>
+          {i18next.t("admin.backToHome")}
+        </a>
+      </nav>
+      <div class="logo">
+        <img src="/images/logo.png" alt={i18next.t("property.title")} />
+        <span class="logo-text">{i18next.t("property.title")}</span>
+      </div>
+    </div>
+  </header>
+
   <main style="max-width:400px; margin:auto; padding:2rem; text-align:center;">
-    <h1>🔑 {i18next.t("admin.login")}</h1>
+    <h1 style="display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+      <span>🔑</span>
+      {i18next.t("admin.login")}
+    </h1>
     <form id="loginForm">
       <div style="margin:1rem 0;">
         <label>{i18next.t("admin.email")}</label><br/>
@@ -27,11 +45,9 @@ import i18next from '../../i18n.js';
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/js/supabase-config.js';
 
-  const supabase = createClient(
-    'https://exnsylhgwjvpphistxqz.supabase.co', 
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4bnN5bGhnd2p2cHBoaXN0eHF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMjE5OTYsImV4cCI6MjA3MTc5Nzk5Nn0.AsiFY7yVDlJqou7naHbqLMS75AqNJlE5JNpC3hmnsLc'
-  );
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
   const form = document.getElementById('loginForm');
