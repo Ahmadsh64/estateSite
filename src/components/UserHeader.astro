@@ -1,0 +1,53 @@
+---
+import i18next from '../i18n.js';
+
+export interface Props {
+  showAdminBtn?: boolean;
+  showBackBtn?: boolean;
+  showContactBtn?: boolean;
+}
+
+const { 
+  showAdminBtn = true, 
+  showBackBtn = false, 
+  showContactBtn = false 
+} = Astro.props;
+---
+
+<header class="main-header">
+  <div class="header-container">
+    {showAdminBtn && (
+      <a href="/admin/login" class="admin-btn admin-btn-left">
+        <span class="btn-icon">🔐</span>
+        {i18next.t("admin.login")}
+      </a>
+    )}
+    <nav class="main-nav">
+      {showBackBtn && (
+        <a href="/" class="nav-btn">
+          <span class="btn-icon">⬅️</span>
+          {i18next.t("property.backToList")}
+        </a>
+      )}
+      {showContactBtn && (
+        <a href="/#contact" class="nav-btn">
+          <span class="btn-icon">📞</span>
+          {i18next.t("property.contact")}
+        </a>
+      )}
+      <!-- כפתורים לסוגי נכסים -->
+      <a href="/" class="filter-btn">{i18next.t("search.apartments")}</a>
+      <a href="/?type=בית" class="filter-btn">{i18next.t("search.houses")}</a>
+      <a href="/?type=צימר" class="filter-btn">{i18next.t("search.cabins")}</a>
+      <a href="/?type=וילה" class="filter-btn">{i18next.t("search.villas")}</a>
+      <a href="/?type=מלון" class="filter-btn">{i18next.t("search.hotels")}</a>
+      <a href="/?type=אטרקציה" class="filter-btn">{i18next.t("search.attractions")}</a>
+      <a href="/?type=קמפינג" class="filter-btn">{i18next.t("search.camping")}</a>
+    </nav>
+    <div class="logo">
+      <img src="/images/logo.png" alt={i18next.t("property.title")} />
+      <span class="logo-text">{i18next.t("property.title")}</span>
+    </div>
+  </div>
+</header>
+

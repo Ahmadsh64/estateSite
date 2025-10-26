@@ -86,3 +86,4 @@ GRANT ALL ON contact_requests TO authenticated;
 -- בדיקה מהירה:
 -- SELECT COUNT(*) FROM contact_requests;
 
+

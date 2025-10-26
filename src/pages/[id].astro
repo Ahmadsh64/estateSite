@@ -3,6 +3,8 @@ import i18next from "../i18n.js";
 import { supabase } from "../lib/supabaseClient";
 import type { Property } from "../types/property";  // ייבוא טיפוס Property
 import { mapDbToProperty } from "../services/propertyMapper";  // ייבוא פונקציית המרה
+import BaseLayout from "../layouts/BaseLayout.astro";
+import UserHeader from "../components/UserHeader.astro";
 
 // פונקציה עזר להוספת קידומת מדינה
 function formatPhoneNumber(phone: string | undefined): string {
@@ -34,35 +36,13 @@ if (data) {
 const images = property ? (Array.isArray(property.images) ? property.images : [property.images]) : [];
 ---
 
-<html lang="he">
-  <head>
-    <meta charset="UTF-8" />
-    <title>{property ? property.title : i18next.t("property.notFound")}</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body dir="rtl">
-    <header class="main-header property-header">
-      <div class="header-container">
-        <a href="/admin/login" class="admin-btn admin-btn-left">
-          <span class="btn-icon">🔐</span>
-          {i18next.t("admin.login")}
-        </a>
-        <nav class="main-nav">
-          <a href="/" class="nav-btn">
-            <span class="btn-icon">⬅️</span>
-            {i18next.t("property.backToList")}
-          </a>
-          <a href="/#contact" class="nav-btn">
-            <span class="btn-icon">📞</span>
-            {i18next.t("property.contact")}
-          </a>
-        </nav>
-        <div class="logo">
-          <img src="/images/logo.png" alt={i18next.t("property.title")} />
-          <span class="logo-text">{i18next.t("property.title")}</span>
-        </div>
-      </div>
-    </header>
+<!-- 
+  הוצאתי את ה-Header ל-UserHeader component
+  מ: שורה 37-65
+  עד: שורה 65
+-->
+<BaseLayout title={property ? property.title : i18next.t("property.notFound")}>
+  <UserHeader showBackBtn={true} showContactBtn={true} />
 
     <main class="detail-container-fullwidth">
       {property ? (
@@ -620,5 +600,4 @@ const images = property ? (Array.isArray(property.images) ? property.images : [p
         }
       });
     </script>
-  </body>
-</html>
+</BaseLayout>

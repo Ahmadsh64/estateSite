@@ -1,0 +1,66 @@
+---
+import type { Property } from '../types/property';
+import i18next from '../i18n.js';
+
+export interface Props {
+  property: Property;
+  showAdminActions?: boolean;
+}
+
+const { property, showAdminActions = false } = Astro.props;
+---
+
+<li class="home-property-item" data-property={JSON.stringify(property)}>
+  <a href={`/${property.id}`} class="home-property-link">
+    <div class="home-property-images">
+      <img
+        id={`main-image-${property.id}`}
+        loading="lazy"
+        src={property.images[0]}
+        alt={property.title}
+        class="property-main-image"
+      />
+    </div>
+
+    <div class="property-details">
+      <h2 class="home-property-title">{property.title}</h2>
+      <p class="home-property-price">
+        {i18next.t("property.price")}:{" "}
+        {property.price.toLocaleString("he-IL")}
+      </p>
+
+      <div class="home-property-info">
+        <p class="home-property-location">
+          {property.location?.city || ""} {property.location?.street || ""}{" "}
+          {property.location?.number || ""}
+          {property.location?.floor ? `, קומה ${property.location.floor}` : ""}
+        </p>
+
+        <p class="home-property-features">
+          {[
+            { label: "חדרים", value: property.bedrooms },
+            { label: "מיטות", value: property.beds },
+            { label: "חדרי אמבטיה", value: property.bathrooms },
+            { label: "נפשות מקסימום", value: property.occupancy },
+          ].map((feature, i) => (
+            <span class="property-feature">
+              {feature.label}: {feature.value} {i < 8 ? "| " : ""}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      <hr class="property-divider" />
+
+      <div class="home-property-amenities">
+        {property.kitchen && <span class="amenity">🍳 {i18next.t("property.kitchen")}</span>}
+        {property.washingmachine && <span class="amenity">🧺 {i18next.t("property.washingMachine")}</span>}
+        {property.wifi && <span class="amenity">📶 {i18next.t("property.wifi")}</span>}
+        {property.tv && <span class="amenity">📺 {i18next.t("property.tv")}</span>}
+        {property.parking && <span class="amenity">🚗 {i18next.t("property.parking")}</span>}
+        {property.publictransportnearby && <span class="amenity">🚌 {i18next.t("property.publicTransport")}</span>}
+      </div>
+    </div>
+  </a>
+</li>
+
