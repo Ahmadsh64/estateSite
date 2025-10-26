@@ -125,6 +125,7 @@ const upload = multer({
  * @param {string} property.whatsapp - WhatsApp number
  * @returns {Object} - Property object flattened to database format with location fields at top level
  */
+
 function mapPropertyToDb(property) {
   return {
     id: property.id,
